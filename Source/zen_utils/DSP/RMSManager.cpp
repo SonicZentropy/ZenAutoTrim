@@ -59,7 +59,7 @@ void RMSManager::processSamples(const float* inSamplesL, const float* inSamplesR
 			{
 				maxFoundRMS = foundRMS;
 				//double rmsInDecibels = Decibels::gainToDecibels<double>(maxFoundRMS);
-				//DBG("Ne max RMS found: " + String(rmsInDecibels));
+				//DBG("New max RMS found: " + String(rmsInDecibels));
 			}
 			numSamplesCalculated = 0;
 			sumOfSamples = 0;
