@@ -79,7 +79,9 @@ public:
 
 private:
 	//size of the averaging window. VU = 300, PPM = 10, etc
-	unsigned int windowSize = 300; 
+	unsigned int windowSizeInMS = 300; 
+	unsigned int sampleRate = 44100;
+	unsigned int samplesPerWindow = 0;
 	unsigned int numSamplesCalculated = 0;
 	double sumOfLeftSamples = 0;
 	double sumOfRightSamples = 0;
@@ -98,6 +100,10 @@ private:
 	double leftRunningRMS = 0, leftRunningRMSSum = 0;
 	double rightRunningRMS = 0, rightRunningRMSSum = 0;
 	unsigned int countTotalRunningSamples = 0;
+
+	double prevLeftBuffer[256] = {0};
+	double prevRightBuffer[256] = {0};
+//#Todo: Implement prevBuffer for running RMS sum
 
 
 	

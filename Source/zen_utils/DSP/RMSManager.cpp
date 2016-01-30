@@ -17,7 +17,7 @@
 
 RMSManager::RMSManager()
 {
-
+	samplesPerWindow = 13230;
 }
 
 RMSManager::~RMSManager()
@@ -27,6 +27,7 @@ RMSManager::~RMSManager()
 
 void RMSManager::processSamples(const float* inSamplesL, const float* inSamplesR, const unsigned int numIncomingSamples, const unsigned int numChannels)
 {
+	DBG("Incoming samples: " + String(numIncomingSamples) + " numSampCalc: " + String(numSamplesCalculated) + " TotalSamp: " + String(countTotalRunningSamples));
 	for (unsigned int i = 0; i < numIncomingSamples; ++i) // Loops over all samples
 	{
 		if (inSamplesL[i] == 0.0f && inSamplesR[i] == 0.0f)
@@ -42,7 +43,7 @@ void RMSManager::processSamples(const float* inSamplesL, const float* inSamplesR
 		leftPeakSample = (fabs(inSamplesL[i]) > leftPeakSample) ? fabs(inSamplesL[i]) : leftPeakSample;
 		rightPeakSample = (fabs(inSamplesR[i]) > rightPeakSample) ? fabs(inSamplesR[i]) : rightPeakSample;
 
-		if (numSamplesCalculated < windowSize) // We're still in window block
+		if (numSamplesCalculated < samplesPerWindow) // We're still in window block
 		{
 			//sumOfSamples += sqrt((double)inSamplesL[i]* (double)inSamplesL[i] + (double)inSamplesR[i]* (double)inSamplesR[i]) ;
 			//double avgSample = (inSamplesL[i] + inSamplesR[i]) / 2;
@@ -56,11 +57,11 @@ void RMSManager::processSamples(const float* inSamplesL, const float* inSamplesR
 		}
 		else
 		{
-			jassert(numSamplesCalculated <= windowSize);
-			++numSamplesCalculated;
-			double foundLeftRMS = (sumOfLeftSamples / windowSize);
-			double foundRightRMS = (sumOfRightSamples / windowSize);
-			double foundRightRMS2 = (sqrt(sumOfRightSamples) / windowSize);
+			jassert(numSamplesCalculated == samplesPerWindow);
+			
+			double foundLeftRMS = (sumOfLeftSamples / samplesPerWindow);
+			double foundRightRMS = (sumOfRightSamples / samplesPerWindow);
+	
 
 			foundLeftRMS = sqrt(foundLeftRMS);
 			foundRightRMS = sqrt(foundRightRMS);
