@@ -12,6 +12,12 @@
 //  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
 ===============================================================================*/
 
+#pragma once
+#ifndef RMSMANAGER_H_INCLUDED
+#define RMSMANAGER_H_INCLUDED
+
+#include <JuceHeader.h>
+
 class RMSManager
 {
 public:
@@ -20,58 +26,82 @@ public:
 
 	void processSamples(const float* inSamplesL, const float* inSamplesR, const unsigned int numIncomingSamples, const unsigned int numChannels = 2);
 
-	double returnCurrentMax() const
-	{
-		return maxFoundRMS;
-	}
-
-	const double getAverageTotalRMS() const { return avgTotalRMS; }
-	const double getMaxFoundRMS() const { return maxFoundRMS; }
-
-
-	const double& getLeftAvgRms() const
+	const double getLeftAvgRms() const
 	{
 		return leftAvgRMS;
 	}
 
-	const double& getRightAvgRms() const
+	const double getRightAvgRms() const
 	{
 		return rightAvgRMS;
 	}
 
-	const double& getLeftMaxRms() const
+	const double getLeftMaxRms() const
 	{
 		return leftMaxRMS;
 	}
 
-	const double& getRightMaxRms() const
+	const double getRightMaxRms() const
 	{
 		return rightMaxRMS;
 	}
 
-	const double& getLeftPeak() const
+	const double getLeftPeak() const
 	{
-		return leftPeak;
+		return leftPeakSample;
 	}
 
-	const double& getRightPeak() const
+	const double getRightPeak() const
 	{
-		return rightPeak;
+		return rightPeakSample;
 	}
+
+	const double getLeftRunningRms() const
+	{
+		return leftRunningRMS;
+	}
+
+	const double getRightRunningRms() const
+	{
+		return rightRunningRMS;
+	}
+
+	const double getLeftCurrentRunningRms() const
+	{
+		return sqrt(leftRunningRMSSum / countTotalRunningSamples);
+	}
+
+	const double getRightCurrentRunningRms() const
+	{
+		return sqrt(rightRunningRMSSum / countTotalRunningSamples);
+	}
+
 
 private:
 	//size of the averaging window. VU = 300, PPM = 10, etc
 	unsigned int windowSize = 300; 
 	unsigned int numSamplesCalculated = 0;
-	double sumOfSamples = 0;
-	double sumOfSamplesSqrd = 0;
-	double maxFoundRMS = 0;
-	double collectedRMS = 0;
+	double sumOfLeftSamples = 0;
+	double sumOfRightSamples = 0;
+	double sumOfLeftSamplesSqrd = 0;
+	double sumOfRightSamplesSqrd = 0;
+	double leftMaxRMS = 0;
+	double leftAvgRMSSummed = 0;
+	double leftAvgRMS = 0;
+	double leftPeakSample = 0;
+	double rightMaxRMS = 0;
+	double rightAvgRMSSummed = 0;
+	double rightAvgRMS = 0;
+	double rightPeakSample = 0;
 	double numRMSBatchesCollected = 0;
-	double avgTotalRMS = 0;
 
-	double leftAvgRMS = 0, rightAvgRMS = 0, leftMaxRMS = 0, rightMaxRMS = 0, leftPeak = 0, rightPeak = 0;
+	double leftRunningRMS = 0, leftRunningRMSSum = 0;
+	double rightRunningRMS = 0, rightRunningRMSSum = 0;
+	unsigned int countTotalRunningSamples = 0;
 
-public:
+
+	
 
 };
+
+#endif // RMSMANAGER_H_INCLUDED

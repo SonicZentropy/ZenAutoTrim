@@ -96,6 +96,33 @@ NewComponent::NewComponent ()
     label10->setColour (TextEditor::textColourId, Colours::black);
     label10->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    addAndMakeVisible (maxBox = new TextEditor ("new text editor"));
+    maxBox->setMultiLine (false);
+    maxBox->setReturnKeyStartsNewLine (false);
+    maxBox->setReadOnly (false);
+    maxBox->setScrollbarsShown (true);
+    maxBox->setCaretVisible (true);
+    maxBox->setPopupMenuEnabled (true);
+    maxBox->setText (TRANS("MAX"));
+
+    addAndMakeVisible (peakBox = new TextEditor ("new text editor"));
+    peakBox->setMultiLine (false);
+    peakBox->setReturnKeyStartsNewLine (false);
+    peakBox->setReadOnly (false);
+    peakBox->setScrollbarsShown (true);
+    peakBox->setCaretVisible (true);
+    peakBox->setPopupMenuEnabled (true);
+    peakBox->setText (TRANS("PEAK"));
+
+    addAndMakeVisible (avgBox = new TextEditor ("new text editor"));
+    avgBox->setMultiLine (false);
+    avgBox->setReturnKeyStartsNewLine (false);
+    avgBox->setReadOnly (false);
+    avgBox->setScrollbarsShown (true);
+    avgBox->setCaretVisible (true);
+    avgBox->setPopupMenuEnabled (true);
+    avgBox->setText (TRANS("AVG"));
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -119,6 +146,9 @@ NewComponent::~NewComponent()
     label8 = nullptr;
     label9 = nullptr;
     label10 = nullptr;
+    maxBox = nullptr;
+    peakBox = nullptr;
+    avgBox = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -149,6 +179,9 @@ void NewComponent::resized()
     label8->setBounds (87, 42, 72, 24);
     label9->setBounds (87, 68, 72, 24);
     label10->setBounds (87, 94, 72, 24);
+    maxBox->setBounds (172, 68, 40, 24);
+    peakBox->setBounds (172, 96, 40, 24);
+    avgBox->setBounds (172, 40, 40, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -207,6 +240,18 @@ BEGIN_JUCER_METADATA
          edBkgCol="0" labelText="label text" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          bold="0" italic="0" justification="33"/>
+  <TEXTEDITOR name="new text editor" id="54d7b3e98994550c" memberName="maxBox"
+              virtualName="" explicitFocusOrder="0" pos="172 68 40 24" initialText="MAX"
+              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
+              caret="1" popupmenu="1"/>
+  <TEXTEDITOR name="new text editor" id="84a1ae3eaf296967" memberName="peakBox"
+              virtualName="" explicitFocusOrder="0" pos="172 96 40 24" initialText="PEAK"
+              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
+              caret="1" popupmenu="1"/>
+  <TEXTEDITOR name="new text editor" id="be6e1acc0edb1ea3" memberName="avgBox"
+              virtualName="" explicitFocusOrder="0" pos="172 40 40 24" initialText="AVG"
+              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
+              caret="1" popupmenu="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

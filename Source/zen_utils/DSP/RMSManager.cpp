@@ -13,7 +13,7 @@
 ===============================================================================*/
 
 #include "RMSManager.h"
-#include <JuceHeader.h>
+
 
 RMSManager::RMSManager()
 {
@@ -27,43 +27,66 @@ RMSManager::~RMSManager()
 
 void RMSManager::processSamples(const float* inSamplesL, const float* inSamplesR, const unsigned int numIncomingSamples, const unsigned int numChannels)
 {
-	for (unsigned int i = 0; i < numIncomingSamples; ++i)
+	for (unsigned int i = 0; i < numIncomingSamples; ++i) // Loops over all samples
 	{
-		++numSamplesCalculated;
-		if (inSamplesL[i] <= 0.00001 && inSamplesR[i] <= 0.00001)
+		if (inSamplesL[i] == 0.0f && inSamplesR[i] == 0.0f)
 			continue; // don't process silence
+		++numSamplesCalculated;
+		leftRunningRMSSum += ((double)inSamplesL[i] * (double)inSamplesL[i]);
+		rightRunningRMSSum += ((double)inSamplesR[i] * (double)inSamplesR[i]);
+		++countTotalRunningSamples;
 		/*float leftSample = inSamplesL[i];
 		float rightSample = inSamplesR[i];
 		*/
 
-		if (numSamplesCalculated < windowSize) // start new window
+		leftPeakSample = (fabs(inSamplesL[i]) > leftPeakSample) ? fabs(inSamplesL[i]) : leftPeakSample;
+		rightPeakSample = (fabs(inSamplesR[i]) > rightPeakSample) ? fabs(inSamplesR[i]) : rightPeakSample;
+
+		if (numSamplesCalculated < windowSize) // We're still in window block
 		{
 			//sumOfSamples += sqrt((double)inSamplesL[i]* (double)inSamplesL[i] + (double)inSamplesR[i]* (double)inSamplesR[i]) ;
 			//double avgSample = (inSamplesL[i] + inSamplesR[i]) / 2;
 			//sumOfSamples += avgSample*avgSample;
-			sumOfSamples += ((double)inSamplesL[i] * (double)inSamplesL[i]) + ((double)inSamplesR[i] * (double)inSamplesR[i]);
-			
+			sumOfLeftSamples += ((double)inSamplesL[i] * (double)inSamplesL[i]);
+			sumOfRightSamples += ((double)inSamplesR[i] * (double)inSamplesR[i]);
+		
+
+
 			
 		}
 		else
 		{
 			jassert(numSamplesCalculated <= windowSize);
 			++numSamplesCalculated;
-			double foundRMS = (sumOfSamples / windowSize);
-			foundRMS = sqrt(foundRMS);
-			collectedRMS += foundRMS;
-			++numRMSBatchesCollected;
-			avgTotalRMS = collectedRMS / numRMSBatchesCollected;
+			double foundLeftRMS = (sumOfLeftSamples / windowSize);
+			double foundRightRMS = (sumOfRightSamples / windowSize);
+			double foundRightRMS2 = (sqrt(sumOfRightSamples) / windowSize);
 
-			if (foundRMS > maxFoundRMS)
+			foundLeftRMS = sqrt(foundLeftRMS);
+			foundRightRMS = sqrt(foundRightRMS);
+
+			leftAvgRMSSummed += foundLeftRMS;
+			rightAvgRMSSummed += foundRightRMS;
+			++numRMSBatchesCollected;
+			leftAvgRMS = leftAvgRMSSummed / numRMSBatchesCollected;
+			rightAvgRMS = rightAvgRMSSummed / numRMSBatchesCollected;
+
+			if (foundLeftRMS > leftMaxRMS)
 			{
-				maxFoundRMS = foundRMS;
+				leftMaxRMS = foundLeftRMS;
 				//double rmsInDecibels = Decibels::gainToDecibels<double>(maxFoundRMS);
 				//DBG("New max RMS found: " + String(rmsInDecibels));
 			}
+
+			if (foundRightRMS > rightMaxRMS)
+			{
+				rightMaxRMS = foundRightRMS;
+			}
+
 			numSamplesCalculated = 0;
-			sumOfSamples = 0;
-			sumOfSamplesSqrd = 0;
+			sumOfLeftSamples = 0;
+			sumOfRightSamples = 0;
+			//sumOfSamplesSqrd = 0;
 		}
 	}
 }

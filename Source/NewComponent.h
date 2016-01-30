@@ -62,6 +62,9 @@ private:
     ScopedPointer<Label> label8;
     ScopedPointer<Label> label9;
     ScopedPointer<Label> label10;
+    ScopedPointer<TextEditor> maxBox;
+    ScopedPointer<TextEditor> peakBox;
+    ScopedPointer<TextEditor> avgBox;
 
 
     //==============================================================================

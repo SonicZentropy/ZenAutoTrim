@@ -108,7 +108,64 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	rightPeakLabel->setColour(TextEditor::textColourId, Colours::black);
 	rightPeakLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
 
-	setSize(550, 550);
+	addAndMakeVisible(maxBox = new TextEditor("new text editor"));
+	maxBox->setMultiLine(false);
+	maxBox->setReturnKeyStartsNewLine(false);
+	maxBox->setReadOnly(false);
+	maxBox->setScrollbarsShown(true);
+	maxBox->setCaretVisible(true);
+	maxBox->setPopupMenuEnabled(true);
+	maxBox->setText(TRANS("MAX"));
+
+	addAndMakeVisible(peakBox = new TextEditor("new text editor"));
+	peakBox->setMultiLine(false);
+	peakBox->setReturnKeyStartsNewLine(false);
+	peakBox->setReadOnly(false);
+	peakBox->setScrollbarsShown(true);
+	peakBox->setCaretVisible(true);
+	peakBox->setPopupMenuEnabled(true);
+	peakBox->setText(TRANS("PEAK"));
+
+	addAndMakeVisible(avgBox = new TextEditor("new text editor"));
+	avgBox->setMultiLine(false);
+	avgBox->setReturnKeyStartsNewLine(false);
+	avgBox->setReadOnly(false);
+	avgBox->setScrollbarsShown(true);
+	avgBox->setCaretVisible(true);
+	avgBox->setPopupMenuEnabled(true);
+	avgBox->setText(TRANS("AVG"));
+
+
+	addAndMakeVisible(leftRunningRMS = new Label("Left Running RMS Label",
+		TRANS("00")));
+	leftRunningRMS->setFont(Font(15.00f, Font::bold));
+	leftRunningRMS->setJustificationType(Justification::centred);
+	leftRunningRMS->setEditable(false, false, false);
+	leftRunningRMS->setColour(Label::backgroundColourId, Colour(0x00000000));
+	leftRunningRMS->setColour(Label::textColourId, Colours::white);
+	leftRunningRMS->setColour(TextEditor::textColourId, Colours::black);
+	leftRunningRMS->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
+
+	addAndMakeVisible(rightRunningRMS = new Label("Right Running RMS Label",
+		TRANS("00")));
+	rightRunningRMS->setFont(Font(15.00f, Font::bold));
+	rightRunningRMS->setJustificationType(Justification::centred);
+	rightRunningRMS->setEditable(false, false, false);
+	rightRunningRMS->setColour(Label::backgroundColourId, Colour(0x00000000));
+	rightRunningRMS->setColour(Label::textColourId, Colours::white);
+	rightRunningRMS->setColour(TextEditor::textColourId, Colours::black);
+	rightRunningRMS->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
+
+	addAndMakeVisible(runningBox = new TextEditor("new text editor"));
+	runningBox->setMultiLine(false);
+	runningBox->setReturnKeyStartsNewLine(false);
+	runningBox->setReadOnly(false);
+	runningBox->setScrollbarsShown(true);
+	runningBox->setCaretVisible(true);
+	runningBox->setPopupMenuEnabled(true);
+	runningBox->setText(TRANS("AVG"));
+
+	setSize(250, 250);
 	startTimer(100);
 	processor.setCurrentEditor(this);
 }
@@ -126,6 +183,14 @@ ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 	rightAvgRMSLabel = nullptr;
 	rightMaxRMSLabel = nullptr;
 	rightPeakLabel = nullptr;
+
+	leftRunningRMS = nullptr;
+	rightRunningRMS = nullptr;
+
+	maxBox = nullptr;
+	peakBox = nullptr;
+	avgBox = nullptr;
+	runningBox = nullptr;
 }
 
 //==============================================================================
@@ -144,6 +209,11 @@ void ZenAutoTrimAudioProcessorEditor::resized()
 	rightAvgRMSLabel->setBounds(87, 42, 72, 24);
 	rightMaxRMSLabel->setBounds(87, 68, 72, 24);
 	rightPeakLabel->setBounds(87, 94, 72, 24);
+	leftRunningRMS->setBounds(8, 120, 72, 24);
+	rightRunningRMS->setBounds(87, 120, 72, 24);
+	maxBox->setBounds(172, 68, 40, 24);
+	peakBox->setBounds(172, 96, 40, 24);
+	avgBox->setBounds(172, 40, 40, 24);
 }
 
 void ZenAutoTrimAudioProcessorEditor::textEditorReturnKeyPressed(TextEditor& editorChanged)
@@ -164,11 +234,21 @@ void ZenAutoTrimAudioProcessorEditor::timerCallback()
 		gainEditor->formatTextAfterEntry();
 		processor.gainParam->setNeedsUIUpdate(false);
 	}
-	double rmsInDB = processor.rmsManager.getAverageTotalRMS();
-	rmsInDB = Decibels::gainToDecibels(rmsInDB);
-	avgRMSLabel->setText(String(rmsInDB), dontSendNotification);
-	double avgInDB = processor.rmsManager.getMaxFoundRMS();
-	avgInDB = Decibels::gainToDecibels(avgInDB);
-	maxRMSLabel->setText(String(avgInDB), dontSendNotification);
+	double leftAvgRmsInDB = processor.rmsManager.getLeftAvgRms();
+	leftAvgRmsInDB = Decibels::gainToDecibels(leftAvgRmsInDB);
+	leftAvgRMSLabel->setText(String(leftAvgRmsInDB), dontSendNotification);
+
+	double rightAvgRmsInDB = processor.rmsManager.getRightAvgRms();
+	rightAvgRmsInDB = Decibels::gainToDecibels(rightAvgRmsInDB);
+	rightAvgRMSLabel->setText(String(rightAvgRmsInDB), dontSendNotification);
+
+	leftPeakLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getLeftPeak())), dontSendNotification);
+	rightPeakLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getRightPeak())), dontSendNotification);
+
+	leftMaxRMSLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getLeftMaxRms())), dontSendNotification);
+	rightMaxRMSLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getRightMaxRms())), dontSendNotification);
+
+	leftRunningRMS->setText(String(Decibels::gainToDecibels(processor.rmsManager.getLeftCurrentRunningRms())), dontSendNotification);
+	rightRunningRMS->setText(String(Decibels::gainToDecibels(processor.rmsManager.getRightCurrentRunningRms())), dontSendNotification);
 }
 

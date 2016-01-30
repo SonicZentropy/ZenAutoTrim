@@ -46,6 +46,8 @@ private:
 	ScopedPointer<Label> leftAvgRMSLabel, rightAvgRMSLabel;
 	ScopedPointer<Label> leftMaxRMSLabel, rightMaxRMSLabel;
 	ScopedPointer<Label> leftPeakLabel, rightPeakLabel;
+	ScopedPointer<Label> leftRunningRMS, rightRunningRMS;
+	ScopedPointer<TextEditor> maxBox, peakBox, avgBox, runningBox;
 	
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenAutoTrimAudioProcessorEditor)
