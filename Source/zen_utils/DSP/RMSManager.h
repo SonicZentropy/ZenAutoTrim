@@ -17,6 +17,10 @@
 #define RMSMANAGER_H_INCLUDED
 
 #include <JuceHeader.h>
+#include <boost/circular_buffer.hpp>
+
+namespace Zen
+{
 
 class RMSManager
 {
@@ -79,8 +83,9 @@ public:
 
 private:
 	//size of the averaging window. VU = 300, PPM = 10, etc
-	unsigned int windowSizeInMS = 300; 
+	unsigned int windowSizeInMS = 300;
 	unsigned int sampleRate = 44100;
+	unsigned int prevSampleRate = 44100;
 	unsigned int samplesPerWindow = 0;
 	unsigned int numSamplesCalculated = 0;
 	double sumOfLeftSamples = 0;
@@ -100,14 +105,15 @@ private:
 	double leftRunningRMS = 0, leftRunningRMSSum = 0;
 	double rightRunningRMS = 0, rightRunningRMSSum = 0;
 	unsigned int countTotalRunningSamples = 0;
+	double leftSumSquares = 0, rightSumSquares = 0;
+	double leftCurrRMS = 0, rightCurrRMS = 0;
 
-	double prevLeftBuffer[256] = {0};
-	double prevRightBuffer[256] = {0};
 //#Todo: Implement prevBuffer for running RMS sum
 
+	std::unique_ptr<boost::circular_buffer<double>> prevLeftBuf, prevRightBuf;
 
-	
 
 };
+} // Namespace Zen
 
 #endif // RMSMANAGER_H_INCLUDED

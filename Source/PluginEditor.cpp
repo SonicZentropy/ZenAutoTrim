@@ -209,8 +209,7 @@ void ZenAutoTrimAudioProcessorEditor::resized()
 	rightAvgRMSLabel->setBounds(87, 42, 72, 24);
 	rightMaxRMSLabel->setBounds(87, 68, 72, 24);
 	rightPeakLabel->setBounds(87, 94, 72, 24);
-	leftRunningRMS->setBounds(8, 120, 72, 24);
-	rightRunningRMS->setBounds(87, 120, 72, 24);
+
 	maxBox->setBounds(172, 68, 40, 24);
 	peakBox->setBounds(172, 96, 40, 24);
 	avgBox->setBounds(172, 40, 40, 24);
@@ -234,21 +233,17 @@ void ZenAutoTrimAudioProcessorEditor::timerCallback()
 		gainEditor->formatTextAfterEntry();
 		processor.gainParam->setNeedsUIUpdate(false);
 	}
-	double leftAvgRmsInDB = processor.rmsManager.getLeftAvgRms();
-	leftAvgRmsInDB = Decibels::gainToDecibels(leftAvgRmsInDB);
-	leftAvgRMSLabel->setText(String(leftAvgRmsInDB), dontSendNotification);
 
-	double rightAvgRmsInDB = processor.rmsManager.getRightAvgRms();
-	rightAvgRmsInDB = Decibels::gainToDecibels(rightAvgRmsInDB);
-	rightAvgRMSLabel->setText(String(rightAvgRmsInDB), dontSendNotification);
+	//Running RMS now calculates proper full-length average RMS. Here just for informational purposes
+	leftAvgRMSLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getLeftCurrentRunningRms())), dontSendNotification);
+	rightAvgRMSLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getRightCurrentRunningRms())), dontSendNotification);
 
-	leftPeakLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getLeftPeak())), dontSendNotification);
-	rightPeakLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getRightPeak())), dontSendNotification);
-
+	// Max RMS is the current maximum found RMS of a single window, used to set proper trim level
 	leftMaxRMSLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getLeftMaxRms())), dontSendNotification);
 	rightMaxRMSLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getRightMaxRms())), dontSendNotification);
 
-	leftRunningRMS->setText(String(Decibels::gainToDecibels(processor.rmsManager.getLeftCurrentRunningRms())), dontSendNotification);
-	rightRunningRMS->setText(String(Decibels::gainToDecibels(processor.rmsManager.getRightCurrentRunningRms())), dontSendNotification);
+	// Peak single sample found
+	leftPeakLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getLeftPeak())), dontSendNotification);
+	rightPeakLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getRightPeak())), dontSendNotification);
 }
 

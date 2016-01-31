@@ -14,10 +14,21 @@
 
 #include "RMSManager.h"
 
+namespace Zen
+{
 
 RMSManager::RMSManager()
 {
-	samplesPerWindow = 13230;
+	samplesPerWindow = sampleRate*(windowSizeInMS/1000.0f);
+	prevLeftBuf = std::make_unique<boost::circular_buffer<double>>(samplesPerWindow);
+	prevRightBuf = std::make_unique<boost::circular_buffer<double>>(samplesPerWindow);
+
+	for (int i = 0; i < samplesPerWindow; ++i)
+	{
+		//fill both circular rms buffers with 0 to start
+		prevLeftBuf->push_back(0.0f);
+		prevRightBuf->push_back(0.0f);
+	}
 }
 
 RMSManager::~RMSManager()
@@ -30,38 +41,45 @@ void RMSManager::processSamples(const float* inSamplesL, const float* inSamplesR
 	DBG("Incoming samples: " + String(numIncomingSamples) + " numSampCalc: " + String(numSamplesCalculated) + " TotalSamp: " + String(countTotalRunningSamples));
 	for (unsigned int i = 0; i < numIncomingSamples; ++i) // Loops over all samples
 	{
-		if (inSamplesL[i] == 0.0f && inSamplesR[i] == 0.0f)
-			continue; // don't process silence
 		++numSamplesCalculated;
 		leftRunningRMSSum += ((double)inSamplesL[i] * (double)inSamplesL[i]);
 		rightRunningRMSSum += ((double)inSamplesR[i] * (double)inSamplesR[i]);
 		++countTotalRunningSamples;
-		/*float leftSample = inSamplesL[i];
-		float rightSample = inSamplesR[i];
-		*/
+		double leftSampleSquared = inSamplesL[i]*inSamplesL[i];
+		double rightSampleSquared = inSamplesR[i]*inSamplesR[i];
+		
+
+		// circular buffer area
+		double leftSquaredSubBuffer = prevLeftBuf->front();
+		double rightSquaredSubBuffer = prevRightBuf->front();
+		leftSumSquares -= leftSquaredSubBuffer;
+		rightSumSquares -= rightSquaredSubBuffer;
+		leftSumSquares += leftSampleSquared;
+		rightSumSquares += rightSampleSquared;
+
+		prevLeftBuf->push_back(leftSampleSquared);
+		prevRightBuf->push_back(rightSampleSquared);
+
+		leftCurrRMS = sqrt(leftSumSquares / samplesPerWindow);
+		rightCurrRMS = sqrt(rightSumSquares / samplesPerWindow);
+
+		if (leftMaxRMS < leftCurrRMS) leftMaxRMS = leftCurrRMS;
+		if (rightMaxRMS < rightCurrRMS) rightMaxRMS = rightCurrRMS;
 
 		leftPeakSample = (fabs(inSamplesL[i]) > leftPeakSample) ? fabs(inSamplesL[i]) : leftPeakSample;
 		rightPeakSample = (fabs(inSamplesR[i]) > rightPeakSample) ? fabs(inSamplesR[i]) : rightPeakSample;
 
 		if (numSamplesCalculated < samplesPerWindow) // We're still in window block
-		{
-			//sumOfSamples += sqrt((double)inSamplesL[i]* (double)inSamplesL[i] + (double)inSamplesR[i]* (double)inSamplesR[i]) ;
-			//double avgSample = (inSamplesL[i] + inSamplesR[i]) / 2;
-			//sumOfSamples += avgSample*avgSample;
+		{			
 			sumOfLeftSamples += ((double)inSamplesL[i] * (double)inSamplesL[i]);
 			sumOfRightSamples += ((double)inSamplesR[i] * (double)inSamplesR[i]);
-		
 
-
-			
-		}
-		else
+		} else
 		{
 			jassert(numSamplesCalculated == samplesPerWindow);
-			
+
 			double foundLeftRMS = (sumOfLeftSamples / samplesPerWindow);
 			double foundRightRMS = (sumOfRightSamples / samplesPerWindow);
-	
 
 			foundLeftRMS = sqrt(foundLeftRMS);
 			foundRightRMS = sqrt(foundRightRMS);
@@ -74,14 +92,14 @@ void RMSManager::processSamples(const float* inSamplesL, const float* inSamplesR
 
 			if (foundLeftRMS > leftMaxRMS)
 			{
-				leftMaxRMS = foundLeftRMS;
+				//leftMaxRMS = foundLeftRMS;
 				//double rmsInDecibels = Decibels::gainToDecibels<double>(maxFoundRMS);
 				//DBG("New max RMS found: " + String(rmsInDecibels));
 			}
 
 			if (foundRightRMS > rightMaxRMS)
 			{
-				rightMaxRMS = foundRightRMS;
+			//	rightMaxRMS = foundRightRMS;
 			}
 
 			numSamplesCalculated = 0;
@@ -91,3 +109,4 @@ void RMSManager::processSamples(const float* inSamplesL, const float* inSamplesR
 		}
 	}
 }
+} //Namespace Zen

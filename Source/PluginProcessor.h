@@ -19,6 +19,8 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include <zen_utils/DSP/RMSManager.h>
 
+using Zen::RMSManager;
+
 //==============================================================================
 class ZenAutoTrimAudioProcessor  : public AudioProcessor
 {

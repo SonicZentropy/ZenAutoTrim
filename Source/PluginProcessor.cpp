@@ -43,8 +43,8 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 	{
 		dynamic_cast<ZenAutoTrimAudioProcessorEditor*>(currentEditor)->vuMeter->copySamples(buffer.getReadPointer(0), buffer.getNumSamples());
 	}
-
-	rmsManager.processSamples(buffer.getReadPointer(0), buffer.getReadPointer(1), buffer.getNumSamples());
+	if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f)
+		rmsManager.processSamples(buffer.getReadPointer(0), buffer.getReadPointer(1), buffer.getNumSamples());
 }
 
 
