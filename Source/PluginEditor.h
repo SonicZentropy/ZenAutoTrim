@@ -22,20 +22,24 @@
 #include "dRowAudio/dRowAudio/gui/dRowAudio_SegmentedMeter.h"
 using drow::SegmentedMeter;
 
-class ZenAutoTrimAudioProcessorEditor : public AudioProcessorEditor,
-	                                public TextEditor::Listener,
-	                                public Timer
+class ZenAutoTrimAudioProcessorEditor 
+	: public AudioProcessorEditor,
+	public TextEditor::Listener,
+	public TextButton::Listener,
+	public Timer
 {
 public:
-	
 	explicit ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAudioProcessor&);
     ~ZenAutoTrimAudioProcessorEditor();
 
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
+
 	void textEditorReturnKeyPressed(TextEditor& editorChanged) override;
-	virtual void timerCallback() override;
+	void buttonClicked(Button*) override;
+
+	void timerCallback() override;
 	ScopedPointer<SegmentedMeter> vuMeter;
 
 private:
@@ -47,8 +51,8 @@ private:
 	ScopedPointer<Label> leftMaxRMSLabel, rightMaxRMSLabel;
 	ScopedPointer<Label> leftPeakLabel, rightPeakLabel;
 	ScopedPointer<Label> leftRunningRMS, rightRunningRMS;
-	ScopedPointer<TextEditor> maxBox, peakBox, avgBox, runningBox;
-	
+	ScopedPointer<TextEditor> maxBox, peakBox, avgBox, runningBox;	
+	ScopedPointer<TextButton> resetBtn;
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenAutoTrimAudioProcessorEditor)
 };

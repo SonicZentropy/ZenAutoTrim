@@ -23,7 +23,7 @@
 ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	:currentEditor(nullptr)
 {
-	addParameter(gainParam = new AudioParameterFloat("gainParam", "Trim", -96.0f, 18.0f, 0.0f));
+	addParameter(gainParam = new AudioParameterFloat("gainParam", "Trim", -96.0f, 18.0f, 0.0f));	
 }
 
 ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
@@ -32,11 +32,15 @@ ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
 
 void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
+	if (prevSampleRate != this->getSampleRate())
+	{
+		prevSampleRate = this->getSampleRate();
+		levelAnalysisManager.sampleRateChanged(prevSampleRate);
+	}
 	if (gainParam->get() != 0.0f)
 	{
 		float gain = Decibels::decibelsToGain<float>(*gainParam);
-		buffer.applyGain(gain);
-		
+		buffer.applyGain(gain);		
 	}
 
 	if (currentEditor != nullptr)
@@ -44,7 +48,7 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 		dynamic_cast<ZenAutoTrimAudioProcessorEditor*>(currentEditor)->vuMeter->copySamples(buffer.getReadPointer(0), buffer.getNumSamples());
 	}
 	if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f)
-		rmsManager.processSamples(buffer.getReadPointer(0), buffer.getReadPointer(1), buffer.getNumSamples());
+		levelAnalysisManager.processSamples(&buffer);
 }
 
 

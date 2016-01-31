@@ -17,13 +17,13 @@
 namespace Zen
 {
 
-RMSManager::RMSManager()
+LevelAnalysisManager::LevelAnalysisManager()
 {
 	samplesPerWindow = sampleRate*(windowSizeInMS/1000.0f);
 	prevLeftBuf = std::make_unique<boost::circular_buffer<double>>(samplesPerWindow);
 	prevRightBuf = std::make_unique<boost::circular_buffer<double>>(samplesPerWindow);
 
-	for (int i = 0; i < samplesPerWindow; ++i)
+	for (unsigned int i = 0; i < samplesPerWindow; ++i)
 	{
 		//fill both circular rms buffers with 0 to start
 		prevLeftBuf->push_back(0.0f);
@@ -31,82 +31,85 @@ RMSManager::RMSManager()
 	}
 }
 
-RMSManager::~RMSManager()
+LevelAnalysisManager::~LevelAnalysisManager()
 {
-
 }
 
-void RMSManager::processSamples(const float* inSamplesL, const float* inSamplesR, const unsigned int numIncomingSamples, const unsigned int numChannels)
-{
-	DBG("Incoming samples: " + String(numIncomingSamples) + " numSampCalc: " + String(numSamplesCalculated) + " TotalSamp: " + String(countTotalRunningSamples));
-	for (unsigned int i = 0; i < numIncomingSamples; ++i) // Loops over all samples
-	{
-		++numSamplesCalculated;
-		leftRunningRMSSum += ((double)inSamplesL[i] * (double)inSamplesL[i]);
-		rightRunningRMSSum += ((double)inSamplesR[i] * (double)inSamplesR[i]);
-		++countTotalRunningSamples;
-		double leftSampleSquared = inSamplesL[i]*inSamplesL[i];
-		double rightSampleSquared = inSamplesR[i]*inSamplesR[i];
+void LevelAnalysisManager::processSamples(const AudioBuffer<float>* buffer)
+{	
+	//#TODO: rms calc based only on # samples is wrong b/c it adds a full window worth of 0s
+
+	unsigned int _numIncomingSamples = buffer->getNumSamples();
+	const float* inSamplesL = buffer->getReadPointer(0);
+	const float* inSamplesR = buffer->getReadPointer(1);
+
+	float leftMag = buffer->getMagnitude(0, 0, _numIncomingSamples);
+	float rightMag = buffer->getMagnitude(1, 0, _numIncomingSamples);
+
+	leftPeakSample = (leftMag > leftPeakSample) ? leftMag : leftPeakSample;
+	rightPeakSample = (rightMag > rightPeakSample) ? rightMag : rightPeakSample;
+
+	DBG("Incoming samples: " + String(_numIncomingSamples) + " TotalSamp: " + String(countTotalRunningSamples));
+	for (unsigned int i = 0; i < _numIncomingSamples; ++i) // Loops over all samples
+	{		
+		++countTotalRunningSamples; // total count of computed samples
+
+		double _leftSampleSquared = inSamplesL[i] * inSamplesL[i];
+		double _rightSampleSquared = inSamplesR[i] * inSamplesR[i];
 		
+		leftRunningSamplesSquaredSum += _leftSampleSquared;
+		rightRunningSamplesSquaredSum += _rightSampleSquared;		
 
 		// circular buffer area
-		double leftSquaredSubBuffer = prevLeftBuf->front();
-		double rightSquaredSubBuffer = prevRightBuf->front();
-		leftSumSquares -= leftSquaredSubBuffer;
-		rightSumSquares -= rightSquaredSubBuffer;
-		leftSumSquares += leftSampleSquared;
-		rightSumSquares += rightSampleSquared;
+		double _leftSquaredSubBuffer = prevLeftBuf->front();
+		double _rightSquaredSubBuffer = prevRightBuf->front();
 
-		prevLeftBuf->push_back(leftSampleSquared);
-		prevRightBuf->push_back(rightSampleSquared);
+		leftSumSquares -= _leftSquaredSubBuffer;
+		rightSumSquares -= _rightSquaredSubBuffer; // remove the sample that falls out of RMS window
+		leftSumSquares += _leftSampleSquared;      // add new sample to the RMS window 
+		rightSumSquares += _rightSampleSquared;
 
-		leftCurrRMS = sqrt(leftSumSquares / samplesPerWindow);
+		prevLeftBuf->push_back(_leftSampleSquared);
+		prevRightBuf->push_back(_rightSampleSquared);
+
+		leftCurrRMS = sqrt(leftSumSquares / samplesPerWindow); // Calculate current RMS
 		rightCurrRMS = sqrt(rightSumSquares / samplesPerWindow);
 
-		if (leftMaxRMS < leftCurrRMS) leftMaxRMS = leftCurrRMS;
-		if (rightMaxRMS < rightCurrRMS) rightMaxRMS = rightCurrRMS;
-
-		leftPeakSample = (fabs(inSamplesL[i]) > leftPeakSample) ? fabs(inSamplesL[i]) : leftPeakSample;
-		rightPeakSample = (fabs(inSamplesR[i]) > rightPeakSample) ? fabs(inSamplesR[i]) : rightPeakSample;
-
-		if (numSamplesCalculated < samplesPerWindow) // We're still in window block
-		{			
-			sumOfLeftSamples += ((double)inSamplesL[i] * (double)inSamplesL[i]);
-			sumOfRightSamples += ((double)inSamplesR[i] * (double)inSamplesR[i]);
-
-		} else
-		{
-			jassert(numSamplesCalculated == samplesPerWindow);
-
-			double foundLeftRMS = (sumOfLeftSamples / samplesPerWindow);
-			double foundRightRMS = (sumOfRightSamples / samplesPerWindow);
-
-			foundLeftRMS = sqrt(foundLeftRMS);
-			foundRightRMS = sqrt(foundRightRMS);
-
-			leftAvgRMSSummed += foundLeftRMS;
-			rightAvgRMSSummed += foundRightRMS;
-			++numRMSBatchesCollected;
-			leftAvgRMS = leftAvgRMSSummed / numRMSBatchesCollected;
-			rightAvgRMS = rightAvgRMSSummed / numRMSBatchesCollected;
-
-			if (foundLeftRMS > leftMaxRMS)
-			{
-				//leftMaxRMS = foundLeftRMS;
-				//double rmsInDecibels = Decibels::gainToDecibels<double>(maxFoundRMS);
-				//DBG("New max RMS found: " + String(rmsInDecibels));
-			}
-
-			if (foundRightRMS > rightMaxRMS)
-			{
-			//	rightMaxRMS = foundRightRMS;
-			}
-
-			numSamplesCalculated = 0;
-			sumOfLeftSamples = 0;
-			sumOfRightSamples = 0;
-			//sumOfSamplesSqrd = 0;
-		}
+		
+		if (leftSumSquares > leftMaxSamplesSquaredWindowFound) leftMaxSamplesSquaredWindowFound = leftSumSquares;
+		if (rightSumSquares > rightMaxSamplesSquaredWindowFound) rightMaxSamplesSquaredWindowFound = rightSumSquares;
+		
 	}
 }
+
+void LevelAnalysisManager::sampleRateChanged(const double& newSampleRate)
+{
+	sampleRate = newSampleRate;
+	samplesPerWindow = sampleRate * (windowSizeInMS / 1000.0f);
+	// don't add any new elements to the buffer, just change size
+	// if the size is reduced, the last samples are truncated so the
+	// measurement is no longer accurate (Intended)
+	prevLeftBuf->rset_capacity(samplesPerWindow); 
+}
+
+void LevelAnalysisManager::resetCalculation()
+{
+	numWindowSamplesCalculated = 0;
+	countTotalRunningSamples = 0;
+
+	leftMaxSamplesSquaredWindowFound = 0;
+	rightMaxSamplesSquaredWindowFound = 0;
+
+	leftPeakSample = 0;
+	rightPeakSample = 0;
+
+	leftRunningSamplesSquaredSum = 0;
+	rightRunningSamplesSquaredSum = 0;
+	leftSumSquares = 0;
+	rightSumSquares = 0;
+	leftCurrRMS = 0;
+	rightCurrRMS = 0;	
+}
+
+	
 } //Namespace Zen

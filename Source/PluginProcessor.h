@@ -19,7 +19,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include <zen_utils/DSP/RMSManager.h>
 
-using Zen::RMSManager;
+using Zen::LevelAnalysisManager;
 
 //==============================================================================
 class ZenAutoTrimAudioProcessor  : public AudioProcessor
@@ -66,7 +66,9 @@ public:
 private:
 	friend class ZenAutoTrimAudioProcessorEditor;
 	AudioProcessorEditor* currentEditor;
-	RMSManager rmsManager;
+	LevelAnalysisManager levelAnalysisManager;
+
+	double prevSampleRate = 44100;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenAutoTrimAudioProcessor)
 };

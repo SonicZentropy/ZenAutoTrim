@@ -165,6 +165,11 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	runningBox->setPopupMenuEnabled(true);
 	runningBox->setText(TRANS("AVG"));
 
+	addAndMakeVisible(resetBtn = new TextButton("Reset Button"));
+	resetBtn->setTooltip(TRANS("Reset RMS Calculation"));
+	resetBtn->setButtonText(TRANS("Reset"));
+	resetBtn->addListener(this);
+
 	setSize(250, 250);
 	startTimer(100);
 	processor.setCurrentEditor(this);
@@ -191,6 +196,8 @@ ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 	peakBox = nullptr;
 	avgBox = nullptr;
 	runningBox = nullptr;
+
+	resetBtn = nullptr;
 }
 
 //==============================================================================
@@ -213,6 +220,7 @@ void ZenAutoTrimAudioProcessorEditor::resized()
 	maxBox->setBounds(172, 68, 40, 24);
 	peakBox->setBounds(172, 96, 40, 24);
 	avgBox->setBounds(172, 40, 40, 24);
+	resetBtn->setBounds(16, 128, 51, 24);
 }
 
 void ZenAutoTrimAudioProcessorEditor::textEditorReturnKeyPressed(TextEditor& editorChanged)
@@ -225,6 +233,12 @@ void ZenAutoTrimAudioProcessorEditor::textEditorReturnKeyPressed(TextEditor& edi
 	}		
 }
 
+void ZenAutoTrimAudioProcessorEditor::buttonClicked(Button* pressedBtn)
+{
+	if (pressedBtn == resetBtn)
+		processor.levelAnalysisManager.resetCalculation();
+}
+
 void ZenAutoTrimAudioProcessorEditor::timerCallback()
 {
 	if (processor.gainParam->needsUIUpdate())
@@ -234,16 +248,16 @@ void ZenAutoTrimAudioProcessorEditor::timerCallback()
 		processor.gainParam->setNeedsUIUpdate(false);
 	}
 
-	//Running RMS now calculates proper full-length average RMS. Here just for informational purposes
-	leftAvgRMSLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getLeftCurrentRunningRms())), dontSendNotification);
-	rightAvgRMSLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getRightCurrentRunningRms())), dontSendNotification);
+	//Running RMS now calculates proper full-length average RMS. Here just for informational purposes	
+	leftAvgRMSLabel->setText(String(processor.levelAnalysisManager.getLeftCurrentRunningRmsInDB()), dontSendNotification);
+	rightAvgRMSLabel->setText(String(processor.levelAnalysisManager.getRightCurrentRunningRmsInDB()), dontSendNotification);
 
 	// Max RMS is the current maximum found RMS of a single window, used to set proper trim level
-	leftMaxRMSLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getLeftMaxRms())), dontSendNotification);
-	rightMaxRMSLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getRightMaxRms())), dontSendNotification);
+	leftMaxRMSLabel->setText(String(processor.levelAnalysisManager.getLeftMaxRmsInDB()), dontSendNotification);
+	rightMaxRMSLabel->setText(String(processor.levelAnalysisManager.getRightMaxRmsInDB()), dontSendNotification);
 
 	// Peak single sample found
-	leftPeakLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getLeftPeak())), dontSendNotification);
-	rightPeakLabel->setText(String(Decibels::gainToDecibels(processor.rmsManager.getRightPeak())), dontSendNotification);
+	leftPeakLabel->setText(String(processor.levelAnalysisManager.getLeftPeakInDB()), dontSendNotification);
+	rightPeakLabel->setText(String(processor.levelAnalysisManager.getRightPeakInDB()), dontSendNotification);
 }
 

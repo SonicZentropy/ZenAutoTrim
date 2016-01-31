@@ -1,5 +1,5 @@
 /*==============================================================================
-//  RMSManager.h
+//  LevelAnalysisManager.h
 //  Part of the Zentropia JUCE Collection
 //  @author Casey Bailey (<a href="SonicZentropy@gmail.com">email</a>)
 //  @version 0.1
@@ -19,35 +19,36 @@
 #include <JuceHeader.h>
 #include <boost/circular_buffer.hpp>
 
+
 namespace Zen
 {
 
-class RMSManager
+class LevelAnalysisManager
 {
 public:
-	RMSManager();
-	~RMSManager();
+	LevelAnalysisManager();
+	~LevelAnalysisManager();
 
-	void processSamples(const float* inSamplesL, const float* inSamplesR, const unsigned int numIncomingSamples, const unsigned int numChannels = 2);
+	void processSamples(const AudioBuffer<float>* buffer);
 
-	const double getLeftAvgRms() const
+	double getLeftMaxRms() const
 	{
-		return leftAvgRMS;
+		return sqrt(leftMaxSamplesSquaredWindowFound / samplesPerWindow);
 	}
 
-	const double getRightAvgRms() const
+	double getRightMaxRms() const
 	{
-		return rightAvgRMS;
+		return sqrt(rightMaxSamplesSquaredWindowFound / samplesPerWindow);
 	}
 
-	const double getLeftMaxRms() const
+	double getLeftMaxRmsInDB() const
 	{
-		return leftMaxRMS;
+		return (leftMaxSamplesSquaredWindowFound != 0) ? 10*log10(leftMaxSamplesSquaredWindowFound / samplesPerWindow) : 0;
 	}
 
-	const double getRightMaxRms() const
+	double getRightMaxRmsInDB() const
 	{
-		return rightMaxRMS;
+		return (rightMaxSamplesSquaredWindowFound != 0) ? 10*log10(rightMaxSamplesSquaredWindowFound / samplesPerWindow) : 0;
 	}
 
 	const double getLeftPeak() const
@@ -60,58 +61,62 @@ public:
 		return rightPeakSample;
 	}
 
-	const double getLeftRunningRms() const
+	double getLeftPeakInDB() const
 	{
-		return leftRunningRMS;
+		return Decibels::gainToDecibels(leftPeakSample);
 	}
 
-	const double getRightRunningRms() const
+	double getRightPeakInDB() const
 	{
-		return rightRunningRMS;
+		return Decibels::gainToDecibels(rightPeakSample);
 	}
 
-	const double getLeftCurrentRunningRms() const
+	double getLeftCurrentRunningRms() const
 	{
-		return sqrt(leftRunningRMSSum / countTotalRunningSamples);
+		return sqrt(leftRunningSamplesSquaredSum / countTotalRunningSamples);
 	}
 
-	const double getRightCurrentRunningRms() const
+	double getRightCurrentRunningRms() const
 	{
-		return sqrt(rightRunningRMSSum / countTotalRunningSamples);
+		return sqrt(rightRunningSamplesSquaredSum / countTotalRunningSamples);
 	}
 
+	double getLeftCurrentRunningRmsInDB() const
+	{
+		return (leftRunningSamplesSquaredSum != 0) ? 10*log10(leftRunningSamplesSquaredSum / countTotalRunningSamples) : 0.0f;
+	}
+
+	double getRightCurrentRunningRmsInDB() const
+	{
+		return (rightRunningSamplesSquaredSum != 0) ? 10*log10(rightRunningSamplesSquaredSum / countTotalRunningSamples) : 0.0f;
+	}	
+
+	void sampleRateChanged(const double& newSampleRate);
+
+	void resetCalculation();	
 
 private:
 	//size of the averaging window. VU = 300, PPM = 10, etc
 	unsigned int windowSizeInMS = 300;
 	unsigned int sampleRate = 44100;
-	unsigned int prevSampleRate = 44100;
 	unsigned int samplesPerWindow = 0;
-	unsigned int numSamplesCalculated = 0;
-	double sumOfLeftSamples = 0;
-	double sumOfRightSamples = 0;
-	double sumOfLeftSamplesSqrd = 0;
-	double sumOfRightSamplesSqrd = 0;
-	double leftMaxRMS = 0;
-	double leftAvgRMSSummed = 0;
-	double leftAvgRMS = 0;
-	double leftPeakSample = 0;
-	double rightMaxRMS = 0;
-	double rightAvgRMSSummed = 0;
-	double rightAvgRMS = 0;
-	double rightPeakSample = 0;
-	double numRMSBatchesCollected = 0;
 
-	double leftRunningRMS = 0, leftRunningRMSSum = 0;
-	double rightRunningRMS = 0, rightRunningRMSSum = 0;
-	unsigned int countTotalRunningSamples = 0;
+	unsigned int numWindowSamplesCalculated = 0;
+	unsigned long long countTotalRunningSamples = 0;
+
+	double leftMaxSamplesSquaredWindowFound = 0;
+	double rightMaxSamplesSquaredWindowFound = 0;
+
+	double leftPeakSample = 0;
+	double rightPeakSample = 0;
+	
+	double leftRunningSamplesSquaredSum = 0;
+	double rightRunningSamplesSquaredSum = 0;
+
 	double leftSumSquares = 0, rightSumSquares = 0;
 	double leftCurrRMS = 0, rightCurrRMS = 0;
 
-//#Todo: Implement prevBuffer for running RMS sum
-
 	std::unique_ptr<boost::circular_buffer<double>> prevLeftBuf, prevRightBuf;
-
 
 };
 } // Namespace Zen
