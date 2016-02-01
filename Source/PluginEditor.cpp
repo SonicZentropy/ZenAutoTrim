@@ -15,6 +15,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <zen_utils/utilities/ZenStringUtils.hpp>
 
 //==============================================================================
 ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAudioProcessor& p)
@@ -170,6 +171,19 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	resetBtn->setButtonText(TRANS("Reset"));
 	resetBtn->addListener(this);
 
+	addAndMakeVisible(autoGainBtn = new TextButton("Auto Gain"));
+	autoGainBtn->setClickingTogglesState(true);
+	autoGainBtn->addListener(this);
+
+	addAndMakeVisible(targetEditor = new DecibelTextEditor("Target Editor", processor.targetParam));
+	targetEditor->setMultiLine(false);
+	targetEditor->setReturnKeyStartsNewLine(false);
+	targetEditor->setReadOnly(false);
+	targetEditor->setScrollbarsShown(false);
+	targetEditor->setCaretVisible(true);
+	targetEditor->setPopupMenuEnabled(true);
+	targetEditor->setText(TRANS("-18.00 dBFS"));
+
 	setSize(250, 250);
 	startTimer(100);
 	processor.setCurrentEditor(this);
@@ -198,6 +212,8 @@ ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 	runningBox = nullptr;
 
 	resetBtn = nullptr;
+	autoGainBtn = nullptr;
+	targetEditor = nullptr;
 }
 
 //==============================================================================
@@ -221,6 +237,9 @@ void ZenAutoTrimAudioProcessorEditor::resized()
 	peakBox->setBounds(172, 96, 40, 24);
 	avgBox->setBounds(172, 40, 40, 24);
 	resetBtn->setBounds(16, 128, 51, 24);
+
+	autoGainBtn->setBounds(68, 128, 75, 24);
+	targetEditor->setBounds(156, 128, 75, 24);
 }
 
 void ZenAutoTrimAudioProcessorEditor::textEditorReturnKeyPressed(TextEditor& editorChanged)
@@ -228,36 +247,41 @@ void ZenAutoTrimAudioProcessorEditor::textEditorReturnKeyPressed(TextEditor& edi
 	if (&editorChanged == gainEditor)
 	{
 		processor.gainParam->setValueNotifyingHost(dynamic_cast<DecibelTextEditor&>(editorChanged).getNormalizedValueFromText());
-		dynamic_cast<DecibelTextEditor&>(editorChanged).formatTextAfterEntry();
-		
+		dynamic_cast<DecibelTextEditor&>(editorChanged).formatTextAfterEntry();		
 	}		
+	else if (&editorChanged == targetEditor)
+	{
+		processor.targetParam->setValueNotifyingHost(dynamic_cast<DecibelTextEditor&>(editorChanged).getNormalizedValueFromText());
+	}
 }
 
 void ZenAutoTrimAudioProcessorEditor::buttonClicked(Button* pressedBtn)
 {
 	if (pressedBtn == resetBtn)
 		processor.levelAnalysisManager.resetCalculation();
+	else if (pressedBtn == autoGainBtn)
+		processor.autoGainEnabled = !processor.autoGainEnabled;
 }
 
 void ZenAutoTrimAudioProcessorEditor::timerCallback()
 {
 	if (processor.gainParam->needsUIUpdate())
 	{
-		gainEditor->setText(String(processor.gainParam->get()));
-		gainEditor->formatTextAfterEntry();
+		gainEditor->setTextWith2Precision<double>(processor.gainParam->get());
 		processor.gainParam->setNeedsUIUpdate(false);
 	}
 
 	//Running RMS now calculates proper full-length average RMS. Here just for informational purposes	
-	leftAvgRMSLabel->setText(String(processor.levelAnalysisManager.getLeftCurrentRunningRmsInDB()), dontSendNotification);
-	rightAvgRMSLabel->setText(String(processor.levelAnalysisManager.getRightCurrentRunningRmsInDB()), dontSendNotification);
+	leftAvgRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getLeftCurrentRunningRmsInDB()), dontSendNotification);
+	rightAvgRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getRightCurrentRunningRmsInDB()), dontSendNotification);
 
 	// Max RMS is the current maximum found RMS of a single window, used to set proper trim level
-	leftMaxRMSLabel->setText(String(processor.levelAnalysisManager.getLeftMaxRmsInDB()), dontSendNotification);
-	rightMaxRMSLabel->setText(String(processor.levelAnalysisManager.getRightMaxRmsInDB()), dontSendNotification);
+	leftMaxRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getLeftMaxRmsInDB()), dontSendNotification);
+	rightMaxRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getRightMaxRmsInDB()), dontSendNotification);
 
 	// Peak single sample found
-	leftPeakLabel->setText(String(processor.levelAnalysisManager.getLeftPeakInDB()), dontSendNotification);
-	rightPeakLabel->setText(String(processor.levelAnalysisManager.getRightPeakInDB()), dontSendNotification);
+	leftPeakLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getLeftPeakInDB()), dontSendNotification);
+	rightPeakLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getRightPeakInDB()), dontSendNotification);
 }
 
+//#TODO: Fix bugs - UI gain not updating properly

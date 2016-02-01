@@ -12,7 +12,7 @@
 //  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
 ===============================================================================*/
 
-
+#pragma once
 #ifndef DECIBEL_CONVERSIONS_H_INCLUDED
 #define DECIBEL_CONVERSIONS_H_INCLUDED
 #include "ZenParamUtils.h"

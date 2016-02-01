@@ -1,3 +1,18 @@
+/*==============================================================================
+//  NotepadComponent.h
+//  Part of the Zentropia JUCE Collection
+//  @author Casey Bailey (<a href="SonicZentropy@gmail.com">email</a>)
+//  @version 0.1
+//  @date 2016/01/31
+//  Copyright (C) 2016 by Casey Bailey
+//  Provided under the [GNU license]
+//
+//  Details: Creates a component basic notepad
+//
+//  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
+===============================================================================*/
+
+#pragma once
 #ifndef NOTEPAD_COMPONENT_H_INCLUDED
 #define NOTEPAD_COMPONENT_H_INCLUDED
 

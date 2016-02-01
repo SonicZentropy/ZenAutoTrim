@@ -11,6 +11,8 @@
 //
 //  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
 ===============================================================================*/
+
+#pragma once
 #ifndef LINEARSMOOTHEDVALUE_H_INCLUDED
 #define LINEARSMOOTHEDVALUE_H_INCLUDED
 

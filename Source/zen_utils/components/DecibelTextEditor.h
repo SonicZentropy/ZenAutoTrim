@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#pragma once
 #ifndef DECIBELTEXTEDITOR_H_INCLUDEDa
 #define DECIBELTEXTEDITOR_H_INCLUDEDa
 
@@ -23,9 +24,17 @@ public:
 	float getNormalizedValueFromText();
 
 	void formatTextAfterEntry();
+	
+	template <class Type>
+	void DecibelTextEditor::setTextWith2Precision(const Type inText)
+	{
+		this->setText(convertTo2PrecisionString(inText));
+	}
+
 private:
 	NormalisableRange<float> nRange;
 };
+
 
 
 

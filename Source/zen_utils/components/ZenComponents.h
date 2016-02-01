@@ -12,6 +12,7 @@
 //  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
 ===============================================================================*/
 
+#pragma once
 #ifndef ZENCOMPONENTS_H_INCLUDED
 #define ZENCOMPONENTS_H_INCLUDED
 

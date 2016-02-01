@@ -13,6 +13,7 @@
 ===============================================================================*/
 #pragma warning(disable:4100 4305)
 
+#pragma once
 #ifndef ZEN_PARAMETER_H_INCLUDED
 #define ZEN_PARAMETER_H_INCLUDED
 

@@ -59,7 +59,9 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	//==============================================================================
-	AudioParameterFloat* gainParam;
+	AudioParameterFloat* gainParam; 
+	AudioParameterFloat* targetParam;
+	bool autoGainEnabled;
 
 	void setCurrentEditor(AudioProcessorEditor* inEditor) { currentEditor = inEditor; }
 

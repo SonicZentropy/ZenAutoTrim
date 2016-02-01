@@ -33,22 +33,24 @@ public:
 
 	double getLeftMaxRms() const
 	{
-		return sqrt(leftMaxSamplesSquaredWindowFound / samplesPerWindow);
+		return sqrt(leftMaxSamplesSquaredWindowFound / getMinOfTotalWindowSamples());
 	}
 
 	double getRightMaxRms() const
 	{
-		return sqrt(rightMaxSamplesSquaredWindowFound / samplesPerWindow);
+		return sqrt(rightMaxSamplesSquaredWindowFound / getMinOfTotalWindowSamples());
 	}
 
 	double getLeftMaxRmsInDB() const
 	{
-		return (leftMaxSamplesSquaredWindowFound != 0) ? 10*log10(leftMaxSamplesSquaredWindowFound / samplesPerWindow) : 0;
+		return (leftMaxSamplesSquaredWindowFound != 0) ? 
+			10*log10(leftMaxSamplesSquaredWindowFound / getMinOfTotalWindowSamples()) : 0;
 	}
 
 	double getRightMaxRmsInDB() const
 	{
-		return (rightMaxSamplesSquaredWindowFound != 0) ? 10*log10(rightMaxSamplesSquaredWindowFound / samplesPerWindow) : 0;
+		return (rightMaxSamplesSquaredWindowFound != 0) ? 
+			10*log10(rightMaxSamplesSquaredWindowFound / getMinOfTotalWindowSamples()) : 0;
 	}
 
 	const double getLeftPeak() const
@@ -83,13 +85,25 @@ public:
 
 	double getLeftCurrentRunningRmsInDB() const
 	{
-		return (leftRunningSamplesSquaredSum != 0) ? 10*log10(leftRunningSamplesSquaredSum / countTotalRunningSamples) : 0.0f;
+		return (leftRunningSamplesSquaredSum != 0) ? 
+			10*log10(leftRunningSamplesSquaredSum / countTotalRunningSamples) : 0.0f;
 	}
 
 	double getRightCurrentRunningRmsInDB() const
 	{
-		return (rightRunningSamplesSquaredSum != 0) ? 10*log10(rightRunningSamplesSquaredSum / countTotalRunningSamples) : 0.0f;
+		return (rightRunningSamplesSquaredSum != 0) ? 
+			10*log10(rightRunningSamplesSquaredSum / countTotalRunningSamples) : 0.0f;
 	}	
+
+	double getMinOfTotalWindowSamples() const
+	{
+		return (numWindowSamplesCalculated < samplesPerWindow) ? numWindowSamplesCalculated : samplesPerWindow;
+	}
+
+	double getMaxChannelRMS() const
+	{
+		return std::max(getLeftMaxRms(), getRightMaxRms());
+	}
 
 	void sampleRateChanged(const double& newSampleRate);
 

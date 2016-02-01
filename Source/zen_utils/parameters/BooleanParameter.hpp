@@ -1,5 +1,5 @@
 /* ==============================================================================
-//  BooleanParameter.cpp
+//  BooleanParameter.hpp
 //  Part of the Zentropia JUCE Collection
 //  @author Casey Bailey (<a href="SonicZentropy@gmail.com">email</a>)
 //  @version 0.1
@@ -19,6 +19,8 @@
 //
 //  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
 ===============================================================================*/
+
+#pragma once
 #ifndef ZEN_BOOLEAN_PARAMETER_H_INCLUDED
 #define ZEN_BOOLEAN_PARAMETER_H_INCLUDED
 

@@ -21,9 +21,10 @@
 
 //==============================================================================
 ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
-	:currentEditor(nullptr)
+	:autoGainEnabled(false), currentEditor(nullptr)
 {
 	addParameter(gainParam = new AudioParameterFloat("gainParam", "Trim", -96.0f, 18.0f, 0.0f));	
+	addParameter(targetParam = new AudioParameterFloat("targetParam", "Trim", -96.0f, 18.0f, 0.0f));
 }
 
 ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
@@ -36,12 +37,7 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 	{
 		prevSampleRate = this->getSampleRate();
 		levelAnalysisManager.sampleRateChanged(prevSampleRate);
-	}
-	if (gainParam->get() != 0.0f)
-	{
-		float gain = Decibels::decibelsToGain<float>(*gainParam);
-		buffer.applyGain(gain);		
-	}
+	}	
 
 	if (currentEditor != nullptr)
 	{
@@ -49,6 +45,20 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 	}
 	if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f)
 		levelAnalysisManager.processSamples(&buffer);
+	
+	if (autoGainEnabled)
+	{
+		//#TODO: Need to check that if the gainParam needs to be adjusted positively, it doesn't cause peaks to clip
+		gainParam->setValueNotifyingHost( (Decibels::decibelsToGain(targetParam->get()) - levelAnalysisManager.getMaxChannelRMS()) );
+		gainParam->setNeedsUIUpdate(true);
+	}
+
+	if (gainParam->get() != 0.0f)
+	{
+		float gain = Decibels::decibelsToGain<float>(*gainParam);
+		buffer.applyGain(gain);
+	}
+	
 }
 
 

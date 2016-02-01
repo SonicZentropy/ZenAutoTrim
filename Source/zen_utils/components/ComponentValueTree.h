@@ -12,6 +12,7 @@
 //  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
 ===============================================================================*/
 
+#pragma once
 #ifndef COMPONENTVALUETREE_H_INCLUDED
 #define COMPONENTVALUETREE_H_INCLUDED
 #include "JuceHeader.h"

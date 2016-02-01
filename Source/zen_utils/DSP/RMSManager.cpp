@@ -22,13 +22,6 @@ LevelAnalysisManager::LevelAnalysisManager()
 	samplesPerWindow = sampleRate*(windowSizeInMS/1000.0f);
 	prevLeftBuf = std::make_unique<boost::circular_buffer<double>>(samplesPerWindow);
 	prevRightBuf = std::make_unique<boost::circular_buffer<double>>(samplesPerWindow);
-
-	for (unsigned int i = 0; i < samplesPerWindow; ++i)
-	{
-		//fill both circular rms buffers with 0 to start
-		prevLeftBuf->push_back(0.0f);
-		prevRightBuf->push_back(0.0f);
-	}
 }
 
 LevelAnalysisManager::~LevelAnalysisManager()
@@ -37,8 +30,6 @@ LevelAnalysisManager::~LevelAnalysisManager()
 
 void LevelAnalysisManager::processSamples(const AudioBuffer<float>* buffer)
 {	
-	//#TODO: rms calc based only on # samples is wrong b/c it adds a full window worth of 0s
-
 	unsigned int _numIncomingSamples = buffer->getNumSamples();
 	const float* inSamplesL = buffer->getReadPointer(0);
 	const float* inSamplesR = buffer->getReadPointer(1);
@@ -53,6 +44,7 @@ void LevelAnalysisManager::processSamples(const AudioBuffer<float>* buffer)
 	for (unsigned int i = 0; i < _numIncomingSamples; ++i) // Loops over all samples
 	{		
 		++countTotalRunningSamples; // total count of computed samples
+		++numWindowSamplesCalculated;
 
 		double _leftSampleSquared = inSamplesL[i] * inSamplesL[i];
 		double _rightSampleSquared = inSamplesR[i] * inSamplesR[i];
@@ -61,21 +53,24 @@ void LevelAnalysisManager::processSamples(const AudioBuffer<float>* buffer)
 		rightRunningSamplesSquaredSum += _rightSampleSquared;		
 
 		// circular buffer area
-		double _leftSquaredSubBuffer = prevLeftBuf->front();
-		double _rightSquaredSubBuffer = prevRightBuf->front();
+		if (numWindowSamplesCalculated >= samplesPerWindow)
+		{
+			double _leftSquaredSubBuffer = prevLeftBuf->front();
+			double _rightSquaredSubBuffer = prevRightBuf->front();
 
-		leftSumSquares -= _leftSquaredSubBuffer;
-		rightSumSquares -= _rightSquaredSubBuffer; // remove the sample that falls out of RMS window
+			leftSumSquares -= _leftSquaredSubBuffer;
+			rightSumSquares -= _rightSquaredSubBuffer; // remove the sample that falls out of RMS window
+		}
+
 		leftSumSquares += _leftSampleSquared;      // add new sample to the RMS window 
 		rightSumSquares += _rightSampleSquared;
 
 		prevLeftBuf->push_back(_leftSampleSquared);
 		prevRightBuf->push_back(_rightSampleSquared);
 
-		leftCurrRMS = sqrt(leftSumSquares / samplesPerWindow); // Calculate current RMS
-		rightCurrRMS = sqrt(rightSumSquares / samplesPerWindow);
-
-		
+		leftCurrRMS = sqrt(leftSumSquares / getMinOfTotalWindowSamples()); // Calculate current RMS
+		rightCurrRMS = sqrt(rightSumSquares / getMinOfTotalWindowSamples());
+				
 		if (leftSumSquares > leftMaxSamplesSquaredWindowFound) leftMaxSamplesSquaredWindowFound = leftSumSquares;
 		if (rightSumSquares > rightMaxSamplesSquaredWindowFound) rightMaxSamplesSquaredWindowFound = rightSumSquares;
 		

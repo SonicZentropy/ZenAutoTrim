@@ -10,6 +10,7 @@
 
 #include "./DecibelTextEditor.h"
 #include <sstream>
+#include "zen_utils/utilities/ZenStringUtils.hpp"
 
 DecibelTextEditor::DecibelTextEditor(const String& compName, const AudioParameterFloat* param, juce_wchar passwordCharacter)
 	:TextEditor(compName, passwordCharacter),
@@ -34,3 +35,4 @@ void DecibelTextEditor::formatTextAfterEntry()
 	ss << getText().getFloatValue();
 	setText(ss.str(), false);
 }
+

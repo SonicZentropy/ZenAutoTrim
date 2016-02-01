@@ -13,6 +13,7 @@
 //  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
 ===============================================================================*/
 
+#pragma once
 #ifndef BUFFER_SAMPLE_PROCESSES_H_INCLUDED
 #define BUFFER_SAMPLE_PROCESSES_H_INCLUDED
 #include <ctime>
