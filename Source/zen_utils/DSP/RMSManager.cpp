@@ -17,30 +17,34 @@
 namespace Zen
 {
 
+
+
 LevelAnalysisManager::LevelAnalysisManager()
 {
 	samplesPerWindow = sampleRate*(windowSizeInMS/1000.0f);
 	prevLeftBuf = std::make_unique<boost::circular_buffer<double>>(samplesPerWindow);
 	prevRightBuf = std::make_unique<boost::circular_buffer<double>>(samplesPerWindow);
+	secondsOfAudioCalculated = 0;
 }
 
 LevelAnalysisManager::~LevelAnalysisManager()
 {
 }
 
-void LevelAnalysisManager::processSamples(const AudioBuffer<float>* buffer)
+void LevelAnalysisManager::processSamples(const AudioBuffer<float>* buffer, AudioPlayHead::CurrentPositionInfo inPosInfo)
 {	
 	unsigned int _numIncomingSamples = buffer->getNumSamples();
 	const float* inSamplesL = buffer->getReadPointer(0);
 	const float* inSamplesR = buffer->getReadPointer(1);
+	//double getLRMS = buffer->getRMSLevel(0, 0, _numIncomingSamples);
+	//double getRRMS = buffer->getRMSLevel(1, 0, _numIncomingSamples);
 
+	//Update overall peak sample found
 	float leftMag = buffer->getMagnitude(0, 0, _numIncomingSamples);
 	float rightMag = buffer->getMagnitude(1, 0, _numIncomingSamples);
-
 	leftPeakSample = (leftMag > leftPeakSample) ? leftMag : leftPeakSample;
 	rightPeakSample = (rightMag > rightPeakSample) ? rightMag : rightPeakSample;
 
-	DBG("Incoming samples: " + String(_numIncomingSamples) + " TotalSamp: " + String(countTotalRunningSamples));
 	for (unsigned int i = 0; i < _numIncomingSamples; ++i) // Loops over all samples
 	{		
 		++countTotalRunningSamples; // total count of computed samples
@@ -59,21 +63,40 @@ void LevelAnalysisManager::processSamples(const AudioBuffer<float>* buffer)
 			double _rightSquaredSubBuffer = prevRightBuf->front();
 
 			leftSumSquares -= _leftSquaredSubBuffer;
-			rightSumSquares -= _rightSquaredSubBuffer; // remove the sample that falls out of RMS window
+			rightSumSquares -= _rightSquaredSubBuffer; // subtract the sample that falls out of RMS window
 		}
 
 		leftSumSquares += _leftSampleSquared;      // add new sample to the RMS window 
 		rightSumSquares += _rightSampleSquared;
-
 		prevLeftBuf->push_back(_leftSampleSquared);
 		prevRightBuf->push_back(_rightSampleSquared);
-
-		leftCurrRMS = sqrt(leftSumSquares / getMinOfTotalWindowSamples()); // Calculate current RMS
-		rightCurrRMS = sqrt(rightSumSquares / getMinOfTotalWindowSamples());
+		
+		// Calc current RMS, Add 3db to meet AES17-2015 specification, so calibration sine wave peaks at 0
+		leftCurrRMS = sqrt(leftSumSquares / getMinOfTotalWindowSamples()) + decibelRMSCalibration;
+		rightCurrRMS = sqrt(rightSumSquares / getMinOfTotalWindowSamples()) + decibelRMSCalibration;
 				
+		//Check for max RMS window found so far
 		if (leftSumSquares > leftMaxSamplesSquaredWindowFound) leftMaxSamplesSquaredWindowFound = leftSumSquares;
 		if (rightSumSquares > rightMaxSamplesSquaredWindowFound) rightMaxSamplesSquaredWindowFound = rightSumSquares;
-		
+
+	    #ifdef JUCE_DEBUG	
+		    if (countTotalRunningSamples % sampleRate == 0) // happens once per second
+			{
+				++secondsOfAudioCalculated;
+				double Xrms = 10 * log10((leftSumSquares + rightSumSquares) / (2 * samplesPerWindow));
+
+				Xrms += decibelRMSCalibration; 
+
+				rmsPair.first = inPosInfo.timeInSeconds + 1;
+				rmsPair.second = Xrms;
+
+				rmsMap.insert_or_assign(rmsPair.first, rmsPair.second);
+
+				DBG("inDB at " << String(secondsOfAudioCalculated) << " Seconds is: " << Xrms);
+
+
+			}
+		#endif // JUCE_DEBUG
 	}
 }
 
@@ -104,6 +127,8 @@ void LevelAnalysisManager::resetCalculation()
 	rightSumSquares = 0;
 	leftCurrRMS = 0;
 	rightCurrRMS = 0;	
+
+	rmsMap.clear();
 }
 
 	

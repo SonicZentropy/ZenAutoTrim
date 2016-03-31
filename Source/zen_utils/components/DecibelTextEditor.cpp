@@ -1,16 +1,20 @@
-/*
-  ==============================================================================
-
-    DecibelTextEditor.cpp
-    Created: 20 Jan 2016 10:12:03am
-    Author:  Zentropy
-
-  ==============================================================================
-*/
+/*==============================================================================
+//  DecibelTextEditor.cpp
+//  Part of the Zentropia JUCE Collection
+//  @author Casey Bailey (<a href="SonicZentropy@gmail.com">email</a>)
+//  @version 0.1
+//  @date 1/20/2016
+//  Copyright (C) 2016 by Casey Bailey
+//  Provided under the [GNU license]
+//
+//  Details: DETAILS
+//
+//  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
+===============================================================================*/
 
 #include "./DecibelTextEditor.h"
 #include <sstream>
-#include "zen_utils/utilities/ZenStringUtils.hpp"
+
 
 DecibelTextEditor::DecibelTextEditor(const String& compName, const AudioParameterFloat* param, juce_wchar passwordCharacter)
 	:TextEditor(compName, passwordCharacter),

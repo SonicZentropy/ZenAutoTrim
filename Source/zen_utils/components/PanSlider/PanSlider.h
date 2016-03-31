@@ -16,7 +16,7 @@
 #ifndef PANSLIDER_H_INCLUDED
 #define PANSLIDER_H_INCLUDED
 #include "JuceHeader.h"
-#include "../AssociatedSlider.hpp"
+#include "../../components/AssociatedSlider.hpp"
 #include "../../parameters/ZenParameter.hpp"
 
 namespace Zen

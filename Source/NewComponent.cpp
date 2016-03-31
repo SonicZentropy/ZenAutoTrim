@@ -123,6 +123,22 @@ NewComponent::NewComponent ()
     avgBox->setPopupMenuEnabled (true);
     avgBox->setText (TRANS("AVG"));
 
+    addAndMakeVisible (resetBtn = new TextButton ("Reset Button"));
+    resetBtn->setButtonText (TRANS("Reset"));
+    resetBtn->addListener (this);
+
+    addAndMakeVisible (autoGainBtn = new TextButton ("Auto Gain"));
+    autoGainBtn->addListener (this);
+
+    addAndMakeVisible (targetEditor = new DecibelTextEditor ("Target Editor"));
+    targetEditor->setMultiLine (false);
+    targetEditor->setReturnKeyStartsNewLine (false);
+    targetEditor->setReadOnly (false);
+    targetEditor->setScrollbarsShown (false);
+    targetEditor->setCaretVisible (true);
+    targetEditor->setPopupMenuEnabled (true);
+    targetEditor->setText (TRANS("-18.00 dBFS"));
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -149,6 +165,9 @@ NewComponent::~NewComponent()
     maxBox = nullptr;
     peakBox = nullptr;
     avgBox = nullptr;
+    resetBtn = nullptr;
+    autoGainBtn = nullptr;
+    targetEditor = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -182,8 +201,31 @@ void NewComponent::resized()
     maxBox->setBounds (172, 68, 40, 24);
     peakBox->setBounds (172, 96, 40, 24);
     avgBox->setBounds (172, 40, 40, 24);
+    resetBtn->setBounds (8, 128, 51, 24);
+    autoGainBtn->setBounds (68, 128, 75, 24);
+    targetEditor->setBounds (156, 128, 75, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
+}
+
+void NewComponent::buttonClicked (Button* buttonThatWasClicked)
+{
+    //[UserbuttonClicked_Pre]
+    //[/UserbuttonClicked_Pre]
+
+    if (buttonThatWasClicked == resetBtn)
+    {
+        //[UserButtonCode_resetBtn] -- add your button handler code here..
+        //[/UserButtonCode_resetBtn]
+    }
+    else if (buttonThatWasClicked == autoGainBtn)
+    {
+        //[UserButtonCode_autoGainBtn] -- add your button handler code here..
+        //[/UserButtonCode_autoGainBtn]
+    }
+
+    //[UserbuttonClicked_Post]
+    //[/UserbuttonClicked_Post]
 }
 
 
@@ -252,6 +294,16 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="172 40 40 24" initialText="AVG"
               multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="1"/>
+  <TEXTBUTTON name="Reset Button" id="680d78160c28fa2" memberName="resetBtn"
+              virtualName="" explicitFocusOrder="0" pos="8 128 51 24" buttonText="Reset"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="Auto Gain" id="b96ce12aa0d8544a" memberName="autoGainBtn"
+              virtualName="" explicitFocusOrder="0" pos="68 128 75 24" buttonText="Auto Gain"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TEXTEDITOR name="Target Editor" id="4cfb8d149191bd88" memberName="targetEditor"
+              virtualName="DecibelTextEditor" explicitFocusOrder="0" pos="156 128 75 24"
+              initialText="-18.00 dBFS" multiline="0" retKeyStartsLine="0"
+              readonly="0" scrollbars="0" caret="1" popupmenu="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

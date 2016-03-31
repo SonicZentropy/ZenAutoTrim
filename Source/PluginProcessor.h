@@ -18,8 +18,11 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include <zen_utils/DSP/RMSManager.h>
+#include "zen_utils/parameters/ZenDecibelParameter.hpp"
+#include "zen_utils/parameters/ZenBoolParameter.hpp"
 
 using Zen::LevelAnalysisManager;
+using namespace Zen;
 
 //==============================================================================
 class ZenAutoTrimAudioProcessor  : public AudioProcessor
@@ -44,7 +47,7 @@ public:
 
     bool acceptsMidi() const override;
     bool producesMidi() const override;
-    bool silenceInProducesSilenceOut() const override;
+    //bool silenceInProducesSilenceOut() const override;
     double getTailLengthSeconds() const override;
 
     //==============================================================================
@@ -59,16 +62,29 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	//==============================================================================
-	AudioParameterFloat* gainParam; 
-	AudioParameterFloat* targetParam;
-	bool autoGainEnabled;
+	ZenDecibelParameter* gainParam; 
+	ZenDecibelParameter* targetParam;
+	ZenBoolParameter* autoGainEnableParam;
 
 	void setCurrentEditor(AudioProcessorEditor* inEditor) { currentEditor = inEditor; }
+
+	enum CalibrationTarget
+	{
+		AverageRMS,
+		MaxRMS,
+		Peak
+	};
+
+	CalibrationTarget getTargetForAutoTrim() const { return targetForAutoTrim; }
+	void setTargetForAutoTrim(CalibrationTarget inValue) { targetForAutoTrim = inValue; }
 
 private:
 	friend class ZenAutoTrimAudioProcessorEditor;
 	AudioProcessorEditor* currentEditor;
 	LevelAnalysisManager levelAnalysisManager;
+	AudioPlayHead* aPlayHead;
+	// #TODO: Create GUI parameter to allow changes to this
+	CalibrationTarget targetForAutoTrim = Peak;
 
 	double prevSampleRate = 44100;
     //==============================================================================

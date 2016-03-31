@@ -1,5 +1,18 @@
-#include "NotepadComponent.h"
+/*==============================================================================
+//  NotepadComponent.cpp
+//  Part of the Zentropia JUCE Collection
+//  @author Casey Bailey (<a href="SonicZentropy@gmail.com">email</a>)
+//  @version 0.1
+//  @date 2016/02/22
+//  Copyright (C) 2016 by Casey Bailey
+//  Provided under the [GNU license]
+//
+//  Details: Creates component for basic text notepad
+//
+//  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
+===============================================================================*/
 
+#include "NotepadComponent.h"
 
 NotepadComponent::NotepadComponent(const String& name, const String& contents) : FileBasedDocument(".jnote", "*.jnote",
 	"Browse for note to load",
@@ -13,18 +26,24 @@ NotepadComponent::NotepadComponent(const String& name, const String& contents) :
 	editor.setMultiLine(true);
 	editor.setReturnKeyStartsNewLine(true);
 	editor.getTextValue().referTo(textValueObject);
-	addAndMakeVisible(editor);
 	editor.addListener(this);
+	addAndMakeVisible(editor);
+
+	addAndMakeVisible(clearBtn = new TextButton("Clear Button", "Clear text"));
+	clearBtn->setButtonText("Clear");
+	clearBtn->addListener(this);	
 }
 
 NotepadComponent::~NotepadComponent()
 {
+	clearBtn = nullptr;
 	editor.removeListener(this);
 }
 
 void NotepadComponent::resized()
 {
 	editor.setBounds(getLocalBounds());
+	clearBtn->setBounds(getLocalBounds().getWidth() - 51, getLocalBounds().getHeight() - 25, 50, 24);
 }
 
 String NotepadComponent::getDocumentTitle()
@@ -71,6 +90,14 @@ void NotepadComponent::textEditorTextChanged(TextEditor& ed)
 	// let our FileBasedDocument know we've changed
 	if (&ed == &editor)
 		changed();
+}
+
+void NotepadComponent::buttonClicked(Button* buttonThatWasClicked)
+{
+	if (buttonThatWasClicked == clearBtn)
+	{
+		editor.clear();
+	}
 }
 
 #endif

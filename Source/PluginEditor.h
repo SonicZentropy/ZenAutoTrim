@@ -37,6 +37,8 @@ public:
     void resized() override;
 
 	void textEditorReturnKeyPressed(TextEditor& editorChanged) override;
+	void textEditorFocusLost(TextEditor& editorChanged) override;
+	void textEditorUpdateDueToChange(TextEditor& editorChanged);
 	void buttonClicked(Button*) override;
 
 	void timerCallback() override;
@@ -55,6 +57,9 @@ private:
 	ScopedPointer<TextButton> resetBtn, autoGainBtn;
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenAutoTrimAudioProcessorEditor)
+
+		
+
 };
 
 

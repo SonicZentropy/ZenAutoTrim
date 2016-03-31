@@ -20,7 +20,7 @@
 #include <sstream>
 #include "../parameters/ZenParameter.hpp"
 #include "AssociatedComponent.hpp"
-
+#include "../debug/ZenDebugEditor.h"
 
 
 namespace Zen
@@ -45,7 +45,7 @@ namespace Zen
 		{
 			setRange(minimumOfRange, maximumOfRange, inStep);
 			//setValue(associatedParam->getValueForGUIComponent(), dontSendNotification);			
-			setValueFromHost(associatedParam->getValueForGUIComponent(), dontSendNotification);
+			setValueFromHost(associatedParam->getValue(), dontSendNotification);
 			associatedParam->setUnitLabel(inLabel);
 		}
 
@@ -83,7 +83,7 @@ namespace Zen
 			numberFormatter.precision(2);
 			//change getValue to getValueFromLinearNormalized
 			//float nearest = roundf(val * 100) / 100;
-			float currValue = getValue();
+
 			numberFormatter << std::fixed << getValue()+0.0001f << getTextValueSuffix();
 			String result = numberFormatter.str();					
 			return result;			

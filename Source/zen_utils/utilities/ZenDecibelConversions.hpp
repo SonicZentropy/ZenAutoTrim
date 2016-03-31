@@ -16,8 +16,6 @@
 #ifndef DECIBEL_CONVERSIONS_H_INCLUDED
 #define DECIBEL_CONVERSIONS_H_INCLUDED
 #include "ZenParamUtils.h"
-#include "ZenUtils.hpp"
-
 
 namespace Zen
 {
@@ -33,8 +31,7 @@ namespace Zen
 		/// <returns>A raw Gain value such that 0.0 gain = minusInfinityDb, 1.0 Gain = 0.0dB, and Gain > 1.0 is decibel increase</returns>
 		static float decibelsToDBGain(const float& decibels, const float& minusInfinityDb = static_cast<float>(defaultMinusInfinitydB))
 		{
-			float dbGain =(decibels > minusInfinityDb) ? pow(10.0, decibels * 0.05) : 0.0f;
-			return dbGain;
+			return (decibels > minusInfinityDb) ? pow(10.0, decibels * 0.05) : 0.0f;			
 		}
 
 		/// <summary>A gain of 1.0 = 0 dB, and lower gains map onto negative decibel values.
@@ -82,48 +79,42 @@ namespace Zen
 		static double mapDecibelsToProperNormalizedValue(const double& inDecibels, const double& decibelMinimum, const double& decibelMaximum, const double& decibelValueForMidpoint)
 		{
 			jassert(inDecibels >= decibelMinimum && inDecibels <= decibelMaximum && decibelValueForMidpoint >= decibelMinimum && decibelValueForMidpoint <= decibelMaximum);
-			double result = ZenParamUtils::convertValueToWarpedLinearBasedOnMidpoint(inDecibels, decibelMinimum, decibelMaximum, decibelValueForMidpoint);
-//			DBG("In DecibelConversions::mapDecibelsToProperNormalizedValue(inDecibels, decibelMinimum, decibelMaximum, decibelValueForMidpoint) with result: " + String(result));
-			return result;
+			return ZenParamUtils::convertValueToWarpedLinearBasedOnMidpoint(inDecibels, decibelMinimum, decibelMaximum, decibelValueForMidpoint);
 		}
 
 		/// <summary>Map a normalized, linearly scaled input value between 0.0 and 1.0 to decibels in a given range (ex: -96 to 12)</summary>
-		/// <param name="x">				 The input value (Between 0.0 and 1.0)</param>
-		/// <param name="normalizedMin">	 Minimum possible value of the normalized range (Generally always 0.0 for VST)</param>
-		/// <param name="normalizedMax">	 Maximum possible value of the normalized range (Generally always 1.0 for VSTs)</param>
-		/// <param name="normalizedMidpoint">Value in the range you want to use as the correlated midpoint (Generally 0.5 for Decibels due to automation)</param>
-		/// <param name="decibelMinimum">	 Minimum possible value for the desired decibal range (ex: -96)</param>
-		/// <param name="decibelMaximum">	 Maximum possible value for the desired decibal range (ex: 12)</param>
-		/// <param name="decibelUnityForMid">Decimal value you want mapped to normalizedMidpoint (Generally 0.0 for Unity Gain Mapped to 0.5 in the host)</param>
-		/// <returns>Decibel value of the input normalized value</returns>
-		static double mapNormalizedValueToDecibels(const double& inValue, const float& decibelMinimum, const float& decibelMaximum)
+		/// <param name="inValue">Input value (in 0to1 normalized form) to be converted to decibels.</param>
+		/// <param name="decibelMinimum">Minimum possible value of the decibel range (ex. -96.0f)</param>
+		/// <param name="decibelMaximum">Maximum possible value of the decibel range (ex. 18.0f)</param>
+		/// <param name="dbValueToMapTo0pt5">	 Minimum possible value for the desired decibal range (ex: -96)</param>
+        /// <returns>Decibel value of the input normalized value</returns>
+		static double mapProperNormalizedValueToDecibels(float inValue, float decibelMinimum, float decibelMaximum, float dbValueToMapTo0pt5=0.0f)
 		{
-			jassert(inValue >= -0.00001f && inValue <= 1.00001f);
-			return ZenParamUtils::convertMidpointWarpedLinearNormalizedValueToRawRangeValue(inValue, decibelMinimum, decibelMaximum, 0.0f);
+			inValue = getClamped(inValue, 0.0f, 1.0f);			
+			return ZenParamUtils::convertMidpointWarpedLinearNormalizedValueToRawRangeValue(inValue, decibelMinimum, decibelMaximum, dbValueToMapTo0pt5);
 		}
 
 		/// <summary>Takes a normalized gain value representing an arbitrary Decibel range and converts it to a raw decibel gain value where 1.0 = 0dB</summary>
 		/// <param name="normGainValue">Value between 0 and 1.0 that represents a converted decibel from arbitrary range</param>
 		/// <param name="maximumDecibels">The maximum decibel value of the arbitrary range</param>
-		/// <param name="minusInfinityDb">Any decibel value below this is returned as a 0</param>
+		/// <param name="minimumDecibels">Any decibel value below this is returned as a 0</param>
 		/// <returns>A de-normalized Gain value that can be used to process audio samples</returns>
-		static double decibelRangeGainToRawDecibelGain(const double& normGainValue, const float& minusInfinityDb, const float& maximumDecibels)
-		{
-			jassert(normGainValue >= -0.00001f && normGainValue <= 1.00001f);
-			auto valueInDecibels = ZenParamUtils::convertMidpointWarpedLinearNormalizedValueToRawRangeValue(normGainValue, minusInfinityDb, maximumDecibels, 0.0);
-			return decibelsToDBGain(valueInDecibels, minusInfinityDb);
+		static double mapProperNormalizedValueToRawDecibelGain(double normGainValue, float minimumDecibels, float maximumDecibels, float mappedMidpointOfRange)
+		{			
+			normGainValue = getClamped(normGainValue, 0.0f, 1.0f);
+			//auto valueInDecibels = ZenParamUtils::convertMidpointWarpedLinearNormalizedValueToRawRangeValue(normGainValue, minimumDecibels, maximumDecibels, mappedMidpointOfRange);
+			double valueInDecibels = mapProperNormalizedValueToDecibels(normGainValue, minimumDecibels, maximumDecibels, mappedMidpointOfRange);
+			return decibelsToDBGain(valueInDecibels, minimumDecibels);
 		}
 
 		static double convertLinearToDecibels(const double& linear, const float minDecibels, const float maxDecibels)
 		{
-			double dbValue = (linear * (maxDecibels - minDecibels)) + minDecibels;
-			return dbValue;
+			return (linear * (maxDecibels - minDecibels)) + minDecibels;
 		}
 
 		static double convertDecibelsToLinear(const double& inDecibels, const float inMinDecibels, const float inMaxDecibels)
 		{
-			double linearValue = (inDecibels - inMinDecibels) / (inMaxDecibels - inMinDecibels);
-			return linearValue;
+			return (inDecibels - inMinDecibels) / (inMaxDecibels - inMinDecibels);			
 		}
 
 	private:

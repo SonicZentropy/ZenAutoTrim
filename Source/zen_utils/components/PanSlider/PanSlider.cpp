@@ -33,7 +33,7 @@ namespace Zen
 	{
 	}
 
-
+	
 	String PanSlider::getTextFromValue(double value)
 	{
 		String temp = String(abs(value));

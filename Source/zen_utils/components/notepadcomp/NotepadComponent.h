@@ -18,12 +18,19 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+/// <summary>
+/// Component that creates a basic text notepad.
+/// </summary>
+/// <seealso cref="Component" />
+/// <seealso cref="FileBasedDocument" />
+/// <seealso cref="TextEditor::Listener" />
 class NotepadComponent : public Component,
 	public FileBasedDocument,
-	private TextEditor::Listener
+	private TextEditor::Listener,
+	public ButtonListener
 {
-
 public:
+	
 	NotepadComponent(const String& name, const String& contents);
 
 	~NotepadComponent();
@@ -31,22 +38,42 @@ public:
 	void resized() override;
 
 	String getDocumentTitle() override;
-
+	
 	Result loadDocument(const File& file) override;
 
 	Result saveDocument(const File& file) override;
-
+	
+/// <summary>Gets the last document opened.</summary>
+/// <returns>File handle to last document</returns>
 	File getLastDocumentOpened() override;
 
 	void setLastDocumentOpened(const File& /*file*/) override;
+
+	void buttonClicked(Button*) override;
 
 #if JUCE_MODAL_LOOPS_PERMITTED
 	File getSuggestedSaveAsFile(const File&) override;
 #endif
 
+	void setNoteText(String inText)
+	{
+		editor.setText(inText);
+	}
+
+	void appendNoteText(String inText)
+	{
+		editor.setText(editor.getText() + inText);
+	}
+
+	String getNoteText() const
+	{
+		return editor.getText();
+	}
+
 private:
 	Value textValueObject;
 	TextEditor editor;
+	ScopedPointer<TextButton> clearBtn;
 
 	void textEditorTextChanged(TextEditor& ed) override;
 

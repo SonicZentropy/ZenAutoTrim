@@ -21,42 +21,101 @@
 
 //==============================================================================
 ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
-	:autoGainEnabled(false), currentEditor(nullptr)
+	:currentEditor(nullptr)
 {
-	addParameter(gainParam = new AudioParameterFloat("gainParam", "Trim", -96.0f, 18.0f, 0.0f));	
-	addParameter(targetParam = new AudioParameterFloat("targetParam", "Trim", -96.0f, 18.0f, 0.0f));
+	addParameter(gainParam = new ZenDecibelParameter("gainParam", "Gain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, true, 50.0f));
+	addParameter(targetParam = new ZenDecibelParameter("targetGain", "TargetGain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, false));
+	addParameter(autoGainEnableParam = new ZenBoolParameter("autoGainParam", "AutoGain", false, ""));
 }
 
 ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
 {
+	DBG("In destructor");
 }
 
 void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
+	aPlayHead = getPlayHead();
+	AudioPlayHead::CurrentPositionInfo posInfo;
+	bool posFound = aPlayHead->getCurrentPosition(posInfo);
+
+	float* leftData = buffer.getWritePointer(0);	//leftData references left channel now
+	float* rightData = buffer.getWritePointer(1); //right data references right channel now
+
+	//DBG("Found pos:");
+	/*if (posInfo.isPlaying)
+	{
+		posFound = true; //placeholder for debugging
+	}*/
+	
 	if (prevSampleRate != this->getSampleRate())
 	{
 		prevSampleRate = this->getSampleRate();
 		levelAnalysisManager.sampleRateChanged(prevSampleRate);
 	}	
 
-	if (currentEditor != nullptr)
+	if (posFound)
 	{
-		dynamic_cast<ZenAutoTrimAudioProcessorEditor*>(currentEditor)->vuMeter->copySamples(buffer.getReadPointer(0), buffer.getNumSamples());
-	}
-	if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f)
-		levelAnalysisManager.processSamples(&buffer);
-	
-	if (autoGainEnabled)
-	{
-		//#TODO: Need to check that if the gainParam needs to be adjusted positively, it doesn't cause peaks to clip
-		gainParam->setValueNotifyingHost( (Decibels::decibelsToGain(targetParam->get()) - levelAnalysisManager.getMaxChannelRMS()) );
-		gainParam->setNeedsUIUpdate(true);
-	}
 
-	if (gainParam->get() != 0.0f)
-	{
-		float gain = Decibels::decibelsToGain<float>(*gainParam);
-		buffer.applyGain(gain);
+		if (currentEditor != nullptr)
+		{
+			dynamic_cast<ZenAutoTrimAudioProcessorEditor*>(currentEditor)->vuMeter->copySamples(
+				buffer.getReadPointer(0), buffer.getNumSamples());
+		}
+		if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f)
+			levelAnalysisManager.processSamples(&buffer, posInfo );
+
+		if (autoGainEnableParam)
+		{
+			// Calibrate gain param based on which value is target
+			switch(targetForAutoTrim)
+			{
+				case Peak:
+				{
+					double maxPeak = levelAnalysisManager.getMaxChannelPeak();
+					double targParamGain = Decibels::decibelsToGain(targetParam->get());
+					double gainValueToSet = levelAnalysisManager.getMaxChannelPeak() 
+						- Decibels::decibelsToGain(targetParam->get());
+					DBG("Max peak is: " << maxPeak);
+					DBG("Targ param get is: " << targetParam->get());
+					DBG("Targ param in gain is: " << targParamGain);
+					DBG("Gain value Gain Param is Set to: " << gainValueToSet);
+				}
+					gainParam->setValueNotifyingHost(levelAnalysisManager.getMaxChannelPeak() 
+						- Decibels::decibelsToGain(targetParam->get()));
+					break;
+				case MaxRMS:
+					gainParam->setValueNotifyingHost((Decibels::decibelsToGain(targetParam->get()) 
+						- levelAnalysisManager.getMaxChannelRMS()));
+					break;
+				case AverageRMS:
+					gainParam->setValueNotifyingHost((Decibels::decibelsToGain(targetParam->get()) 
+						- levelAnalysisManager.getMaxCurrentRunningRMS()));
+					break;
+				default:
+					throw std::runtime_error("This should never happen");
+
+			}
+			
+			gainParam->setNeedsUIUpdate(true);
+		}
+
+		if (*gainParam != 0.0f)
+		{
+			//Wrong because param.get returns decibel value
+			// #TODO: FIX by using new parameter class that exposes decent amount of shit
+			for (size_t sampleIdx = 0; sampleIdx < buffer.getNumSamples(); ++sampleIdx)
+			{
+				if (leftData[sampleIdx] < 0)
+					leftData[sampleIdx] += gainParam->get();
+				else 
+					leftData[sampleIdx] -= gainParam->get();
+				if (rightData[sampleIdx] < 0)
+					rightData[sampleIdx] += gainParam->get();
+				else
+					rightData[sampleIdx] -= gainParam->get();
+			}
+		}
 	}
 	
 }
@@ -114,10 +173,11 @@ bool ZenAutoTrimAudioProcessor::producesMidi() const
    #endif
 }
 
+/*
 bool ZenAutoTrimAudioProcessor::silenceInProducesSilenceOut() const
 {
     return false;
-}
+}*/
 
 double ZenAutoTrimAudioProcessor::getTailLengthSeconds() const
 {

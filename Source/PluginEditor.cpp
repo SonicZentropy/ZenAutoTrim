@@ -41,6 +41,16 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	gainEditor->setInputRestrictions(8, "-1234567890.");	
 	gainEditor->addListener(this);
 
+	addAndMakeVisible(targetEditor = new DecibelTextEditor("Target Editor", processor.targetParam));
+	targetEditor->setMultiLine(false);
+	targetEditor->setReturnKeyStartsNewLine(false);
+	targetEditor->setReadOnly(false);
+	targetEditor->setScrollbarsShown(false);
+	targetEditor->setCaretVisible(true);
+	targetEditor->setPopupMenuEnabled(true);
+	targetEditor->setText(TRANS("-18.00 dBFS"));
+	targetEditor->addListener(this);
+
 	graphicalManager = new TimeSliceThread("graphicalManagerTrd");
 	graphicalManager->startThread(2);
 	//addAndMakeVisible(vuMeter = new SegmentedMeter());
@@ -175,15 +185,6 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	autoGainBtn->setClickingTogglesState(true);
 	autoGainBtn->addListener(this);
 
-	addAndMakeVisible(targetEditor = new DecibelTextEditor("Target Editor", processor.targetParam));
-	targetEditor->setMultiLine(false);
-	targetEditor->setReturnKeyStartsNewLine(false);
-	targetEditor->setReadOnly(false);
-	targetEditor->setScrollbarsShown(false);
-	targetEditor->setCaretVisible(true);
-	targetEditor->setPopupMenuEnabled(true);
-	targetEditor->setText(TRANS("-18.00 dBFS"));
-
 	setSize(250, 250);
 	startTimer(100);
 	processor.setCurrentEditor(this);
@@ -244,23 +245,35 @@ void ZenAutoTrimAudioProcessorEditor::resized()
 
 void ZenAutoTrimAudioProcessorEditor::textEditorReturnKeyPressed(TextEditor& editorChanged)
 {
+	textEditorUpdateDueToChange(editorChanged);
+}
+
+
+void ZenAutoTrimAudioProcessorEditor::textEditorFocusLost(TextEditor& editorChanged)
+{
+	textEditorUpdateDueToChange(editorChanged);
+}
+
+void ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(TextEditor& editorChanged)
+{
 	if (&editorChanged == gainEditor)
 	{
 		processor.gainParam->setValueNotifyingHost(dynamic_cast<DecibelTextEditor&>(editorChanged).getNormalizedValueFromText());
-		dynamic_cast<DecibelTextEditor&>(editorChanged).formatTextAfterEntry();		
-	}		
-	else if (&editorChanged == targetEditor)
+		dynamic_cast<DecibelTextEditor&>(editorChanged).formatTextAfterEntry();
+	} else if (&editorChanged == targetEditor)
 	{
-		processor.targetParam->setValueNotifyingHost(dynamic_cast<DecibelTextEditor&>(editorChanged).getNormalizedValueFromText());
+		float targetGain = dynamic_cast<DecibelTextEditor&>(editorChanged).getNormalizedValueFromText();
+		processor.targetParam->setValueNotifyingHost(targetGain);
 	}
 }
+
 
 void ZenAutoTrimAudioProcessorEditor::buttonClicked(Button* pressedBtn)
 {
 	if (pressedBtn == resetBtn)
 		processor.levelAnalysisManager.resetCalculation();
 	else if (pressedBtn == autoGainBtn)
-		processor.autoGainEnabled = !processor.autoGainEnabled;
+		processor.autoGainEnableParam = !processor.autoGainEnableParam;
 }
 
 void ZenAutoTrimAudioProcessorEditor::timerCallback()

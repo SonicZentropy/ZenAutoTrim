@@ -34,7 +34,8 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class NewComponent  : public Component
+class NewComponent  : public Component,
+                      public ButtonListener
 {
 public:
     //==============================================================================
@@ -47,6 +48,7 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
@@ -65,6 +67,9 @@ private:
     ScopedPointer<TextEditor> maxBox;
     ScopedPointer<TextEditor> peakBox;
     ScopedPointer<TextEditor> avgBox;
+    ScopedPointer<TextButton> resetBtn;
+    ScopedPointer<TextButton> autoGainBtn;
+    ScopedPointer<DecibelTextEditor> targetEditor;
 
 
     //==============================================================================

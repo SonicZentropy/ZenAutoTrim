@@ -103,40 +103,4 @@ namespace Zen
 	};
 }  // Zen Namespace
 
-
-namespace
-{
-inline bool areAlmostEqual(const double& x, const double& y, const double& precision = 0.00001)
-{
-	return (x - y < precision || y - x < precision) ? false : true;
-}
-
-inline bool almostEqual(const double& x, const double& y, const double& precision = 0.00001)
-{
-	return (x - y < precision || y - x < precision) ? false : true;
-}
-
-/// <summary> Convert float to boolean. Float 0.0 => False, any other value True </summary>
-inline bool convertFloatToBoolean(const float& inFloat)
-{
-	return (0.0 == inFloat) ? false : true;
-}
-
-/// <summary>Convert Boolean to float. True => 1.0, False => 0.0</summary>
-inline float convertBooleanToFloat(const bool& inBool)
-{
-	return (false == inBool) ? 0.0 : 1.0;
-}
-
-/// <summary> Convert a 0-1.0 normalized value into a boolean where 0.5+ is true </summary>
-inline bool convertFloatToBooleanViaRange(float inputValue)
-{
-	if (inputValue < 0.5)
-		return false;
-	else
-		return true;
-}
-
-} // anon namespace
-
 #endif //ZEN_PARAM_UTILS_H_INCLUDED

@@ -21,6 +21,12 @@
 namespace Zen
 {
 
+/// <summary>
+/// Wrapper for a processor parameter and its text button GUI representation.
+/// No longer needed as of JUCE4, here only for backwards compatibility
+/// </summary>
+/// <seealso cref="TextButton" />
+/// <seealso cref="AssociatedComponent" />
 class AssociatedTextButton : public virtual TextButton, public AssociatedComponent
 {
 
