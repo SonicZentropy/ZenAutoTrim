@@ -12,10 +12,8 @@
 //  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
 ===============================================================================*/
 
-
-#include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include <zen_utils/utilities/ZenStringUtils.hpp>
+
 
 //==============================================================================
 ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAudioProcessor& p)
@@ -35,7 +33,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	gainEditor->setScrollbarsShown(false);
 	gainEditor->setCaretVisible(true);
 	gainEditor->setPopupMenuEnabled(true);
-	gainEditor->setText(String(processor.gainParam->get()));
+	gainEditor->setText(String(processor.gainParam->getValueInDecibels()));
 	gainEditor->setSelectAllWhenFocused(true);
 	gainEditor->setPopupMenuEnabled(false);	
 	gainEditor->setInputRestrictions(8, "-1234567890.");	
@@ -59,8 +57,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	
 	graphicalManager->addTimeSliceClient(vuMeter);
 
-	addAndMakeVisible(leftAvgRMSLabel = new Label("Average RMS Label",
-		TRANS("0")));
+	addAndMakeVisible(leftAvgRMSLabel = new Label("Average RMS Label", TRANS("0")));
 	leftAvgRMSLabel->setFont(Font(15.00f, Font::bold));
 	leftAvgRMSLabel->setJustificationType(Justification::centred);
 	leftAvgRMSLabel->setEditable(false, false, false);
@@ -69,8 +66,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	leftAvgRMSLabel->setColour(TextEditor::textColourId, Colours::black);
 	leftAvgRMSLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
 
-	addAndMakeVisible(leftMaxRMSLabel = new Label("Max RMS Label",
-		TRANS("00")));
+	addAndMakeVisible(leftMaxRMSLabel = new Label("Max RMS Label", TRANS("00")));
 	leftMaxRMSLabel->setFont(Font(15.00f, Font::bold));
 	leftMaxRMSLabel->setJustificationType(Justification::centred);
 	leftMaxRMSLabel->setEditable(false, false, false);
@@ -79,8 +75,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	leftMaxRMSLabel->setColour(TextEditor::textColourId, Colours::black);
 	leftMaxRMSLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
 	
-	addAndMakeVisible(leftPeakLabel = new Label("Max RMS Label",
-		TRANS("00")));
+	addAndMakeVisible(leftPeakLabel = new Label("Max RMS Label", TRANS("00")));
 	leftPeakLabel->setFont(Font(15.00f, Font::bold));
 	leftPeakLabel->setJustificationType(Justification::centred);
 	leftPeakLabel->setEditable(false, false, false);
@@ -89,8 +84,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	leftPeakLabel->setColour(TextEditor::textColourId, Colours::black);
 	leftPeakLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
 
-	addAndMakeVisible(rightAvgRMSLabel = new Label("Average RMS Label",
-		TRANS("0")));
+	addAndMakeVisible(rightAvgRMSLabel = new Label("Average RMS Label", TRANS("0")));
 	rightAvgRMSLabel->setFont(Font(15.00f, Font::bold));
 	rightAvgRMSLabel->setJustificationType(Justification::centred);
 	rightAvgRMSLabel->setEditable(false, false, false);
@@ -99,8 +93,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	rightAvgRMSLabel->setColour(TextEditor::textColourId, Colours::black);
 	rightAvgRMSLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
 
-	addAndMakeVisible(rightMaxRMSLabel = new Label("Max RMS Label",
-		TRANS("00")));
+	addAndMakeVisible(rightMaxRMSLabel = new Label("Max RMS Label", TRANS("00")));
 	rightMaxRMSLabel->setFont(Font(15.00f, Font::bold));
 	rightMaxRMSLabel->setJustificationType(Justification::centred);
 	rightMaxRMSLabel->setEditable(false, false, false);
@@ -109,8 +102,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	rightMaxRMSLabel->setColour(TextEditor::textColourId, Colours::black);
 	rightMaxRMSLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
 
-	addAndMakeVisible(rightPeakLabel = new Label("Max RMS Label",
-		TRANS("00")));
+	addAndMakeVisible(rightPeakLabel = new Label("Max RMS Label", TRANS("00")));
 	rightPeakLabel->setFont(Font(15.00f, Font::bold));
 	rightPeakLabel->setJustificationType(Justification::centred);
 	rightPeakLabel->setEditable(false, false, false);
@@ -147,8 +139,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	avgBox->setText(TRANS("AVG"));
 
 
-	addAndMakeVisible(leftRunningRMS = new Label("Left Running RMS Label",
-		TRANS("00")));
+	addAndMakeVisible(leftRunningRMS = new Label("Left Running RMS Label", TRANS("00")));
 	leftRunningRMS->setFont(Font(15.00f, Font::bold));
 	leftRunningRMS->setJustificationType(Justification::centred);
 	leftRunningRMS->setEditable(false, false, false);
@@ -157,8 +148,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	leftRunningRMS->setColour(TextEditor::textColourId, Colours::black);
 	leftRunningRMS->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
 
-	addAndMakeVisible(rightRunningRMS = new Label("Right Running RMS Label",
-		TRANS("00")));
+	addAndMakeVisible(rightRunningRMS = new Label("Right Running RMS Label", TRANS("00")));
 	rightRunningRMS->setFont(Font(15.00f, Font::bold));
 	rightRunningRMS->setJustificationType(Justification::centred);
 	rightRunningRMS->setEditable(false, false, false);
@@ -258,11 +248,11 @@ void ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(TextEditor& ed
 {
 	if (&editorChanged == gainEditor)
 	{
-		processor.gainParam->setValueNotifyingHost(dynamic_cast<DecibelTextEditor&>(editorChanged).getNormalizedValueFromText());
+		processor.gainParam->setValueNotifyingHost(dynamic_cast<DecibelTextEditor&>(editorChanged).getDecibelValueFromText());
 		dynamic_cast<DecibelTextEditor&>(editorChanged).formatTextAfterEntry();
 	} else if (&editorChanged == targetEditor)
 	{
-		float targetGain = dynamic_cast<DecibelTextEditor&>(editorChanged).getNormalizedValueFromText();
+		float targetGain = dynamic_cast<DecibelTextEditor&>(editorChanged).getDecibelValueFromText();
 		processor.targetParam->setValueNotifyingHost(targetGain);
 	}
 }
@@ -273,14 +263,14 @@ void ZenAutoTrimAudioProcessorEditor::buttonClicked(Button* pressedBtn)
 	if (pressedBtn == resetBtn)
 		processor.levelAnalysisManager.resetCalculation();
 	else if (pressedBtn == autoGainBtn)
-		processor.autoGainEnableParam = !processor.autoGainEnableParam;
+		processor.autoGainEnableParam->toggleValue();
 }
 
 void ZenAutoTrimAudioProcessorEditor::timerCallback()
 {
 	if (processor.gainParam->needsUIUpdate())
 	{
-		gainEditor->setTextWith2Precision<double>(processor.gainParam->get());
+		gainEditor->setTextWith2Precision<double>(processor.gainParam->getValueInDecibels());
 		processor.gainParam->setNeedsUIUpdate(false);
 	}
 
@@ -296,5 +286,3 @@ void ZenAutoTrimAudioProcessorEditor::timerCallback()
 	leftPeakLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getLeftPeakInDB()), dontSendNotification);
 	rightPeakLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getRightPeakInDB()), dontSendNotification);
 }
-
-//#TODO: Fix bugs - UI gain not updating properly

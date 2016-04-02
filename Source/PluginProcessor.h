@@ -16,13 +16,8 @@
 #ifndef PLUGINPROCESSOR_H_INCLUDED
 #define PLUGINPROCESSOR_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
-#include <zen_utils/DSP/RMSManager.h>
-#include "zen_utils/parameters/ZenDecibelParameter.hpp"
-#include "zen_utils/parameters/ZenBoolParameter.hpp"
-
-using Zen::LevelAnalysisManager;
-using namespace Zen;
+#include "JuceHeader.h"
+//using namespace Zen;
 
 //==============================================================================
 class ZenAutoTrimAudioProcessor  : public AudioProcessor
@@ -47,7 +42,6 @@ public:
 
     bool acceptsMidi() const override;
     bool producesMidi() const override;
-    //bool silenceInProducesSilenceOut() const override;
     double getTailLengthSeconds() const override;
 
     //==============================================================================
@@ -62,9 +56,6 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	//==============================================================================
-	ZenDecibelParameter* gainParam; 
-	ZenDecibelParameter* targetParam;
-	ZenBoolParameter* autoGainEnableParam;
 
 	void setCurrentEditor(AudioProcessorEditor* inEditor) { currentEditor = inEditor; }
 
@@ -80,6 +71,9 @@ public:
 
 private:
 	friend class ZenAutoTrimAudioProcessorEditor;
+	ZenDecibelParameter* gainParam; 
+	ZenDecibelParameter* targetParam;
+	ZenBoolParameter* autoGainEnableParam;
 	AudioProcessorEditor* currentEditor;
 	LevelAnalysisManager levelAnalysisManager;
 	AudioPlayHead* aPlayHead;

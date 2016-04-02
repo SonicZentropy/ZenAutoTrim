@@ -12,14 +12,13 @@
 //  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
 ===============================================================================*/
 
-
 #ifndef PLUGINEDITOR_H_INCLUDED
 #define PLUGINEDITOR_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "JuceHeader.h"
 #include "PluginProcessor.h"
-#include "zen_utils/components/DecibelTextEditor.h"
-#include "dRowAudio/dRowAudio/gui/dRowAudio_SegmentedMeter.h"
+//#include "dRowAudio/dRowAudio/gui/dRowAudio_SegmentedMeter.h"
+
 using drow::SegmentedMeter;
 
 class ZenAutoTrimAudioProcessorEditor 
@@ -57,9 +56,6 @@ private:
 	ScopedPointer<TextButton> resetBtn, autoGainBtn;
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenAutoTrimAudioProcessorEditor)
-
-		
-
 };
 
 

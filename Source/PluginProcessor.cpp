@@ -15,7 +15,6 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "juce_audio_basics\effects\juce_Decibels.h"
 #include <memory>
 
 
@@ -30,7 +29,7 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 
 ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
 {
-	DBG("In destructor");
+	//DBG("In destructor");
 }
 
 void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
@@ -41,12 +40,6 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 
 	float* leftData = buffer.getWritePointer(0);	//leftData references left channel now
 	float* rightData = buffer.getWritePointer(1); //right data references right channel now
-
-	//DBG("Found pos:");
-	/*if (posInfo.isPlaying)
-	{
-		posFound = true; //placeholder for debugging
-	}*/
 	
 	if (prevSampleRate != this->getSampleRate())
 	{
@@ -54,8 +47,8 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 		levelAnalysisManager.sampleRateChanged(prevSampleRate);
 	}	
 
-	if (posFound)
-	{
+	//if (posFound)
+	//{
 
 		if (currentEditor != nullptr)
 		{
@@ -72,24 +65,22 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 			{
 				case Peak:
 				{
-					double maxPeak = levelAnalysisManager.getMaxChannelPeak();
-					double targParamGain = Decibels::decibelsToGain(targetParam->get());
-					double gainValueToSet = levelAnalysisManager.getMaxChannelPeak() 
-						- Decibels::decibelsToGain(targetParam->get());
-					DBG("Max peak is: " << maxPeak);
-					DBG("Targ param get is: " << targetParam->get());
-					DBG("Targ param in gain is: " << targParamGain);
-					DBG("Gain value Gain Param is Set to: " << gainValueToSet);
+					double maxPeak = levelAnalysisManager.getMaxChannelPeakInDB();
+					double targParamDB = targetParam->getValueInDecibels();
+					double decibelValueToAdd = targParamDB - maxPeak;
+					//DBG("Max peak is: " << maxPeak);
+					//DBG("Targ param db is: " << targetParam->getValueInDecibels());
+					//DBG("Targ param in gain is: " << targParamGain);
+					//DBG("Gain value Gain Param is Set to: " << gainValueToSet);
+					gainParam->setValueNotifyingHost(decibelValueToAdd);
 				}
-					gainParam->setValueNotifyingHost(levelAnalysisManager.getMaxChannelPeak() 
-						- Decibels::decibelsToGain(targetParam->get()));
 					break;
 				case MaxRMS:
-					gainParam->setValueNotifyingHost((Decibels::decibelsToGain(targetParam->get()) 
+					gainParam->setValueNotifyingHost((targetParam->getValueGain()
 						- levelAnalysisManager.getMaxChannelRMS()));
 					break;
 				case AverageRMS:
-					gainParam->setValueNotifyingHost((Decibels::decibelsToGain(targetParam->get()) 
+					gainParam->setValueNotifyingHost((targetParam->getValueGain()
 						- levelAnalysisManager.getMaxCurrentRunningRMS()));
 					break;
 				default:
@@ -100,44 +91,51 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 			gainParam->setNeedsUIUpdate(true);
 		}
 
-		if (*gainParam != 0.0f)
+		if (autoGainEnableParam->getValueAsBool())
 		{
+			float gainChange = gainParam->getValueGain();
 			//Wrong because param.get returns decibel value
 			// #TODO: FIX by using new parameter class that exposes decent amount of shit
-			for (size_t sampleIdx = 0; sampleIdx < buffer.getNumSamples(); ++sampleIdx)
+			/*for (size_t sampleIdx = 0; sampleIdx < buffer.getNumSamples(); ++sampleIdx)
 			{
+				float leftSample = leftData[sampleIdx];
+				float rightSample = rightData[sampleIdx];
 				if (leftData[sampleIdx] < 0)
-					leftData[sampleIdx] += gainParam->get();
+					leftData[sampleIdx] -= gainParam->getValueGain();
 				else 
-					leftData[sampleIdx] -= gainParam->get();
+					leftData[sampleIdx] += gainParam->getValueGain();
 				if (rightData[sampleIdx] < 0)
-					rightData[sampleIdx] += gainParam->get();
+					rightData[sampleIdx] -= gainParam->getValueGain();
 				else
-					rightData[sampleIdx] -= gainParam->get();
-			}
+					rightData[sampleIdx] += gainParam->getValueGain();
+			}*/
+			buffer.applyGain(gainChange);
 		}
-	}
+	//}
 	
 }
 
 
 //==============================================================================
+/** Copy current plugin state to XML */
 void ZenAutoTrimAudioProcessor::getStateInformation(MemoryBlock& destData)
 {
-	DBG("In ZenTrimAudioProcessor::getStateInformation(destData) ");
+	//DBG("In ZenTrimAudioProcessor::getStateInformation(destData) ");
+/*
 	XmlElement xml("ZENTRIMSETTINGS");
 	
 	for (int i = 0; i < getNumParameters(); ++i)
 		if (AudioProcessorParameterWithID* p = dynamic_cast<AudioProcessorParameterWithID*>(getParameters().getUnchecked(i)))
 			xml.setAttribute(p->paramID, p->getValue());
 	
-	copyXmlToBinary(xml, destData);
+	copyXmlToBinary(xml, destData);*/
 }
 
+/** Load plugin with settings from XML */
 void ZenAutoTrimAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-	DBG("In ZenTrimAudioProcessor::setStateInformation(data, sizeInBytes) ");
-	std::unique_ptr<XmlElement> xmlState = std::unique_ptr<XmlElement>(getXmlFromBinary(data, sizeInBytes));
+	//DBG("In ZenTrimAudioProcessor::setStateInformation(data, sizeInBytes) ");
+	/*std::unique_ptr<XmlElement> xmlState = std::unique_ptr<XmlElement>(getXmlFromBinary(data, sizeInBytes));
 	if (xmlState != nullptr)
 	{
 		if (xmlState->hasTagName("ZENTRIMSETTINGS"))
@@ -146,7 +144,7 @@ void ZenAutoTrimAudioProcessor::setStateInformation(const void* data, int sizeIn
 				if (AudioProcessorParameterWithID* p = dynamic_cast<AudioProcessorParameterWithID*> (getParameters().getUnchecked(i)))
 					p->setValueNotifyingHost((float)xmlState->getDoubleAttribute(p->paramID, p->getValue()));
 		}
-	}
+	}*/
 }
 
 //==============================================================================

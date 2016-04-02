@@ -1,21 +1,16 @@
-/*
-  ==============================================================================
-
-  This is an automatically generated GUI class created by the Introjucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Introjucer version: 4.1.0
-
-  ------------------------------------------------------------------------------
-
-  The Introjucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
-
-  ==============================================================================
-*/
+/*==============================================================================
+//  FILENAME
+//  Part of the Zentropia JUCE Collection
+//  @author Casey Bailey (<a href="SonicZentropy@gmail.com">email</a>)
+//  @version 0.1
+//  @date DATE
+//  Copyright (C) 2016 by Casey Bailey
+//  Provided under the [GNU license]
+//
+//  Details: Generic GUI Component Header
+//
+//  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
+===============================================================================*/
 
 #ifndef __JUCE_HEADER_369DD91DB9C1C992__
 #define __JUCE_HEADER_369DD91DB9C1C992__
