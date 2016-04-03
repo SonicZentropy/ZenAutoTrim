@@ -138,7 +138,6 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	avgBox->setPopupMenuEnabled(true);
 	avgBox->setText(TRANS("AVG"));
 
-
 	addAndMakeVisible(leftRunningRMS = new Label("Left Running RMS Label", TRANS("00")));
 	leftRunningRMS->setFont(Font(15.00f, Font::bold));
 	leftRunningRMS->setJustificationType(Justification::centred);
@@ -178,6 +177,8 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	setSize(250, 250);
 	startTimer(100);
 	processor.setCurrentEditor(this);
+	openGLContext = new OpenGLContext();
+	openGLContext->attachTo(*this);
 }
 
 ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
@@ -205,6 +206,7 @@ ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 	resetBtn = nullptr;
 	autoGainBtn = nullptr;
 	targetEditor = nullptr;
+	openGLContext->detach();
 }
 
 //==============================================================================

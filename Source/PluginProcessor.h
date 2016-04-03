@@ -87,3 +87,11 @@ private:
 
 
 #endif  // PLUGINPROCESSOR_H_INCLUDED
+
+// #TODO: fix process block speed by offloading autogain calc
+
+// #TODO: autotrim to peak sample or max rms
+// #TODO: rms window length
+// #TODO: rms calibration(+3 or 0)
+// #TODO: stereo linkage(yes or no, whether each channel handled separately)
+// #TODO: display calculation

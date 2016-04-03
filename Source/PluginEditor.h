@@ -45,6 +45,8 @@ public:
 
 private:
     ZenAutoTrimAudioProcessor& processor;
+	// #TODO: Implement opengl context
+	ScopedPointer<OpenGLContext> openGLContext;
 
 	ScopedPointer<DecibelTextEditor> gainEditor, targetEditor;
 	ScopedPointer<TimeSliceThread> graphicalManager;

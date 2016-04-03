@@ -36,10 +36,11 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 {
 	aPlayHead = getPlayHead();
 	AudioPlayHead::CurrentPositionInfo posInfo;
-	bool posFound = aPlayHead->getCurrentPosition(posInfo);
+	aPlayHead->getCurrentPosition(posInfo);
+	//bool posFound = aPlayHead->getCurrentPosition(posInfo);
 
-	float* leftData = buffer.getWritePointer(0);	//leftData references left channel now
-	float* rightData = buffer.getWritePointer(1); //right data references right channel now
+	//float* leftData = buffer.getWritePointer(0);	//leftData references left channel now
+	//float* rightData = buffer.getWritePointer(1); //right data references right channel now
 	
 	if (prevSampleRate != this->getSampleRate())
 	{
@@ -47,71 +48,50 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 		levelAnalysisManager.sampleRateChanged(prevSampleRate);
 	}	
 
-	//if (posFound)
-	//{
+	if (currentEditor != nullptr)
+	{
+		dynamic_cast<ZenAutoTrimAudioProcessorEditor*>(currentEditor)->vuMeter->copySamples(
+			buffer.getReadPointer(0), buffer.getNumSamples());
+	}
+	if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f)
+		levelAnalysisManager.processSamples(&buffer, posInfo );
 
-		if (currentEditor != nullptr)
+	if (autoGainEnableParam)
+	{
+		// Calibrate gain param based on which value is target
+		switch(targetForAutoTrim)
 		{
-			dynamic_cast<ZenAutoTrimAudioProcessorEditor*>(currentEditor)->vuMeter->copySamples(
-				buffer.getReadPointer(0), buffer.getNumSamples());
-		}
-		if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f)
-			levelAnalysisManager.processSamples(&buffer, posInfo );
-
-		if (autoGainEnableParam)
-		{
-			// Calibrate gain param based on which value is target
-			switch(targetForAutoTrim)
+			case Peak:
 			{
-				case Peak:
-				{
-					double maxPeak = levelAnalysisManager.getMaxChannelPeakInDB();
-					double targParamDB = targetParam->getValueInDecibels();
-					double decibelValueToAdd = targParamDB - maxPeak;
-					//DBG("Max peak is: " << maxPeak);
-					//DBG("Targ param db is: " << targetParam->getValueInDecibels());
-					//DBG("Targ param in gain is: " << targParamGain);
-					//DBG("Gain value Gain Param is Set to: " << gainValueToSet);
-					gainParam->setValueNotifyingHost(decibelValueToAdd);
-				}
-					break;
-				case MaxRMS:
-					gainParam->setValueNotifyingHost((targetParam->getValueGain()
-						- levelAnalysisManager.getMaxChannelRMS()));
-					break;
-				case AverageRMS:
-					gainParam->setValueNotifyingHost((targetParam->getValueGain()
-						- levelAnalysisManager.getMaxCurrentRunningRMS()));
-					break;
-				default:
-					throw std::runtime_error("This should never happen");
-
+				double maxPeak = levelAnalysisManager.getMaxChannelPeakInDB();
+				double targParamDB = targetParam->getValueInDecibels();
+				double decibelValueToAdd = targParamDB - maxPeak;
+				//DBG("Max peak is: " << maxPeak);
+				//DBG("Targ param db is: " << targetParam->getValueInDecibels());
+				//DBG("Targ param in gain is: " << targParamGain);
+				//DBG("Gain value Gain Param is Set to: " << gainValueToSet);
+				gainParam->setValueNotifyingHost(decibelValueToAdd);
 			}
+				break;
+			case MaxRMS:
+				gainParam->setValueNotifyingHost((targetParam->getValueGain()
+					- levelAnalysisManager.getMaxChannelRMS()));
+				break;
+			case AverageRMS:
+				gainParam->setValueNotifyingHost((targetParam->getValueGain()
+					- levelAnalysisManager.getMaxCurrentRunningRMS()));
+				break;
+			default:
+				throw std::runtime_error("This should never happen");
+		}
 			
-			gainParam->setNeedsUIUpdate(true);
+		gainParam->setNeedsUIUpdate(true);
+		
+		if (autoGainEnableParam)
+		{						
+			buffer.applyGain(gainParam->getValueGain());
 		}
-
-		if (autoGainEnableParam->getValueAsBool())
-		{
-			float gainChange = gainParam->getValueGain();
-			//Wrong because param.get returns decibel value
-			// #TODO: FIX by using new parameter class that exposes decent amount of shit
-			/*for (size_t sampleIdx = 0; sampleIdx < buffer.getNumSamples(); ++sampleIdx)
-			{
-				float leftSample = leftData[sampleIdx];
-				float rightSample = rightData[sampleIdx];
-				if (leftData[sampleIdx] < 0)
-					leftData[sampleIdx] -= gainParam->getValueGain();
-				else 
-					leftData[sampleIdx] += gainParam->getValueGain();
-				if (rightData[sampleIdx] < 0)
-					rightData[sampleIdx] -= gainParam->getValueGain();
-				else
-					rightData[sampleIdx] += gainParam->getValueGain();
-			}*/
-			buffer.applyGain(gainChange);
-		}
-	//}
+	}
 	
 }
 
