@@ -15,7 +15,7 @@
 //[Headers] You can add your own extra header files here...
 //[/Headers]
 
-#include "NewComponent.h"
+#include "MainScreenComponent.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -39,8 +39,8 @@ NewComponent::NewComponent ()
 
     addAndMakeVisible (label2 = new Label ("new label",
                                            TRANS("label text")));
-    label2->setFont (Font (15.00f, Font::plain));
-    label2->setJustificationType (Justification::centredLeft);
+    label2->setFont (Font ("Futura Std", 21.00f, Font::plain));
+    label2->setJustificationType (Justification::centred);
     label2->setEditable (false, false, false);
     label2->setColour (Label::backgroundColourId, Colour (0x9e000000));
     label2->setColour (TextEditor::textColourId, Colours::black);
@@ -48,8 +48,8 @@ NewComponent::NewComponent ()
 
     addAndMakeVisible (label3 = new Label ("new label",
                                            TRANS("label text")));
-    label3->setFont (Font (15.00f, Font::plain));
-    label3->setJustificationType (Justification::centredLeft);
+    label3->setFont (Font ("Futura Std", 21.00f, Font::plain));
+    label3->setJustificationType (Justification::centred);
     label3->setEditable (false, false, false);
     label3->setColour (Label::backgroundColourId, Colour (0x9e000000));
     label3->setColour (TextEditor::textColourId, Colours::black);
@@ -57,8 +57,8 @@ NewComponent::NewComponent ()
 
     addAndMakeVisible (label6 = new Label ("new label",
                                            TRANS("label text")));
-    label6->setFont (Font (15.00f, Font::plain));
-    label6->setJustificationType (Justification::centredLeft);
+    label6->setFont (Font ("Futura Std", 21.00f, Font::plain));
+    label6->setJustificationType (Justification::centred);
     label6->setEditable (false, false, false);
     label6->setColour (Label::backgroundColourId, Colour (0x9e000000));
     label6->setColour (TextEditor::textColourId, Colours::black);
@@ -66,8 +66,8 @@ NewComponent::NewComponent ()
 
     addAndMakeVisible (label8 = new Label ("new label",
                                            TRANS("label text")));
-    label8->setFont (Font (15.00f, Font::plain));
-    label8->setJustificationType (Justification::centredLeft);
+    label8->setFont (Font ("Futura Std", 21.00f, Font::bold));
+    label8->setJustificationType (Justification::centred);
     label8->setEditable (false, false, false);
     label8->setColour (Label::backgroundColourId, Colour (0x9e000000));
     label8->setColour (TextEditor::textColourId, Colours::black);
@@ -75,8 +75,8 @@ NewComponent::NewComponent ()
 
     addAndMakeVisible (label9 = new Label ("new label",
                                            TRANS("label text")));
-    label9->setFont (Font (15.00f, Font::plain));
-    label9->setJustificationType (Justification::centredLeft);
+    label9->setFont (Font ("Futura Std", 21.00f, Font::plain));
+    label9->setJustificationType (Justification::centred);
     label9->setEditable (false, false, false);
     label9->setColour (Label::backgroundColourId, Colour (0x9e000000));
     label9->setColour (TextEditor::textColourId, Colours::black);
@@ -84,8 +84,8 @@ NewComponent::NewComponent ()
 
     addAndMakeVisible (label10 = new Label ("new label",
                                             TRANS("label text")));
-    label10->setFont (Font (15.00f, Font::plain));
-    label10->setJustificationType (Justification::centredLeft);
+    label10->setFont (Font ("Futura Std", 21.00f, Font::plain));
+    label10->setJustificationType (Justification::centred);
     label10->setEditable (false, false, false);
     label10->setColour (Label::backgroundColourId, Colour (0x9e000000));
     label10->setColour (TextEditor::textColourId, Colours::black);
@@ -98,15 +98,19 @@ NewComponent::NewComponent ()
     maxBox->setScrollbarsShown (true);
     maxBox->setCaretVisible (true);
     maxBox->setPopupMenuEnabled (true);
+    maxBox->setColour (TextEditor::textColourId, Colour (0xff00c30a));
+    maxBox->setColour (TextEditor::backgroundColourId, Colour (0xff404040));
     maxBox->setText (TRANS("MAX"));
 
     addAndMakeVisible (peakBox = new TextEditor ("new text editor"));
     peakBox->setMultiLine (false);
     peakBox->setReturnKeyStartsNewLine (false);
-    peakBox->setReadOnly (false);
-    peakBox->setScrollbarsShown (true);
-    peakBox->setCaretVisible (true);
+    peakBox->setReadOnly (true);
+    peakBox->setScrollbarsShown (false);
+    peakBox->setCaretVisible (false);
     peakBox->setPopupMenuEnabled (true);
+    peakBox->setColour (TextEditor::textColourId, Colour (0xff00c30a));
+    peakBox->setColour (TextEditor::backgroundColourId, Colour (0xff404040));
     peakBox->setText (TRANS("PEAK"));
 
     addAndMakeVisible (avgBox = new TextEditor ("new text editor"));
@@ -116,6 +120,8 @@ NewComponent::NewComponent ()
     avgBox->setScrollbarsShown (true);
     avgBox->setCaretVisible (true);
     avgBox->setPopupMenuEnabled (true);
+    avgBox->setColour (TextEditor::textColourId, Colour (0xff00c30a));
+    avgBox->setColour (TextEditor::backgroundColourId, Colour (0xff404040));
     avgBox->setText (TRANS("AVG"));
 
     addAndMakeVisible (resetBtn = new TextButton ("Reset Button"));
@@ -132,7 +138,10 @@ NewComponent::NewComponent ()
     targetEditor->setScrollbarsShown (false);
     targetEditor->setCaretVisible (true);
     targetEditor->setPopupMenuEnabled (true);
-    targetEditor->setText (TRANS("-18.00 dBFS"));
+    targetEditor->setColour (TextEditor::textColourId, Colour (0xff00c30a));
+    targetEditor->setColour (TextEditor::backgroundColourId, Colour (0xff404040));
+    targetEditor->setColour (CaretComponent::caretColourId, Colour (0xff6aab00));
+    targetEditor->setText (TRANS("-18.00 dB"));
 
 
     //[UserPreSize]
@@ -198,7 +207,7 @@ void NewComponent::resized()
     avgBox->setBounds (172, 40, 40, 24);
     resetBtn->setBounds (8, 128, 51, 24);
     autoGainBtn->setBounds (68, 128, 75, 24);
-    targetEditor->setBounds (156, 128, 75, 24);
+    targetEditor->setBounds (156, 128, 88, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -250,45 +259,45 @@ BEGIN_JUCER_METADATA
   <LABEL name="new label" id="129ad4ff0dbba9ce" memberName="label2" virtualName=""
          explicitFocusOrder="0" pos="8 42 72 24" bkgCol="9e000000" edTextCol="ff000000"
          edBkgCol="0" labelText="label text" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Futura Std" fontsize="21"
+         bold="0" italic="0" justification="36"/>
   <LABEL name="new label" id="cf3b88eca5e26785" memberName="label3" virtualName=""
          explicitFocusOrder="0" pos="8 68 72 24" bkgCol="9e000000" edTextCol="ff000000"
          edBkgCol="0" labelText="label text" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Futura Std" fontsize="21"
+         bold="0" italic="0" justification="36"/>
   <LABEL name="new label" id="feeb63faa46d05db" memberName="label6" virtualName=""
          explicitFocusOrder="0" pos="8 94 72 24" bkgCol="9e000000" edTextCol="ff000000"
          edBkgCol="0" labelText="label text" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Futura Std" fontsize="21"
+         bold="0" italic="0" justification="36"/>
   <LABEL name="new label" id="d0e6ab678ea1399a" memberName="label8" virtualName=""
          explicitFocusOrder="0" pos="87 42 72 24" bkgCol="9e000000" edTextCol="ff000000"
          edBkgCol="0" labelText="label text" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Futura Std" fontsize="21"
+         bold="1" italic="0" justification="36"/>
   <LABEL name="new label" id="745745f591566cbe" memberName="label9" virtualName=""
          explicitFocusOrder="0" pos="87 68 72 24" bkgCol="9e000000" edTextCol="ff000000"
          edBkgCol="0" labelText="label text" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Futura Std" fontsize="21"
+         bold="0" italic="0" justification="36"/>
   <LABEL name="new label" id="a90ec086cbfe4329" memberName="label10" virtualName=""
          explicitFocusOrder="0" pos="87 94 72 24" bkgCol="9e000000" edTextCol="ff000000"
          edBkgCol="0" labelText="label text" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Futura Std" fontsize="21"
+         bold="0" italic="0" justification="36"/>
   <TEXTEDITOR name="new text editor" id="54d7b3e98994550c" memberName="maxBox"
-              virtualName="" explicitFocusOrder="0" pos="172 68 40 24" initialText="MAX"
-              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
-              caret="1" popupmenu="1"/>
+              virtualName="" explicitFocusOrder="0" pos="172 68 40 24" textcol="ff00c30a"
+              bkgcol="ff404040" initialText="MAX" multiline="0" retKeyStartsLine="0"
+              readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <TEXTEDITOR name="new text editor" id="84a1ae3eaf296967" memberName="peakBox"
-              virtualName="" explicitFocusOrder="0" pos="172 96 40 24" initialText="PEAK"
-              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
-              caret="1" popupmenu="1"/>
+              virtualName="" explicitFocusOrder="0" pos="172 96 40 24" textcol="ff00c30a"
+              bkgcol="ff404040" initialText="PEAK" multiline="0" retKeyStartsLine="0"
+              readonly="1" scrollbars="0" caret="0" popupmenu="1"/>
   <TEXTEDITOR name="new text editor" id="be6e1acc0edb1ea3" memberName="avgBox"
-              virtualName="" explicitFocusOrder="0" pos="172 40 40 24" initialText="AVG"
-              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
-              caret="1" popupmenu="1"/>
+              virtualName="" explicitFocusOrder="0" pos="172 40 40 24" textcol="ff00c30a"
+              bkgcol="ff404040" initialText="AVG" multiline="0" retKeyStartsLine="0"
+              readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <TEXTBUTTON name="Reset Button" id="680d78160c28fa2" memberName="resetBtn"
               virtualName="" explicitFocusOrder="0" pos="8 128 51 24" buttonText="Reset"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
@@ -296,9 +305,10 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="68 128 75 24" buttonText="Auto Gain"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTEDITOR name="Target Editor" id="4cfb8d149191bd88" memberName="targetEditor"
-              virtualName="DecibelTextEditor" explicitFocusOrder="0" pos="156 128 75 24"
-              initialText="-18.00 dBFS" multiline="0" retKeyStartsLine="0"
-              readonly="0" scrollbars="0" caret="1" popupmenu="1"/>
+              virtualName="DecibelTextEditor" explicitFocusOrder="0" pos="156 128 88 24"
+              textcol="ff00c30a" bkgcol="ff404040" caretcol="ff6aab00" initialText="-18.00 dB"
+              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="0"
+              caret="1" popupmenu="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -43,19 +43,26 @@ public:
 	void timerCallback() override;
 	ScopedPointer<SegmentedMeter> vuMeter;
 
+	void initializeImageCache();
+
 private:
     ZenAutoTrimAudioProcessor& processor;
 	// #TODO: Implement opengl context
 	ScopedPointer<OpenGLContext> openGLContext;
 
-	ScopedPointer<DecibelTextEditor> gainEditor, targetEditor;
+	ScopedPointer<ZenDecibelTextEditor> gainEditor, targetEditor;
 	ScopedPointer<TimeSliceThread> graphicalManager;
-	ScopedPointer<Label> leftAvgRMSLabel, rightAvgRMSLabel;
-	ScopedPointer<Label> leftMaxRMSLabel, rightMaxRMSLabel;
-	ScopedPointer<Label> leftPeakLabel, rightPeakLabel;
-	ScopedPointer<Label> leftRunningRMS, rightRunningRMS;
-	ScopedPointer<TextEditor> maxBox, peakBox, avgBox, runningBox;	
-	ScopedPointer<TextButton> resetBtn, autoGainBtn;
+	ScopedPointer<ZenLabelDisplay> leftAvgRMSLabel, rightAvgRMSLabel;
+	ScopedPointer<ZenLabelDisplay> leftMaxRMSLabel, rightMaxRMSLabel;
+	ScopedPointer<ZenLabelDisplay> leftPeakLabel, rightPeakLabel;
+	ScopedPointer<ZenLabelDisplay> leftRunningRMS, rightRunningRMS;
+	ScopedPointer<ZenTextEditor> maxBox, peakBox, avgBox, runningBox;	
+	ScopedPointer<ZenImageButton> resetBtn, autoGainBtn;
+
+	ScopedPointer<ZenLookAndFeel> zenLookAndFeel;
+
+	//ScopedPointer<ImageCache> imageCache;
+	Image testImg, bypassImg;
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenAutoTrimAudioProcessorEditor)
 };

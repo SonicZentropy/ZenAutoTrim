@@ -25,11 +25,18 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	addParameter(gainParam = new ZenDecibelParameter("gainParam", "Gain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, true, 50.0f));
 	addParameter(targetParam = new ZenDecibelParameter("targetGain", "TargetGain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, false));
 	addParameter(autoGainEnableParam = new ZenBoolParameter("autoGainParam", "AutoGain", false, ""));
+
+#ifdef JUCE_DEBUG
+	debugWindow = ZenDebugEditor::getInstance();
+	debugWindow->setSize(650, 400);
+	//Open in bottom right corner
+	debugWindow->setTopLeftPosition(1900 - debugWindow->getWidth(), 1040 - debugWindow->getHeight());
+#endif
 }
 
 ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
 {
-	//DBG("In destructor");
+	debugWindow->deleteInstance();
 }
 
 void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages)

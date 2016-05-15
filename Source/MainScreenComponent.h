@@ -12,8 +12,8 @@
 //  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
 ===============================================================================*/
 
-#ifndef __JUCE_HEADER_369DD91DB9C1C992__
-#define __JUCE_HEADER_369DD91DB9C1C992__
+#ifndef __JUCE_HEADER_DFF908F087F96C1__
+#define __JUCE_HEADER_DFF908F087F96C1__
 
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
@@ -74,4 +74,4 @@ private:
 //[EndFile] You can add extra defines here...
 //[/EndFile]
 
-#endif   // __JUCE_HEADER_369DD91DB9C1C992__
+#endif   // __JUCE_HEADER_DFF908F087F96C1__

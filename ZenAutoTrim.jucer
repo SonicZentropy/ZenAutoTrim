@@ -11,9 +11,19 @@
               pluginRTASCategory="" aaxIdentifier="com.yourcompany.ZenTrim"
               pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="4.1.0"
               companyWebsite="https://soundcloud.com/Zentropy" companyName="Zentropy"
-              companyEmail="SonicZentropy@gmail.com" userNotes="xcopy &quot;$(TargetPath)&quot; &quot;Z:\VSTs\Organized\Test\&quot;  /q /y">
+              companyEmail="SonicZentropy@gmail.com" userNotes="xcopy &quot;$(TargetPath)&quot; &quot;Z:\VSTs\Organized\Test\&quot;  /q /y"
+              defines="ZEN_DEBUG">
   <MAINGROUP id="rkSyKN" name="ZenAutoTrim">
+    <GROUP id="{46BC2584-9128-B380-7D1C-6797FA2C5463}" name="assets">
+      <GROUP id="{606CE0B9-19EC-EBD6-9894-C772651A04EE}" name="gui">
+        <FILE id="nJzgVM" name="backgroundImg.png" compile="0" resource="1"
+              file="assets/gui/backgroundImg.png"/>
+        <FILE id="CwdIP4" name="bypassBtnImg.png" compile="0" resource="1"
+              file="assets/gui/bypassBtnImg.png"/>
+      </GROUP>
+    </GROUP>
     <GROUP id="{EAD41354-CE9E-3D83-523D-F535CD5A63FA}" name="Source">
+      <GROUP id="{163A5499-ADBD-9089-D6F5-0E24599C0786}" name="data"/>
       <FILE id="hkB5t7" name="NewComponent.cpp" compile="0" resource="0"
             file="Source/NewComponent.cpp"/>
       <FILE id="eL91k4" name="NewComponent.h" compile="0" resource="0" file="Source/NewComponent.h"/>
@@ -52,10 +62,10 @@
         <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
-        <MODULEPATH id="zen_utils" path="../JUCE/modules"/>
         <MODULEPATH id="dRowAudio" path="../JUCE/modules"/>
         <MODULEPATH id="juce_audio_plugin_client" path="../JUCE/modules"/>
         <MODULEPATH id="juce_opengl" path="../JUCE/modules"/>
+        <MODULEPATH id="zen_utils" path="../JUCE/modules"/>
       </MODULEPATHS>
     </VS2015>
   </EXPORTFORMATS>

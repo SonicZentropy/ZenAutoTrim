@@ -83,6 +83,7 @@ private:
 	double prevSampleRate = 44100;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenAutoTrimAudioProcessor)
+		ZenDebugEditor* debugWindow;
 };
 
 
