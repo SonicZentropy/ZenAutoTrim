@@ -17,7 +17,7 @@
 #define PLUGINPROCESSOR_H_INCLUDED
 
 #include "JuceHeader.h"
-//using namespace Zen;
+//using namespace Zen; test
 
 //==============================================================================
 class ZenAutoTrimAudioProcessor  : public AudioProcessor
