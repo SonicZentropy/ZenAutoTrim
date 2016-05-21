@@ -25,9 +25,11 @@ class ZenAutoTrimAudioProcessorEditor
 	: public AudioProcessorEditor,
 	public TextEditor::Listener,
 	public TextButton::Listener,
+	//public ZenLabelDisplay::Listener,
 	public Timer
 {
 public:
+	
 	explicit ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAudioProcessor&);
     ~ZenAutoTrimAudioProcessorEditor();
 
@@ -39,30 +41,34 @@ public:
 	void textEditorFocusLost(TextEditor& editorChanged) override;
 	void textEditorUpdateDueToChange(TextEditor& editorChanged);
 	void buttonClicked(Button*) override;
-
+	
 	void timerCallback() override;
-	ScopedPointer<SegmentedMeter> vuMeter;
-
-	void initializeImageCache();
+	
+	//ScopedPointer<SegmentedMeter> vuMeter;
+	//void initializeImageCache();
 
 private:
     ZenAutoTrimAudioProcessor& processor;
 	// #TODO: Implement opengl context
-	ScopedPointer<OpenGLContext> openGLContext;
-
-	ScopedPointer<ZenDecibelTextEditor> gainEditor, targetEditor;
+	//ScopedPointer<OpenGLContext> openGLContext;
+	
 	ScopedPointer<TimeSliceThread> graphicalManager;
+	
+	ScopedPointer<ZenDecibelTextEditor> targetEditor;
+	ScopedPointer<ZenLabelDisplay> gainEditor;
 	ScopedPointer<ZenLabelDisplay> leftAvgRMSLabel, rightAvgRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftMaxRMSLabel, rightMaxRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftPeakLabel, rightPeakLabel;
 	ScopedPointer<ZenLabelDisplay> leftRunningRMS, rightRunningRMS;
-	ScopedPointer<ZenTextEditor> maxBox, peakBox, avgBox, runningBox;	
+	ScopedPointer<Label> maxBox, peakBox, avgBox, runningBox;	
 	ScopedPointer<ZenImageButton> resetBtn, autoGainBtn;
-
+	
 	ScopedPointer<ZenLookAndFeel> zenLookAndFeel;
 
+	Colour textColour;
+
 	//ScopedPointer<ImageCache> imageCache;
-	Image testImg, bypassImg;
+	Image backgroundImg, bypassImg;
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenAutoTrimAudioProcessorEditor)
 };

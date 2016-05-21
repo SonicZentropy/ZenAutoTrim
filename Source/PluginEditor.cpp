@@ -17,174 +17,95 @@
 
 //==============================================================================
 ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p)
-{
-
+    : AudioProcessorEditor (&p), processor (p), textColour(Colours::lightgrey)
+{	
 	
 	zenLookAndFeel = new ZenLookAndFeel();
 	LookAndFeel::setDefaultLookAndFeel(zenLookAndFeel);
 		
-	//testImg = ImageFileFormat::loadFrom(BinaryData::backgroundImg_png, (size_t)BinaryData::backgroundImg_pngSize);
+	backgroundImg = ImageFileFormat::loadFrom(BinaryData::backgroundImg_png, (size_t)BinaryData::backgroundImg_pngSize);
 	//bypassImg = ImageFileFormat::loadFrom(BinaryData::bypassBtnImg_png, (size_t)BinaryData::bypassBtnImg_pngSize);
 	
-	addAndMakeVisible(gainEditor = new ZenDecibelTextEditor("Gain", processor.gainParam));
-	gainEditor->setColour(TextEditor::textColourId, Colour(0xff003C0A));
-	gainEditor->setColour(TextEditor::backgroundColourId, Colour(0xff484848));
-	gainEditor->setColour(TextEditor::highlightColourId, Colour(0xff00f5ff));
-	gainEditor->setColour(TextEditor::outlineColourId, Colours::lightslategrey);
-	gainEditor->setColour(TextEditor::shadowColourId, Colour(0xff2a2a2a));
-	gainEditor->setColour(CaretComponent::caretColourId, Colours::white);
+	addAndMakeVisible(gainEditor = new ZenLabelDisplay("Gain", "00"));
+	gainEditor->setBounds(90, 8, 55, 24);
 	
-	gainEditor->setMultiLine(false);
-	gainEditor->setReturnKeyStartsNewLine(false);
-	gainEditor->setReadOnly(false);
-	gainEditor->setScrollbarsShown(false);
-	gainEditor->setCaretVisible(true);
-	gainEditor->setPopupMenuEnabled(true);
-	gainEditor->setText(String(processor.gainParam->getValueInDecibels()));
-	gainEditor->setSelectAllWhenFocused(true);
-	gainEditor->setPopupMenuEnabled(false);	
-	gainEditor->setInputRestrictions(8, "-1234567890.");	
-	gainEditor->addListener(this);
-
 	addAndMakeVisible(targetEditor = new ZenDecibelTextEditor("Target Editor", processor.targetParam));
 	targetEditor->setMultiLine(false);
 	targetEditor->setReturnKeyStartsNewLine(false);
 	targetEditor->setReadOnly(false);
 	targetEditor->setScrollbarsShown(false);
 	targetEditor->setCaretVisible(true);
-	targetEditor->setPopupMenuEnabled(true);
-	targetEditor->setText("-18.00 dBFS");
+	targetEditor->setSelectAllWhenFocused(true);
+	targetEditor->setText("-18.00 dB");
+	targetEditor->setBounds(156, 128, 70, 24);
 	targetEditor->addListener(this);
-
-	graphicalManager = new TimeSliceThread("graphicalManagerTrd");
-	graphicalManager->startThread(2);
-	//addAndMakeVisible(vuMeter = new SegmentedMeter());
-	addChildComponent(vuMeter = new SegmentedMeter());
-	vuMeter->setNumDecibelsPerSeg(6);
 	
-	graphicalManager->addTimeSliceClient(vuMeter);
-
-	addAndMakeVisible(leftAvgRMSLabel = new ZenLabelDisplay("Average RMS Label", "0"));
-	leftAvgRMSLabel->setFont(Font(15.00f, Font::bold));
-	leftAvgRMSLabel->setJustificationType(Justification::centred);
-	leftAvgRMSLabel->setEditable(false, false, false);
-	leftAvgRMSLabel->setColour(Label::backgroundColourId, Colour(0x00000000));
+	//graphicalManager = new TimeSliceThread("graphicalManagerTrd");
+	//graphicalManager->startThread(2);
+	////addAndMakeVisible(vuMeter = new SegmentedMeter());
+	//addChildComponent(vuMeter = new SegmentedMeter());
+	//vuMeter->setNumDecibelsPerSeg(6);
+	//vuMeter->setBounds(200, 200, 100, 100);
+	//
+	//graphicalManager->addTimeSliceClient(vuMeter);
+	
+	addAndMakeVisible(leftAvgRMSLabel = new ZenLabelDisplay("Average RMS Label", "00"));
 	leftAvgRMSLabel->setColour(Label::textColourId, Colours::white);
-	leftAvgRMSLabel->setColour(TextEditor::textColourId, Colours::black);
-	leftAvgRMSLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
-
+	leftAvgRMSLabel->setBounds(8, 42, 72, 24);
+	
 	addAndMakeVisible(leftMaxRMSLabel = new ZenLabelDisplay("Max RMS Label", "00"));
-	leftMaxRMSLabel->setFont(Font(15.00f, Font::bold));
-	leftMaxRMSLabel->setJustificationType(Justification::centred);
-	leftMaxRMSLabel->setEditable(false, false, false);
-	leftMaxRMSLabel->setColour(Label::backgroundColourId, Colour(0x00000000));
 	leftMaxRMSLabel->setColour(Label::textColourId, Colours::white);
-	leftMaxRMSLabel->setColour(TextEditor::textColourId, Colours::black);
-	leftMaxRMSLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
+	leftMaxRMSLabel->setBounds(8, 68, 72, 24);
 	
 	addAndMakeVisible(leftPeakLabel = new ZenLabelDisplay("Max RMS Label", "00"));
-	leftPeakLabel->setFont(Font(15.00f, Font::bold));
-	leftPeakLabel->setJustificationType(Justification::centred);
-	leftPeakLabel->setEditable(false, false, false);
-	leftPeakLabel->setColour(Label::backgroundColourId, Colour(0x00000000));
 	leftPeakLabel->setColour(Label::textColourId, Colours::white);
-	leftPeakLabel->setColour(TextEditor::textColourId, Colours::black);
-	leftPeakLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
-
-	addAndMakeVisible(rightAvgRMSLabel = new ZenLabelDisplay("Average RMS Label", "0"));
-	rightAvgRMSLabel->setFont(Font(15.00f, Font::bold));
-	rightAvgRMSLabel->setJustificationType(Justification::centred);
-	rightAvgRMSLabel->setEditable(false, false, false);
-	rightAvgRMSLabel->setColour(Label::backgroundColourId, Colour(0x00000000));
-	rightAvgRMSLabel->setColour(Label::textColourId, Colours::white);
-	rightAvgRMSLabel->setColour(TextEditor::textColourId, Colours::black);
-	rightAvgRMSLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
-
-	addAndMakeVisible(rightMaxRMSLabel = new ZenLabelDisplay("Max RMS Label", "00"));
-	rightMaxRMSLabel->setFont(Font(15.00f, Font::bold));
-	rightMaxRMSLabel->setJustificationType(Justification::centred);
-	rightMaxRMSLabel->setEditable(false, false, false);
-	rightMaxRMSLabel->setColour(Label::backgroundColourId, Colour(0x00000000));
-	rightMaxRMSLabel->setColour(Label::textColourId, Colours::white);
-	rightMaxRMSLabel->setColour(TextEditor::textColourId, Colours::black);
-	rightMaxRMSLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
-
-	addAndMakeVisible(rightPeakLabel = new ZenLabelDisplay("Max RMS Label", "00"));
-	rightPeakLabel->setFont(Font(15.00f, Font::bold));
-	rightPeakLabel->setJustificationType(Justification::centred);
-	rightPeakLabel->setEditable(false, false, false);
-	rightPeakLabel->setColour(Label::backgroundColourId, Colour(0x00000000));
-	rightPeakLabel->setColour(Label::textColourId, Colours::white);
-	rightPeakLabel->setColour(TextEditor::textColourId, Colours::black);
-	rightPeakLabel->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
-
-	addAndMakeVisible(maxBox = new ZenTextEditor("maxBox"));
-	maxBox->setMultiLine(false);
-	maxBox->setReturnKeyStartsNewLine(false);
-	maxBox->setReadOnly(false);
-	maxBox->setScrollbarsShown(true);
-	maxBox->setCaretVisible(true);
-	maxBox->setPopupMenuEnabled(true);
-	maxBox->setText(TRANS("MAX"));
-
-	addAndMakeVisible(peakBox = new ZenTextEditor("peakBox"));
-	peakBox->setMultiLine(false);
-	peakBox->setReturnKeyStartsNewLine(false);
-	peakBox->setReadOnly(false);
-	peakBox->setScrollbarsShown(true);
-	peakBox->setCaretVisible(true);
-	peakBox->setPopupMenuEnabled(true);
-	peakBox->setText(TRANS("PEAK"));
-
-	addAndMakeVisible(avgBox = new ZenTextEditor("avgBox"));
-	avgBox->setMultiLine(false);
-	avgBox->setReturnKeyStartsNewLine(false);
-	avgBox->setReadOnly(false);
-	avgBox->setScrollbarsShown(true);
-	avgBox->setCaretVisible(true);
-	avgBox->setPopupMenuEnabled(true);
-	avgBox->setText("AVG1");
-
-	addAndMakeVisible(runningBox = new ZenTextEditor("RunningBox"));
-	runningBox->setMultiLine(false);
-	runningBox->setReturnKeyStartsNewLine(false);
-	runningBox->setReadOnly(false);
-	runningBox->setScrollbarsShown(true);
-	runningBox->setCaretVisible(true);
-	runningBox->setPopupMenuEnabled(true);
-	runningBox->setText("RunningBox");
-
-	addAndMakeVisible(leftRunningRMS = new ZenLabelDisplay("Left Running RMS Label", TRANS("00")));
-	leftRunningRMS->setFont(Font(15.00f, Font::bold));
-	leftRunningRMS->setJustificationType(Justification::centred);
-	leftRunningRMS->setEditable(false, false, false);
-	leftRunningRMS->setColour(Label::backgroundColourId, Colour(0x00000000));
-	leftRunningRMS->setColour(Label::textColourId, Colours::white);
-	leftRunningRMS->setColour(TextEditor::textColourId, Colours::black);
-	leftRunningRMS->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
-
-	addAndMakeVisible(rightRunningRMS = new ZenLabelDisplay("Right Running RMS Label", TRANS("00")));
-	rightRunningRMS->setFont(Font(15.00f, Font::bold));
-	rightRunningRMS->setJustificationType(Justification::centred);
-	rightRunningRMS->setEditable(false, false, false);
-	rightRunningRMS->setColour(Label::backgroundColourId, Colour(0x00000000));
-	rightRunningRMS->setColour(Label::textColourId, Colours::white);
-	rightRunningRMS->setColour(TextEditor::textColourId, Colours::black);
-	rightRunningRMS->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
-
+	leftPeakLabel->setBounds(8, 94, 72, 24);
 	
-
+	addAndMakeVisible(rightAvgRMSLabel = new ZenLabelDisplay("Average RMS Label", "0"));
+	rightAvgRMSLabel->setColour(Label::textColourId, Colours::white);
+	rightAvgRMSLabel->setBounds(87, 42, 72, 24);
+	
+	addAndMakeVisible(rightMaxRMSLabel = new ZenLabelDisplay("Max RMS Label", "00"));
+	rightMaxRMSLabel->setColour(Label::textColourId, Colours::white);
+	rightMaxRMSLabel->setBounds(87, 68, 72, 24);
+	
+	addAndMakeVisible(rightPeakLabel = new ZenLabelDisplay("Max RMS Label", "00"));
+	rightPeakLabel->setColour(Label::textColourId, textColour);
+	rightPeakLabel->setBounds(87, 94, 72, 24);
+	
+	addAndMakeVisible(maxBox = new Label("maxBox", "MAX"));
+	maxBox->setColour(Label::textColourId, textColour);
+	maxBox->setBounds(172, 68, 40, 24);
+	
+	addAndMakeVisible(peakBox = new Label("peakBox", "PEAK"));
+	peakBox->setColour(Label::textColourId, textColour);
+	peakBox->setBounds(172, 96, 40, 24);
+	
+	addAndMakeVisible(avgBox = new Label("avgBox", "AVG"));
+	avgBox->setColour(Label::textColourId, textColour);
+	avgBox->setBounds(172, 40, 40, 24);
+	
+	addAndMakeVisible(runningBox = new Label("RunningBox", "RUN"));
+	runningBox->setColour(Label::textColourId, textColour);
+	runningBox->setBounds(0, 8, 70, 24);
+	
+	//addAndMakeVisible(leftRunningRMS = new ZenLabelDisplay("Left Running RMS Label", TRANS("00")));
+	//leftRunningRMS->setColour(Label::textColourId, Colours::white);
+	//leftRunningRMS->setBounds();
+	
+	//addAndMakeVisible(rightRunningRMS = new ZenLabelDisplay("Right Running RMS Label", TRANS("00")));
+	//rightRunningRMS->setColour(Label::textColourId, Colours::white);
+	//rightRunningRMS->setBounds();
+	
 	addAndMakeVisible(resetBtn = new ZenImageButton("Reset Button", "Reset"));
 	resetBtn->setTooltip("Reset RMS Calculation");
-	//resetBtn->setColour(TextButton::textColourOffId, Colours::lightgrey);
-	//resetBtn->setColour(TextButton::textColourOnId, Colours::lightgrey);	
+	resetBtn->setBounds(16, 128, 51, 24);
 	resetBtn->addListener(this);
-
-	addAndMakeVisible(autoGainBtn = new ZenImageButton("Auto Gain", "AutoGain1"));
+	
+	
+	addAndMakeVisible(autoGainBtn = new ZenImageButton("Auto Gain", "AutoGain"));
 	autoGainBtn->setClickingTogglesState(true);
-	autoGainBtn->setColour(TextButton::textColourOffId, Colours::lightgrey);
-	autoGainBtn->setColour(TextButton::textColourOnId, Colours::lightgrey);
+	autoGainBtn->setBounds(68, 128, 75, 24);
 	autoGainBtn->addListener(this);
 
 	setSize(250, 250);
@@ -200,24 +121,24 @@ ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 {
 	processor.setCurrentEditor(nullptr);
 	gainEditor = nullptr;
-	graphicalManager = nullptr;
-	vuMeter = nullptr;
+	//graphicalManager = nullptr;
+	//vuMeter = nullptr;
 	leftAvgRMSLabel = nullptr;
 	leftMaxRMSLabel = nullptr;
 	leftPeakLabel = nullptr;
-
+	
 	rightAvgRMSLabel = nullptr;
 	rightMaxRMSLabel = nullptr;
 	rightPeakLabel = nullptr;
-
-	leftRunningRMS = nullptr;
-	rightRunningRMS = nullptr;
-
+	
+	//leftRunningRMS = nullptr;
+	//rightRunningRMS = nullptr;
+	
 	maxBox = nullptr;
 	peakBox = nullptr;
 	avgBox = nullptr;
 	runningBox = nullptr;
-
+	
 	resetBtn = nullptr;
 	autoGainBtn = nullptr;
 	targetEditor = nullptr;
@@ -225,41 +146,17 @@ ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 	ZEN_COMPONENT_DEBUG_DETACH();
 }
 
-void ZenAutoTrimAudioProcessorEditor::initializeImageCache()
-{
-	//imageCache = new ImageCache();
-	//imageCache->addImageToCache(ImageFileFormat::loadFrom(File()))
-	return;
-}
 
 //==============================================================================
 void ZenAutoTrimAudioProcessorEditor::paint (Graphics& g)
 {
-	//g.fillAll(Colours::grey);
-	//g.drawImage(testImg, 0, 0, getWidth(), getHeight(), 0, 0, testImg.getWidth(), testImg.getHeight());
-
+	g.fillAll(Colours::darkslategrey);
+	g.drawImage(backgroundImg, 0, 0, getWidth(), getHeight(), 0, 0, backgroundImg.getWidth(), backgroundImg.getHeight());
 	//g.drawImageAt(bypassImg, 0, 0);
 }
 
 void ZenAutoTrimAudioProcessorEditor::resized()
-{
-	gainEditor->setBounds(56, 8, 55, 24);
-	vuMeter->setBounds(200, 200, 100, 100);
-	leftAvgRMSLabel->setBounds(8, 42, 72, 24);
-	leftMaxRMSLabel->setBounds(8, 68, 72, 24);
-	leftPeakLabel->setBounds(8, 94, 72, 24);
-	rightAvgRMSLabel->setBounds(87, 42, 72, 24);
-	rightMaxRMSLabel->setBounds(87, 68, 72, 24);
-	rightPeakLabel->setBounds(87, 94, 72, 24);
-
-	maxBox->setBounds(172, 68, 40, 24);
-	peakBox->setBounds(172, 96, 40, 24);
-	avgBox->setBounds(172, 40, 40, 24);
-	resetBtn->setBounds(16, 128, 51, 24);
-
-	autoGainBtn->setBounds(68, 128, 75, 24);
-	targetEditor->setBounds(156, 128, 75, 24);
-}
+{ }
 
 void ZenAutoTrimAudioProcessorEditor::textEditorReturnKeyPressed(TextEditor& editorChanged)
 {
@@ -274,12 +171,9 @@ void ZenAutoTrimAudioProcessorEditor::textEditorFocusLost(TextEditor& editorChan
 
 void ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(TextEditor& editorChanged)
 {
-	if (&editorChanged == gainEditor)
+	if (&editorChanged == targetEditor)
 	{
-		processor.gainParam->setValueNotifyingHost(dynamic_cast<ZenDecibelTextEditor&>(editorChanged).getDecibelValueFromText());
-		dynamic_cast<ZenDecibelTextEditor&>(editorChanged).formatTextAfterEntry();
-	} else if (&editorChanged == targetEditor)
-	{
+		// #TODO: DYNAMIC CAST
 		float targetGain = dynamic_cast<ZenDecibelTextEditor&>(editorChanged).getDecibelValueFromText();
 		processor.targetParam->setValueNotifyingHost(targetGain);
 	}
@@ -298,18 +192,19 @@ void ZenAutoTrimAudioProcessorEditor::timerCallback()
 {
 	if (processor.gainParam->needsUIUpdate())
 	{
-		gainEditor->setTextWith2Precision<double>(processor.gainParam->getValueInDecibels());
+		//gainEditor->setTextWith2Precision<double>(processor.gainParam->getValueInDecibels());
+		gainEditor->setText(String(processor.gainParam->getValueInDecibels(), 2), dontSendNotification);
 		processor.gainParam->setNeedsUIUpdate(false);
 	}
-
+	
 	//Running RMS now calculates proper full-length average RMS. Here just for informational purposes	
 	leftAvgRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getLeftCurrentRunningRmsInDB()), dontSendNotification);
 	rightAvgRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getRightCurrentRunningRmsInDB()), dontSendNotification);
-
+	
 	// Max RMS is the current maximum found RMS of a single window, used to set proper trim level
 	leftMaxRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getLeftMaxRmsInDB()), dontSendNotification);
 	rightMaxRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getRightMaxRmsInDB()), dontSendNotification);
-
+	
 	// Peak single sample found
 	leftPeakLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getLeftPeakInDB()), dontSendNotification);
 	rightPeakLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getRightPeakInDB()), dontSendNotification);

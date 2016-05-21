@@ -26,12 +26,19 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	addParameter(targetParam = new ZenDecibelParameter("targetGain", "TargetGain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, false));
 	addParameter(autoGainEnableParam = new ZenBoolParameter("autoGainParam", "AutoGain", false, ""));
 
+#ifdef JUCE_MSVC
+	//Visual Studio mem leak diagnostics settings 
+	_CrtSetDbgFlag(0);	//Turn off VS memory dump output
+	//_crtBreakAlloc = 5389;	//Break on this memory allocation number (When Debug)
+#endif
+
 #ifdef JUCE_DEBUG
 	debugWindow = ZenDebugEditor::getInstance();
 	debugWindow->setSize(650, 400);
 	//Open in bottom right corner
 	debugWindow->setTopLeftPosition(1900 - debugWindow->getWidth(), 1040 - debugWindow->getHeight());
 #endif
+	// #TODO: add JUCE REF COUNTED OBJECT to zen GUI
 }
 
 ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
@@ -57,8 +64,9 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 
 	if (currentEditor != nullptr)
 	{
-		dynamic_cast<ZenAutoTrimAudioProcessorEditor*>(currentEditor)->vuMeter->copySamples(
-			buffer.getReadPointer(0), buffer.getNumSamples());
+		// #TODO: FIX THIS so GUI is never accessed in process block
+		//dynamic_cast<ZenAutoTrimAudioProcessorEditor*>(currentEditor)->vuMeter->copySamples(
+		//	buffer.getReadPointer(0), buffer.getNumSamples());
 	}
 	if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f)
 		levelAnalysisManager.processSamples(&buffer, posInfo );
