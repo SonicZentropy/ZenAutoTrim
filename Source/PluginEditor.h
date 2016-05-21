@@ -25,11 +25,12 @@ class ZenAutoTrimAudioProcessorEditor
 	: public AudioProcessorEditor,
 	public TextEditor::Listener,
 	public TextButton::Listener,
+	public ComboBox::Listener,
 	//public ZenLabelDisplay::Listener,
 	public Timer
 {
 public:
-	
+
 	explicit ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAudioProcessor&);
     ~ZenAutoTrimAudioProcessorEditor();
 
@@ -41,6 +42,7 @@ public:
 	void textEditorFocusLost(TextEditor& editorChanged) override;
 	void textEditorUpdateDueToChange(TextEditor& editorChanged);
 	void buttonClicked(Button*) override;
+	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
 	
 	void timerCallback() override;
 	
@@ -62,6 +64,7 @@ private:
 	ScopedPointer<ZenLabelDisplay> leftRunningRMS, rightRunningRMS;
 	ScopedPointer<Label> maxBox, peakBox, avgBox, runningBox;	
 	ScopedPointer<ZenImageButton> resetBtn, autoGainBtn;
+	ScopedPointer<ZenComboBox> targetComboBox, rmsWindowComboBox;
 	
 	ScopedPointer<ZenLookAndFeel> zenLookAndFeel;
 

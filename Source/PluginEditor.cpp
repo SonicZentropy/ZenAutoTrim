@@ -85,9 +85,9 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	avgBox->setColour(Label::textColourId, textColour);
 	avgBox->setBounds(172, 40, 40, 24);
 	
-	addAndMakeVisible(runningBox = new Label("RunningBox", "RUN"));
+	addAndMakeVisible(runningBox = new Label("RunningBox", "Gain:"));
 	runningBox->setColour(Label::textColourId, textColour);
-	runningBox->setBounds(0, 8, 70, 24);
+	runningBox->setBounds(40, 8, 50, 24);
 	
 	//addAndMakeVisible(leftRunningRMS = new ZenLabelDisplay("Left Running RMS Label", TRANS("00")));
 	//leftRunningRMS->setColour(Label::textColourId, Colours::white);
@@ -107,6 +107,22 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	autoGainBtn->setClickingTogglesState(true);
 	autoGainBtn->setBounds(68, 128, 75, 24);
 	autoGainBtn->addListener(this);
+
+	addAndMakeVisible(targetComboBox = new ZenComboBox("Target Combo Box"));
+	targetComboBox->setBounds(20, 160, 60, 24);
+	targetComboBox->addItem("RMS", 1);
+	targetComboBox->addItem("Peak", 2);
+	targetComboBox->setTextWhenNothingSelected("Target");
+	//targetComboBox->setSelectedId(1, sendNotificationAsync);
+
+	addAndMakeVisible(rmsWindowComboBox = new ZenComboBox("RMS Window Combo Box"));
+	rmsWindowComboBox->setBounds(140, 160, 80, 24);
+	rmsWindowComboBox->addItem("10ms", 10);
+	rmsWindowComboBox->addItem("300ms", 300);
+	rmsWindowComboBox->addItem("1000ms", 1000);
+	rmsWindowComboBox->addItem("5000ms", 5000);
+	rmsWindowComboBox->setTextWhenNothingSelected("Window");
+	//rmsWindowComboBox->setSelectedId(300, sendNotificationAsync);
 
 	setSize(250, 250);
 	startTimer(100);
@@ -186,6 +202,17 @@ void ZenAutoTrimAudioProcessorEditor::buttonClicked(Button* pressedBtn)
 		processor.levelAnalysisManager.resetCalculation();
 	else if (pressedBtn == autoGainBtn)
 		processor.autoGainEnableParam->toggleValue();
+}
+
+void ZenAutoTrimAudioProcessorEditor::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
+{
+	if (targetComboBox == comboBoxThatHasChanged)
+	{
+		
+	} else if (rmsWindowComboBox == comboBoxThatHasChanged)
+	{
+		//processor.
+	}
 }
 
 void ZenAutoTrimAudioProcessorEditor::timerCallback()
