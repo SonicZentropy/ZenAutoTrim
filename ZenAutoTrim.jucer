@@ -23,10 +23,11 @@
       </GROUP>
     </GROUP>
     <GROUP id="{EAD41354-CE9E-3D83-523D-F535CD5A63FA}" name="Source">
+      <FILE id="rPMXjB" name="DummyComponent.cpp" compile="0" resource="0"
+            file="Source/DummyComponent.cpp"/>
+      <FILE id="rocl2R" name="DummyComponent.h" compile="0" resource="0"
+            file="Source/DummyComponent.h"/>
       <GROUP id="{163A5499-ADBD-9089-D6F5-0E24599C0786}" name="data"/>
-      <FILE id="hkB5t7" name="NewComponent.cpp" compile="0" resource="0"
-            file="Source/NewComponent.cpp"/>
-      <FILE id="eL91k4" name="NewComponent.h" compile="0" resource="0" file="Source/NewComponent.h"/>
       <FILE id="w3tMFs" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="QNnvjL" name="PluginProcessor.h" compile="0" resource="0"

@@ -724,3 +724,5 @@ hs_err_pid*
 *.exe
 *.out
 *.app
+/Source/DummyComponent.h
+/Source/DummyComponent.cpp
