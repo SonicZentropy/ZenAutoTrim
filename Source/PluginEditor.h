@@ -56,13 +56,14 @@ private:
 	
 	ScopedPointer<TimeSliceThread> graphicalManager;
 	
+	ScopedPointer<ZenTitleBar> titleBar;
 	ScopedPointer<ZenDecibelTextEditor> targetEditor;
 	ScopedPointer<ZenLabelDisplay> gainEditor;
 	ScopedPointer<ZenLabelDisplay> leftAvgRMSLabel, rightAvgRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftMaxRMSLabel, rightMaxRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftPeakLabel, rightPeakLabel;
 	ScopedPointer<ZenLabelDisplay> leftRunningRMS, rightRunningRMS;
-	ScopedPointer<Label> maxBox, peakBox, avgBox, runningBox;	
+	ScopedPointer<Label> maxBox, peakBox, avgBox, gainLabel;	
 	ScopedPointer<ZenImageButton> resetBtn, autoGainBtn;
 	ScopedPointer<ZenComboBox> targetComboBox, rmsWindowComboBox;
 	

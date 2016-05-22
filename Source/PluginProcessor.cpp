@@ -20,7 +20,8 @@
 
 //==============================================================================
 ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
-	:currentEditor(nullptr)
+	:currentEditor(nullptr),
+	rmsWindowTime("RMS Window Time", 300)
 {
 	addParameter(gainParam = new ZenDecibelParameter("gainParam", "Gain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, true, 50.0f));
 	addParameter(targetParam = new ZenDecibelParameter("targetGain", "TargetGain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, false));
@@ -85,16 +86,14 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 				//DBG("Targ param db is: " << targetParam->getValueInDecibels());
 				//DBG("Targ param in gain is: " << targParamGain);
 				//DBG("Gain value Gain Param is Set to: " << gainValueToSet);
-				gainParam->setValueNotifyingHost(decibelValueToAdd);
+			//	gainParam->setValueNotifyingHost(decibelValueToAdd);
 			}
 				break;
 			case MaxRMS:
-				gainParam->setValueNotifyingHost((targetParam->getValueGain()
-					- levelAnalysisManager.getMaxChannelRMS()));
+				//gainParam->setValueNotifyingHost((targetParam->getValueGain() - levelAnalysisManager.getMaxChannelRMS()));
 				break;
 			case AverageRMS:
-				gainParam->setValueNotifyingHost((targetParam->getValueGain()
-					- levelAnalysisManager.getMaxCurrentRunningRMS()));
+				//gainParam->setValueNotifyingHost((targetParam->getValueGain() - levelAnalysisManager.getMaxCurrentRunningRMS()));
 				break;
 			default:
 				throw std::runtime_error("This should never happen");
