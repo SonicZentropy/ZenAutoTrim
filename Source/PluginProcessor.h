@@ -75,6 +75,7 @@ private:
 	ZenDecibelParameter* gainParam; 
 	ZenDecibelParameter* targetParam;
 	ZenBoolParameter* autoGainEnableParam;
+	ZenBoolParameter* bypassParam;
 	AudioProcessorEditor* currentEditor;
 	LevelAnalysisManager levelAnalysisManager;
 	AudioPlayHead* aPlayHead;

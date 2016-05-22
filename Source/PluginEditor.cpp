@@ -22,30 +22,65 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	
 	zenLookAndFeel = new ZenLookAndFeel();
 	LookAndFeel::setDefaultLookAndFeel(zenLookAndFeel);
-	setSize(234, 250);
+	setSize(222, 232);
 		
 	backgroundImg = ImageFileFormat::loadFrom(BinaryData::backgroundImg_png, (size_t)BinaryData::backgroundImg_pngSize);
 	
-	addAndMakeVisible(titleBar = new ZenTitleBar());
+	addAndMakeVisible(titleBar = new ZenTitleBar("Zen Title Bar", this));
 	titleBar->setBounds(0, 0, getWidth(), 30);
+	titleBar->addBypassListener(this);
+
+	//https://www.reddit.com/r/cpp_questions/comments/4kisug/lambdastdfunction_this_access_confusion/
+	//auto MakeGetTextParserLambda = [] (ZenLabelDisplay* labelRef)
+	//{
+	//	return [labelRef]
+	//	{
+	//		float val = labelRef->getTextValue().getValue();
+	//		if (val < -96.0f)
+	//			return String("-Inf");
+	//		else
+	//			return String(val);
+	//	};
+	//};
+
+	auto MakeGetTextParserLambda = [] (ZenLabelDisplay* labelRef)
+	{
+		float val = labelRef->getTextValue().getValue();
+		if (val < -96.0f)
+			return String("-Inf");
+		else
+			return String(val);
+	};
+	
 
 	addAndMakeVisible(gainLabel = new Label("Gain Text", "Gain:"));
 	gainLabel->setColour(Label::textColourId, textColour);
-	gainLabel->setBounds(40, 40, 50, 24);
+	gainLabel->setBounds(40, 40, 50, 34);
 
 	addAndMakeVisible(gainEditor = new ZenLabelDisplay("Calculated Gain Label", "0.00"));
-	gainEditor->setBounds(90, 40, 55, 24);
+	gainEditor->setGetTextFunction(MakeGetTextParserLambda);
+	gainEditor->setBounds(90, 40, 75, 34);
 	
 	addAndMakeVisible(leftAvgRMSLabel = new ZenLabelDisplay("Left Avg RMS Out", "00"));
 	leftAvgRMSLabel->setColour(Label::textColourId, Colours::white);
+	leftAvgRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
 	leftAvgRMSLabel->setBounds(8, 80, 72, 24);
 	
 	addAndMakeVisible(leftMaxRMSLabel = new ZenLabelDisplay("Left Max RMS Out", "0.00"));
 	leftMaxRMSLabel->setColour(Label::textColourId, Colours::white);
+	leftMaxRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
 	leftMaxRMSLabel->setBounds(8, 108, 72, 24);
 	
 	addAndMakeVisible(leftPeakLabel = new ZenLabelDisplay("Left Peak Out", "0.00"));
 	leftPeakLabel->setColour(Label::textColourId, Colours::white);
+	//leftPeakLabel->setGetTextFunction([this]()
+	//{
+	//	//float val = leftPeakLabel->getTextValue().getValue();
+	//	String(ZenLabelDisplay::*getTextValue) ();
+	//	if (val <= -96.0f) return String("-Inf");
+	//	else return String(val);
+	//});
+	leftPeakLabel->setGetTextFunction(MakeGetTextParserLambda);
 	leftPeakLabel->setBounds(8, 136, 72, 24);
 
 	addAndMakeVisible(avgBox = new Label("Avg Label", "AVG"));
@@ -62,14 +97,17 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	
 	addAndMakeVisible(rightAvgRMSLabel = new ZenLabelDisplay("Right Avg RMS Out", "0.00"));
 	rightAvgRMSLabel->setColour(Label::textColourId, Colours::white);
+	rightAvgRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
 	rightAvgRMSLabel->setBounds(140, 80, 72, 24);
 	
 	addAndMakeVisible(rightMaxRMSLabel = new ZenLabelDisplay("Right Max RMS Out", "0.00"));
 	rightMaxRMSLabel->setColour(Label::textColourId, Colours::white);
+	rightMaxRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
 	rightMaxRMSLabel->setBounds(140, 108, 72, 24);
 	
 	addAndMakeVisible(rightPeakLabel = new ZenLabelDisplay("Right Peak Out", "0.00"));
 	rightPeakLabel->setColour(Label::textColourId, textColour);
+	rightPeakLabel->setGetTextFunction(MakeGetTextParserLambda);
 	rightPeakLabel->setBounds(140, 136, 72, 24);
 
 	addAndMakeVisible(targetComboBox = new ZenComboBox("Target Combo Box"));
@@ -200,6 +238,9 @@ void ZenAutoTrimAudioProcessorEditor::buttonClicked(Button* pressedBtn)
 		processor.levelAnalysisManager.resetCalculation();
 	else if (pressedBtn == autoGainBtn)
 		processor.autoGainEnableParam->toggleValue();
+	else if (pressedBtn == titleBar->getBypassBtn())
+		//invert toggle state, since processor param is "Bypassed"
+		processor.bypassParam->setValueFromBool(! pressedBtn->getToggleState());
 }
 
 void ZenAutoTrimAudioProcessorEditor::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
