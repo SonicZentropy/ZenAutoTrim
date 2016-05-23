@@ -51,7 +51,6 @@ public:
 
 private:
     ZenAutoTrimAudioProcessor& processor;
-	// #TODO: Implement opengl context
 	//ScopedPointer<OpenGLContext> openGLContext;
 	
 	ScopedPointer<TimeSliceThread> graphicalManager;
@@ -62,8 +61,8 @@ private:
 	ScopedPointer<ZenLabelDisplay> leftAvgRMSLabel, rightAvgRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftMaxRMSLabel, rightMaxRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftPeakLabel, rightPeakLabel;
-	ScopedPointer<ZenLabelDisplay> leftRunningRMS, rightRunningRMS;
-	ScopedPointer<Label> maxBox, peakBox, avgBox, gainLabel;	
+	ScopedPointer<ZenLabelDisplay> leftWindowRMSLabel, rightWindowRMSLabel;
+	ScopedPointer<Label> maxBox, peakBox, avgBox, gainLabel, winBox;	
 	ScopedPointer<ZenImageButton> resetBtn, autoGainBtn;
 	ScopedPointer<ZenComboBox> targetComboBox, rmsWindowComboBox;
 	

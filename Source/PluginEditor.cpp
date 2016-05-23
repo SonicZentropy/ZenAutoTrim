@@ -22,7 +22,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	
 	zenLookAndFeel = new ZenLookAndFeel();
 	LookAndFeel::setDefaultLookAndFeel(zenLookAndFeel);
-	setSize(222, 232);
+	setSize(222, 250);
 		
 	backgroundImg = ImageFileFormat::loadFrom(BinaryData::backgroundImg_png, (size_t)BinaryData::backgroundImg_pngSize);
 	
@@ -55,67 +55,74 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 
 	addAndMakeVisible(gainLabel = new Label("Gain Text", "Gain:"));
 	gainLabel->setColour(Label::textColourId, textColour);
-	gainLabel->setBounds(40, 40, 50, 34);
+	gainLabel->setBounds(40, 35, 50, 24);
 
 	addAndMakeVisible(gainEditor = new ZenLabelDisplay("Calculated Gain Label", "0.00"));
 	gainEditor->setGetTextFunction(MakeGetTextParserLambda);
-	gainEditor->setBounds(90, 40, 75, 34);
+	gainEditor->setBounds(90, 35, 75, 24);
 	
+	addAndMakeVisible(leftWindowRMSLabel = new ZenLabelDisplay("Left Window RMS Out", "00"));
+	leftWindowRMSLabel->setColour(Label::textColourId, textColour);
+	leftWindowRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
+	leftWindowRMSLabel->setBounds(8, 70, 72, 24);
+
 	addAndMakeVisible(leftAvgRMSLabel = new ZenLabelDisplay("Left Avg RMS Out", "00"));
-	leftAvgRMSLabel->setColour(Label::textColourId, Colours::white);
+	leftAvgRMSLabel->setColour(Label::textColourId, textColour);
 	leftAvgRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
-	leftAvgRMSLabel->setBounds(8, 80, 72, 24);
+	leftAvgRMSLabel->setBounds(8, 98, 72, 24);
 	
 	addAndMakeVisible(leftMaxRMSLabel = new ZenLabelDisplay("Left Max RMS Out", "0.00"));
-	leftMaxRMSLabel->setColour(Label::textColourId, Colours::white);
+	leftMaxRMSLabel->setColour(Label::textColourId, textColour);
 	leftMaxRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
-	leftMaxRMSLabel->setBounds(8, 108, 72, 24);
+	leftMaxRMSLabel->setBounds(8, 126, 72, 24);
 	
 	addAndMakeVisible(leftPeakLabel = new ZenLabelDisplay("Left Peak Out", "0.00"));
-	leftPeakLabel->setColour(Label::textColourId, Colours::white);
-	//leftPeakLabel->setGetTextFunction([this]()
-	//{
-	//	//float val = leftPeakLabel->getTextValue().getValue();
-	//	String(ZenLabelDisplay::*getTextValue) ();
-	//	if (val <= -96.0f) return String("-Inf");
-	//	else return String(val);
-	//});
+	leftPeakLabel->setColour(Label::textColourId, textColour);
 	leftPeakLabel->setGetTextFunction(MakeGetTextParserLambda);
-	leftPeakLabel->setBounds(8, 136, 72, 24);
+	leftPeakLabel->setBounds(8, 154, 72, 24);
 
-	addAndMakeVisible(avgBox = new Label("Avg Label", "AVG"));
+	addAndMakeVisible(winBox = new Label("Window Label", "WIN"));
+	winBox->setColour(Label::textColourId, textColour);
+	winBox->setBounds(90, 70, 40, 24);
+
+	addAndMakeVisible(avgBox = new Label("Avg Label", "ALL"));
 	avgBox->setColour(Label::textColourId, textColour);
-	avgBox->setBounds(90, 80, 40, 24);
+	avgBox->setBounds(90, 98, 40, 24);
 
 	addAndMakeVisible(maxBox = new Label("Max Label", "MAX"));
 	maxBox->setColour(Label::textColourId, textColour);
-	maxBox->setBounds(90, 108, 40, 24);
+	maxBox->setBounds(90, 126, 40, 24);
 
 	addAndMakeVisible(peakBox = new Label("Peak Label", "PEAK"));
 	peakBox->setColour(Label::textColourId, textColour);
-	peakBox->setBounds(90, 136, 40, 24);
+	peakBox->setBounds(90, 154, 40, 24);
+
+	addAndMakeVisible(rightWindowRMSLabel = new ZenLabelDisplay("Right Avg RMS Out", "0.00"));
+	rightWindowRMSLabel->setColour(Label::textColourId, Colours::white);
+	rightWindowRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
+	rightWindowRMSLabel->setBounds(140, 70, 72, 24);
 	
 	addAndMakeVisible(rightAvgRMSLabel = new ZenLabelDisplay("Right Avg RMS Out", "0.00"));
 	rightAvgRMSLabel->setColour(Label::textColourId, Colours::white);
 	rightAvgRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
-	rightAvgRMSLabel->setBounds(140, 80, 72, 24);
+	rightAvgRMSLabel->setBounds(140, 98, 72, 24);
 	
 	addAndMakeVisible(rightMaxRMSLabel = new ZenLabelDisplay("Right Max RMS Out", "0.00"));
 	rightMaxRMSLabel->setColour(Label::textColourId, Colours::white);
 	rightMaxRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
-	rightMaxRMSLabel->setBounds(140, 108, 72, 24);
+	rightMaxRMSLabel->setBounds(140, 126, 72, 24);
 	
 	addAndMakeVisible(rightPeakLabel = new ZenLabelDisplay("Right Peak Out", "0.00"));
 	rightPeakLabel->setColour(Label::textColourId, textColour);
 	rightPeakLabel->setGetTextFunction(MakeGetTextParserLambda);
-	rightPeakLabel->setBounds(140, 136, 72, 24);
+	rightPeakLabel->setBounds(140, 154, 72, 24);
 
 	addAndMakeVisible(targetComboBox = new ZenComboBox("Target Combo Box"));
 	targetComboBox->addItem("Avg RMS", 1);
 	targetComboBox->addItem("Max RMS", 2);
 	targetComboBox->addItem("Peak", 3);
 	targetComboBox->setTextWhenNothingSelected("Target");
-	targetComboBox->setBounds(9, 168, 90, 24);
+	targetComboBox->setBounds(9, 186, 90, 24);
 	//targetComboBox->setSelectedId(1, sendNotificationAsync);
 	targetComboBox->addListener(this);
 
@@ -125,19 +132,19 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	rmsWindowComboBox->addItem("1000ms", 1000);
 	rmsWindowComboBox->addItem("5000ms", 5000);
 	rmsWindowComboBox->setTextWhenNothingSelected("Window");
-	rmsWindowComboBox->setBounds(122, 168, 90, 24);
+	rmsWindowComboBox->setBounds(122, 186, 90, 24);
 	rmsWindowComboBox->setEnabled(false);
 	//rmsWindowComboBox->setSelectedId(300, sendNotificationAsync);
 	rmsWindowComboBox->addListener(this);
 	
 	addAndMakeVisible(resetBtn = new ZenImageButton("Reset Button", "Reset"));
 	resetBtn->setTooltip("Reset RMS Calculation");
-	resetBtn->setBounds(16, 200, 51, 24);
+	resetBtn->setBounds(16, 218, 51, 24);
 	resetBtn->addListener(this);	
 	
 	addAndMakeVisible(autoGainBtn = new ZenImageButton("Auto Gain Button", "AutoGain"));
 	autoGainBtn->setClickingTogglesState(true);
-	autoGainBtn->setBounds(154, 200, 60, 24);
+	autoGainBtn->setBounds(154, 218, 60, 24);
 	autoGainBtn->addListener(this);
 
 	addAndMakeVisible(targetEditor = new ZenDecibelTextEditor("Target Editor", processor.targetParam));
@@ -148,7 +155,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	targetEditor->setCaretVisible(true);
 	targetEditor->setSelectAllWhenFocused(true);
 	targetEditor->setText("-18.00 dB");
-	targetEditor->setBounds(75, 200, 71, 24);
+	targetEditor->setBounds(75, 218, 71, 24);
 	targetEditor->addListener(this);
 		
 	startTimer(100);
@@ -157,12 +164,12 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	//openGLContext->attachTo(*this);
 
 	ZEN_COMPONENT_DEBUG_ATTACH(this);
-	//addAndMakeVisible(leftRunningRMS = new ZenLabelDisplay("Left Running RMS Label", TRANS("00")));
-	//leftRunningRMS->setColour(Label::textColourId, Colours::white);
-	//leftRunningRMS->setBounds();
-	//addAndMakeVisible(rightRunningRMS = new ZenLabelDisplay("Right Running RMS Label", TRANS("00")));
-	//rightRunningRMS->setColour(Label::textColourId, Colours::white);
-	//rightRunningRMS->setBounds();
+	//addAndMakeVisible(leftWindowRMS = new ZenLabelDisplay("Left Window RMS Label", TRANS("00")));
+	//leftWindowRMS->setColour(Label::textColourId, Colours::white);
+	//leftWindowRMS->setBounds();
+	//addAndMakeVisible(rightWindowRMS = new ZenLabelDisplay("Right Window RMS Label", TRANS("00")));
+	//rightWindowRMS->setColour(Label::textColourId, Colours::white);
+	//rightWindowRMS->setBounds();
 	//graphicalManager = new TimeSliceThread("graphicalManagerTrd");
 	//graphicalManager->startThread(2);
 	////addAndMakeVisible(vuMeter = new SegmentedMeter());
@@ -185,8 +192,8 @@ ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 	rightMaxRMSLabel = nullptr;
 	rightPeakLabel = nullptr;
 	
-	//leftRunningRMS = nullptr;
-	//rightRunningRMS = nullptr;
+	//leftWindowRMS = nullptr;
+	//rightWindowRMS = nullptr;
 	
 	maxBox = nullptr;
 	peakBox = nullptr;
@@ -282,16 +289,20 @@ void ZenAutoTrimAudioProcessorEditor::timerCallback()
 		gainEditor->setText(String(processor.gainParam->getValueInDecibels(), 2), dontSendNotification);
 		processor.gainParam->setNeedsUIUpdate(false);
 	}
+
+	//Grabs instantaneous RMS of whichever process block most recently completed IGNORING WINDOW SIZE
+	leftWindowRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getLeftCurrentRms())), dontSendNotification);
+	rightWindowRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getRightCurrentRms())), dontSendNotification);
 	
-	//Running RMS now calculates proper full-length average RMS. Here just for informational purposes	
-	leftAvgRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getLeftCurrentRunningRmsInDB()), dontSendNotification);
-	rightAvgRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getRightCurrentRunningRmsInDB()), dontSendNotification);
+	//Window RMS now calculates proper full-length average RMS. Here just for informational purposes	
+	leftAvgRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getLeftCurrentRunningRms())), dontSendNotification);
+	rightAvgRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getRightCurrentRunningRms())), dontSendNotification);
 	
 	// Max RMS is the current maximum found RMS of a single window, used to set proper trim level
-	leftMaxRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getLeftMaxRmsInDB()), dontSendNotification);
-	rightMaxRMSLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getRightMaxRmsInDB()), dontSendNotification);
+	leftMaxRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getLeftMaxRms())), dontSendNotification);
+	rightMaxRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getRightMaxRms())), dontSendNotification);
 	
 	// Peak single sample found
-	leftPeakLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getLeftPeakInDB()), dontSendNotification);
-	rightPeakLabel->setText(convertTo2PrecisionString(processor.levelAnalysisManager.getRightPeakInDB()), dontSendNotification);
+	leftPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getLeftPeak())), dontSendNotification);
+	rightPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getRightPeak())), dontSendNotification);
 }
