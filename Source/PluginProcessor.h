@@ -68,7 +68,11 @@ public:
 
 	CalibrationTarget getTargetForAutoTrim() const { return targetForAutoTrim; }
 	void setTargetForAutoTrim(CalibrationTarget inValue) { targetForAutoTrim = inValue; }
-	void setRMSWindowTimeInMS(TimeValue inTime) { rmsWindowTime.setValueFromMS(inTime); }
+	void setRMSWindowTimeInMS(TimeValue inTime)
+	{
+		rmsWindowTime.setValueFromMS(inTime);
+		levelAnalysisManager.setWindowSizeInMS(inTime);
+	}
 
 private:
 	friend class ZenAutoTrimAudioProcessorEditor;
