@@ -43,7 +43,7 @@ public:
 	void textEditorUpdateDueToChange(TextEditor& editorChanged);
 	void buttonClicked(Button*) override;
 	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
-	
+	void updateUIFromProcessor();
 	void timerCallback() override;
 	
 	//ScopedPointer<SegmentedMeter> vuMeter;

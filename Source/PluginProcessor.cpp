@@ -66,7 +66,7 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 
 	if (currentEditor != nullptr)
 	{
-		// #TODO: FIX THIS so GUI is never accessed in process block
+		
 		//dynamic_cast<ZenAutoTrimAudioProcessorEditor*>(currentEditor)->vuMeter->copySamples(
 		//	buffer.getReadPointer(0), buffer.getNumSamples());
 	}
@@ -80,14 +80,14 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 		{
 			case Peak:
 			{
-				double maxPeak = levelAnalysisManager.getMaxChannelPeakInDB();
+				double maxPeak = Decibels::gainToDecibels(levelAnalysisManager.getMaxChannelPeak());
 				double targParamDB = targetParam->getValueInDecibels();
 				double decibelValueToAdd = targParamDB - maxPeak;
 				//DBG("Max peak is: " << maxPeak);
 				//DBG("Targ param db is: " << targetParam->getValueInDecibels());
 				//DBG("Targ param in gain is: " << targParamGain);
 				//DBG("Gain value Gain Param is Set to: " << gainValueToSet);
-			//	gainParam->setValueNotifyingHost(decibelValueToAdd);
+				//gainParam->setValueNotifyingHost(decibelValueToAdd);
 			}
 				break;
 			case MaxRMS:

@@ -74,6 +74,16 @@ public:
 		levelAnalysisManager.setWindowSizeInMS(inTime);
 	}
 
+	bool isBypassed() const
+	{
+		return bypassParam->isOn();
+	}
+
+	bool isEnabled() const
+	{
+		return bypassParam->isOff();
+	}
+
 private:
 	friend class ZenAutoTrimAudioProcessorEditor;
 	ZenDecibelParameter* gainParam; 
