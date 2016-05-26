@@ -24,7 +24,7 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	rmsWindowTime("RMS Window Time", 300)
 {
 	addParameter(gainParam = new ZenDecibelParameter("gainParam", "Gain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, true, 50.0f));
-	addParameter(targetParam = new ZenDecibelParameter("targetGain", "TargetGain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, false));
+	addParameter(targetParam = new ZenDecibelParameter("targetGain", "TargetGain", -96.0f, 18.0f, 0.0f, 0.0f, -18.0f, false));
 	addParameter(autoGainEnableParam = new ZenBoolParameter("autoGainParam", "AutoGain", false, ""));
 	addParameter(bypassParam = new ZenBoolParameter("bypassParam", "Bypass", false, ""));
 
@@ -35,12 +35,12 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 #endif
 
 #ifdef JUCE_DEBUG
-	debugWindow = ZenDebugEditor::getInstance();
-	debugWindow->setSize(650, 400);
+	//debugWindow = ZenDebugEditor::getInstance();
+	//debugWindow->setSize(650, 400);
 	//Open in bottom right corner
-	debugWindow->setTopLeftPosition(1900 - debugWindow->getWidth(), 1040 - debugWindow->getHeight());
-#endif
+	//debugWindow->setTopLeftPosition(1900 - debugWindow->getWidth(), 1040 - debugWindow->getHeight());
 	// #TODO: add JUCE REF COUNTED OBJECT to zen GUI
+#endif
 }
 
 ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
@@ -55,8 +55,9 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 	aPlayHead->getCurrentPosition(posInfo);
 	//bool posFound = aPlayHead->getCurrentPosition(posInfo);
 
-	//float* leftData = buffer.getWritePointer(0);	//leftData references left channel now
-	//float* rightData = buffer.getWritePointer(1); //right data references right channel now
+	float* leftData = buffer.getWritePointer(0);	//leftData references left channel now
+	float* rightData = buffer.getWritePointer(1); //right data references right channel now
+	unsigned int numSamples = buffer.getNumSamples();
 	
 	if (prevSampleRate != this->getSampleRate())
 	{
@@ -80,21 +81,35 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 		{
 			case Peak:
 			{
-				double maxPeak = Decibels::gainToDecibels(levelAnalysisManager.getMaxChannelPeak());
-				double targParamDB = targetParam->getValueInDecibels();
-				double decibelValueToAdd = targParamDB - maxPeak;
+				double maxPeak = levelAnalysisManager.getMaxChannelPeak();
+				double targParamGain = targetParam->getValueInGain();
+				
+				//division in log equiv to subtract in base
+				double gainValueToAdd = targParamGain / maxPeak;
+
+				float maxPeakInDB = Decibels::gainToDecibels(levelAnalysisManager.getMaxChannelPeak());
+				double targParamGainInDB =  Decibels::gainToDecibels(targetParam->getValueInGain());
+				double gainValueToAddInDB = Decibels::gainToDecibels(targParamGain) - Decibels::gainToDecibels(maxPeak);
 				//DBG("Max peak is: " << maxPeak);
-				//DBG("Targ param db is: " << targetParam->getValueInDecibels());
-				//DBG("Targ param in gain is: " << targParamGain);
-				//DBG("Gain value Gain Param is Set to: " << gainValueToSet);
-				//gainParam->setValueNotifyingHost(decibelValueToAdd);
+				if(!almostEqual(gainValueToAdd, gainParam->getValueInGain()) && maxPeak > -900)  // gain value changed
+				{ 
+					DBG("\nGain To Add In DB: " << Decibels::gainToDecibels(maxPeak + gainValueToAdd) << " gainValueToAdd: " << gainValueToAdd << " != (gainParam)" << gainParam->getValueInGain());
+					DBG("Max peak is: " << maxPeak << " and gainValueToAdd value is (targParamGain)" << targParamGain << " - (maxPeak)" << maxPeak << " = (gainValueToAdd)" << gainValueToAdd);
+					DBG("Targ param gain in DB: " << Decibels::gainToDecibels(targParamGain) << " max peak in db: " << Decibels::gainToDecibels(maxPeak) << " gain to add in db: " << Decibels::gainToDecibels(abs(gainValueToAdd)));
+					DBG("MaxPeak in DB: " << maxPeakInDB << " and gainValueToAddInDB value is (targParamGainInDB)" << targParamGainInDB << " - (maxPeakInDB)" << maxPeakInDB << " = (gainValueToAddInDB)" << gainValueToAddInDB);
+					DBG("gainvaluetoaddindb to gain:" << Decibels::decibelsToGain(gainValueToAddInDB));
+					DBG("Setting gain to add to: " << gainValueToAdd << " or in DB: " << Decibels::gainToDecibels(gainValueToAdd));
+					gainParam->setValueFromGainNotifyingHost(gainValueToAdd);
+					//gainParam->setValueFromDecibels(gainValueToAddInDB);
+					
+				}
 			}
 				break;
 			case MaxRMS:
-				//gainParam->setValueNotifyingHost((targetParam->getValueGain() - levelAnalysisManager.getMaxChannelRMS()));
+				//gainParam->setValueNotifyingHost((targetParam->getValueInGain() - levelAnalysisManager.getMaxChannelRMS()));
 				break;
 			case AverageRMS:
-				//gainParam->setValueNotifyingHost((targetParam->getValueGain() - levelAnalysisManager.getMaxCurrentRunningRMS()));
+				//gainParam->setValueNotifyingHost((targetParam->getValueInGain() - levelAnalysisManager.getMaxCurrentRunningRMS()));
 				break;
 			default:
 				throw std::runtime_error("This should never happen");
@@ -102,9 +117,26 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 			
 		gainParam->setNeedsUIUpdate(true);
 		
-		if (autoGainEnableParam)
+		if (autoGainEnableParam->isOn())
 		{						
-			buffer.applyGain(gainParam->getValueGain());
+			//buffer.applyGain(gainParam->getValueInGain());
+			//THIS IS RIGHT in db
+			//float gainToAdd = gainParam->getValueInDecibels();
+			//for(unsigned int i = 0; i < numSamples; ++i)
+			//{
+			//	leftData[i] = Decibels::decibelsToGain(Decibels::gainToDecibels(leftData[i]) + gainToAdd);
+			//	rightData[i] = Decibels::decibelsToGain( Decibels::gainToDecibels(rightData[i]) + gainToAdd);
+			//}
+			
+			//in gain, multiply in log equivalent to add in base
+			float gainToAdd = gainParam->getValueInGain();
+			for (unsigned int i = 0; i < numSamples; ++i)
+			{
+				leftData[i] =  leftData[i] * gainToAdd;
+				rightData[i] = rightData[i] * gainToAdd;
+			}
+			
+			
 		}
 	}
 	

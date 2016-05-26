@@ -164,7 +164,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	//openGLContext = new OpenGLContext();
 	//openGLContext->attachTo(*this);
 
-	ZEN_COMPONENT_DEBUG_ATTACH(this);
+	//ZEN_COMPONENT_DEBUG_ATTACH(this);
 	//addAndMakeVisible(leftWindowRMS = new ZenLabelDisplay("Left Window RMS Label", TRANS("00")));
 	//leftWindowRMS->setColour(Label::textColourId, Colours::white);
 	//leftWindowRMS->setBounds();
@@ -235,6 +235,7 @@ void ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(TextEditor& ed
 	if (&editorChanged == targetEditor)
 	{		
 		float targetGain = static_cast<ZenDecibelTextEditor&>(editorChanged).getDecibelValueFromText();
+		DBG("Setting target gain in DB to: " << targetGain);
 		processor.targetParam->setValueNotifyingHost(targetGain);
 	}
 }
