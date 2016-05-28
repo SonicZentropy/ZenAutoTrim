@@ -145,16 +145,17 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	addAndMakeVisible(autoGainBtn = new ZenImageButton("Auto Gain Button", "AutoGain"));
 	autoGainBtn->setClickingTogglesState(true);
 	autoGainBtn->setBounds(154, 218, 60, 24);
+	autoGainBtn->setToggleState(processor.getAutoGainEnableParam()->getValueAsBool(), dontSendNotification);
 	autoGainBtn->addListener(this);
 
-	addAndMakeVisible(targetEditor = new ZenDecibelTextEditor("Target Editor", processor.targetParam));
+	addAndMakeVisible(targetEditor = new ZenDecibelTextEditor("Target Editor", processor.getTargetParam()));
 	targetEditor->setMultiLine(false);
 	targetEditor->setReturnKeyStartsNewLine(false);
 	targetEditor->setReadOnly(false);
 	targetEditor->setScrollbarsShown(false);
 	targetEditor->setCaretVisible(true);
 	targetEditor->setSelectAllWhenFocused(true);
-	targetEditor->setText("-18.00 dB");
+	targetEditor->setText(processor.getTargetParam()->getTextInDB());
 	targetEditor->setBounds(75, 218, 71, 24);
 	targetEditor->addListener(this);
 		
@@ -236,7 +237,7 @@ void ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(TextEditor& ed
 	{		
 		float targetGain = static_cast<ZenDecibelTextEditor&>(editorChanged).getDecibelValueFromText();
 		DBG("Setting target gain in DB to: " << targetGain);
-		processor.targetParam->setValueNotifyingHost(targetGain);
+		processor.getTargetParam()->setValueNotifyingHost(targetGain);
 	}
 }
 
@@ -245,13 +246,13 @@ void ZenAutoTrimAudioProcessorEditor::buttonClicked(Button* pressedBtn)
 {
 	if (pressedBtn == resetBtn)
 	{
-		processor.levelAnalysisManager.resetCalculation();
+		processor.getLevelAnalysisManager().resetCalculation();
 		updateUIFromProcessor();
 	} else if (pressedBtn == autoGainBtn)
-		processor.autoGainEnableParam->toggleValue();
+		processor.getAutoGainEnableParam()->toggleValue();
 	else if (pressedBtn == titleBar->getBypassBtn())
 		//invert toggle state, since processor param is "Bypassed"
-		processor.bypassParam->setValueFromBool(! pressedBtn->getToggleState());
+		processor.getBypassParam()->setValueFromBool(! pressedBtn->getToggleState());
 }
 
 void ZenAutoTrimAudioProcessorEditor::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
@@ -288,11 +289,11 @@ void ZenAutoTrimAudioProcessorEditor::comboBoxChanged(ComboBox* comboBoxThatHasC
 
 void ZenAutoTrimAudioProcessorEditor::updateUIFromProcessor()
 {
-	if (processor.gainParam->needsUIUpdate())
+	if (processor.getGainParam()->needsUIUpdate())
 	{
 		//gainEditor->setTextWith2Precision<double>(processor.gainParam->getValueInDecibels());
-		gainEditor->setText(String(processor.gainParam->getValueInDecibels(), 2), dontSendNotification);
-		processor.gainParam->setNeedsUIUpdate(false);
+		gainEditor->setText(String(processor.getGainParam()->getValueInDecibels(), 2), dontSendNotification);
+		processor.getGainParam()->setNeedsUIUpdate(false);
 	}
 
 	//Grabs instantaneous RMS of whichever process block most recently completed IGNORING WINDOW SIZE
@@ -300,16 +301,16 @@ void ZenAutoTrimAudioProcessorEditor::updateUIFromProcessor()
 	//rightWindowRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getRightCurrentRms())), dontSendNotification);
 
 	//Window RMS now calculates proper full-length average RMS. Here just for informational purposes	
-	leftAvgRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getLeftCurrentRunningRms())), dontSendNotification);
-	rightAvgRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getRightCurrentRunningRms())), dontSendNotification);
+	leftAvgRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftCurrentRunningRms())), dontSendNotification);
+	rightAvgRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getRightCurrentRunningRms())), dontSendNotification);
 
 	// Max RMS is the current maximum found RMS of a single window, used to set proper trim level
-	leftMaxRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getLeftMaxRms())), dontSendNotification);
-	rightMaxRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getRightMaxRms())), dontSendNotification);
+	leftMaxRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftMaxRms())), dontSendNotification);
+	rightMaxRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getRightMaxRms())), dontSendNotification);
 
 	// Peak single sample found
-	leftPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getLeftPeak())), dontSendNotification);
-	rightPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getRightPeak())), dontSendNotification);
+	leftPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftPeak())), dontSendNotification);
+	rightPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getRightPeak())), dontSendNotification);
 
 }
 

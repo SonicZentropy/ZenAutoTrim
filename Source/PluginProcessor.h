@@ -82,10 +82,20 @@ public:
 	bool isEnabled() const
 	{
 		return bypassParam->isOff();
-	}
+	}	
+
+	LevelAnalysisManager& getLevelAnalysisManager() { return levelAnalysisManager; }
+	
+	ZenDecibelParameter* getGainParam() { return gainParam; }
+
+	ZenBoolParameter* getAutoGainEnableParam() { return autoGainEnableParam; }
+
+	ZenDecibelParameter* getTargetParam() { return targetParam; }
+
+	ZenBoolParameter* getBypassParam() { return bypassParam; }
 
 private:
-	friend class ZenAutoTrimAudioProcessorEditor;
+	//friend class ZenAutoTrimAudioProcessorEditor;
 	ZenDecibelParameter* gainParam; 
 	ZenDecibelParameter* targetParam;
 	ZenBoolParameter* autoGainEnableParam;
