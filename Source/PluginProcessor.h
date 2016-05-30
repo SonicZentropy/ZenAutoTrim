@@ -27,12 +27,18 @@ public:
     ZenAutoTrimAudioProcessor();
     ~ZenAutoTrimAudioProcessor();
 
+	//==============================================================================
+	enum CalibrationTarget
+	{
+		AverageRMS,
+		MaxRMS,
+		Peak
+	};
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
-
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
@@ -59,13 +65,6 @@ public:
 
 	void setCurrentEditor(AudioProcessorEditor* inEditor) { currentEditor = inEditor; }
 
-	enum CalibrationTarget
-	{
-		AverageRMS,
-		MaxRMS,
-		Peak
-	};
-
 	CalibrationTarget getTargetForAutoTrim() const { return targetForAutoTrim; }
 	void setTargetForAutoTrim(CalibrationTarget inValue) { targetForAutoTrim = inValue; }
 	void setRMSWindowTimeInMS(TimeValue inTime)
@@ -74,25 +73,20 @@ public:
 		levelAnalysisManager.setWindowSizeInMS(inTime);
 	}
 
-	bool isBypassed() const
-	{
-		return bypassParam->isOn();
-	}
+	bool isBypassed() const	{ return bypassParam->isOn(); }
 
-	bool isEnabled() const
-	{
-		return bypassParam->isOff();
-	}	
+	bool isEnabled() const { return bypassParam->isOff(); }	
 
-	LevelAnalysisManager& getLevelAnalysisManager() { return levelAnalysisManager; }
-	
+	LevelAnalysisManager& getLevelAnalysisManager() { return levelAnalysisManager; }	
 	ZenDecibelParameter* getGainParam() { return gainParam; }
-
 	ZenBoolParameter* getAutoGainEnableParam() { return autoGainEnableParam; }
-
 	ZenDecibelParameter* getTargetParam() { return targetParam; }
-
 	ZenBoolParameter* getBypassParam() { return bypassParam; }
+
+	//==============================================================================
+
+	UndoManager undoManager;
+	AudioProcessorValueTreeState apTree;
 
 private:
 	//friend class ZenAutoTrimAudioProcessorEditor;

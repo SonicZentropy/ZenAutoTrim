@@ -23,6 +23,10 @@
       </GROUP>
     </GROUP>
     <GROUP id="{EAD41354-CE9E-3D83-523D-F535CD5A63FA}" name="Source">
+      <FILE id="pY67zT" name="ZenAudioProcessorValueTreeState.cpp" compile="1"
+            resource="0" file="Source/ZenAudioProcessorValueTreeState.cpp"/>
+      <FILE id="s9qAUG" name="ZenAudioProcessorValueTreeState.h" compile="0"
+            resource="0" file="Source/ZenAudioProcessorValueTreeState.h"/>
       <FILE id="rPMXjB" name="DummyComponent.cpp" compile="0" resource="0"
             file="Source/DummyComponent.cpp"/>
       <FILE id="rocl2R" name="DummyComponent.h" compile="0" resource="0"

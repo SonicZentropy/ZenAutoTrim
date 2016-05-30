@@ -20,8 +20,10 @@
 
 //==============================================================================
 ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
-	: currentEditor(nullptr),
-	  rmsWindowTime("RMS Window Time", 300)
+	: undoManager(),
+	apTree(*this, &undoManager),
+	currentEditor(nullptr),
+	rmsWindowTime("RMS Window Time", 300)
 {
 	// #TODO: swap to audioprocessorvaluetreestate to save GUI component params by connecting
 
@@ -30,6 +32,18 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	addParameter(targetParam = new ZenDecibelParameter("targetGain", "TargetGain", -96.0f, 18.0f, 0.0f, 0.0f, -18.0f, false));
 	addParameter(autoGainEnableParam = new ZenBoolParameter("autoGainParam", "AutoGain", false, ""));
 	addParameter(bypassParam = new ZenBoolParameter("bypassParam", "Bypass", false, ""));
+
+
+	apTree.createAndAddParameter("gainParam", "Gain", "Gain", NormalisableRange<float>(0.0f, 1.0f), 0.0f)
+
+	//AudioProcessorParameter* AudioProcessorValueTreeState::createAndAddParameter(String  	parameterID,
+	//	String  	parameterName,
+	//	String  	labelText,
+	//	NormalisableRange< float >  	valueRange,
+	//	float  	defaultValue,
+	//	std::function< String(float)>  	valueToTextFunction,
+	//	std::function< float(const String &)>  	textToValueFunction
+	//)
 
 #ifdef JUCE_MSVC
 	//Visual Studio mem leak diagnostics settings 
