@@ -27,17 +27,10 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 {
 	// #TODO: swap to audioprocessorvaluetreestate to save GUI component params by connecting
 
-
-	//addParameter(gainParam = new ZenDecibelParameter("gainParam", "Gain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, true, 50.0f));
-	//addParameter(targetParam = new ZenDecibelParameter("targetGain", "TargetGain", -96.0f, 18.0f, 0.0f, 0.0f, -18.0f, false));
-	//addParameter(autoGainEnableParam = new ZenBoolParameter("autoGainParam", "AutoGain", false, ""));
-	//addParameter(bypassParam = new ZenBoolParameter("bypassParam", "Bypass", false, ""));
-
-
-	params.createAndAddDecibelParameter("gainParam", "Gain", -96.0f, 18.0f, 0.0f);
-	params.createAndAddDecibelParameter("targetGainParam", "TargetGain", -96.0f, 18.0f, 0.0f);
-	params.createAndAddBoolParameter("autoGainParam", "AutoGain", false);
-	params.createAndAddBoolParameter("bypassParam", "Bypass", false);
+	params.createAndAddDecibelParameter(gainParam, "Gain", -96.0f, 18.0f, 0.0f);
+	params.createAndAddDecibelParameter(targetGainParam, "TargetGain", -96.0f, 18.0f, 0.0f);
+	params.createAndAddBoolParameter(autoGainParam, "AutoGain", false);
+	params.createAndAddBoolParameter(bypassParam, "Bypass", false);
 
 #ifdef JUCE_MSVC
 	//Visual Studio mem leak diagnostics settings 
@@ -81,7 +74,7 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 	if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f) 
 		levelAnalysisManager.processSamples(&buffer, posInfo);
 
-	if (params.getBoolParameter("autoGainParam")->isOn())
+	if (params.getBoolParameter(autoGainParam)->isOn())
 	{
 		// Calibrate gain param based on which value is target
 		double peakToHit = -1000;
@@ -102,7 +95,7 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 			jassertfalse;
 		}
 
-		double targParamGain = params.getDecibelParameter("targetGainParam")->getValueInGain();
+		double targParamGain = params.getDecibelParameter(targetGainParam)->getValueInGain();
 
 		//division in log equiv to subtract in base
 		double gainValueToAdd = targParamGain / peakToHit;
@@ -111,7 +104,7 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 		//double targParamGainInDB =  Decibels::gainToDecibels(targetParam->getValueInGain());
 		//double gainValueToAddInDB = Decibels::gainToDecibels(targParamGain) - Decibels::gainToDecibels(maxPeak);
 		//DBG("Max peak is: " << maxPeak);
-		if (!almostEqual(gainValueToAdd, params.getDecibelParameter("gainParam")->getValueInGain()) && targParamGain > -900) // gain value changed
+		if (!almostEqual(gainValueToAdd, params.getDecibelParameter(gainParam)->getValueInGain()) && targParamGain > -900) // gain value changed
 		{
 			//DBG("\nGain To Add In DB: " << Decibels::gainToDecibels(maxPeak + gainValueToAdd) << " gainValueToAdd: " << gainValueToAdd << " != (gainParam)" << gainParam->getValueInGain());
 			//DBG("Max peak is: " << maxPeak << " and gainValueToAdd value is (targParamGain)" << targParamGain << " - (maxPeak)" << maxPeak << " = (gainValueToAdd)" << gainValueToAdd);
@@ -120,10 +113,10 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 			//DBG("gainvaluetoaddindb to gain:" << Decibels::decibelsToGain(gainValueToAddInDB));
 			//DBG("Setting gain to add to: " << gainValueToAdd << " or in DB: " << Decibels::gainToDecibels(gainValueToAdd));
 			//gainParam->setValueFromDecibels(gainValueToAddInDB);
-			params.getDecibelParameter("gainParam")->setValueFromGainNotifyingHost(gainValueToAdd);
+			params.getDecibelParameter(gainParam)->setValueFromGainNotifyingHost(gainValueToAdd);
 		}
 
-		params.getDecibelParameter("gainParam")->setNeedsUIUpdate(true);
+		params.getDecibelParameter(gainParam)->setNeedsUIUpdate(true);
 
 
 		//buffer.applyGain(gainParam->getValueInGain());
@@ -136,7 +129,7 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 		//}
 
 		//in gain, multiply in log equivalent to add in base
-		float gainToAdd = params.getDecibelParameter("gainParam")->getValueInGain();
+		float gainToAdd = params.getDecibelParameter(gainParam)->getValueInGain();
 
 		//for (unsigned int i = 0; i < numSamples; ++i)
 		//{

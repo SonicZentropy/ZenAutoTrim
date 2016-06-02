@@ -79,20 +79,24 @@ public:
 		levelAnalysisManager.setWindowSizeInMS(inTime);
 	}
 
-	bool isBypassed() { return params.getBoolParameter("bypassParam")->isOn(); }
+	bool isBypassed() { return params.getBoolParameter(bypassParam)->isOn(); }
 
-	bool isEnabled() { return params.getBoolParameter("bypassParam")->isOff(); }
+	bool isEnabled() { return params.getBoolParameter(bypassParam)->isOff(); }
 
 	LevelAnalysisManager& getLevelAnalysisManager() { return levelAnalysisManager; }	
-	ZenDecibelParameter* getGainParam() { return params.getDecibelParameter("gainParam"); }
-	ZenDecibelParameter* getTargetParam() { return params.getDecibelParameter("targetGainParam"); }
-	ZenBoolParameter* getAutoGainEnableParam() { return params.getBoolParameter("autoGainParam"); }
-	ZenBoolParameter* getBypassParam() { return params.getBoolParameter("bypassParam"); }
+	ZenDecibelParameter* getGainParam() { return params.getDecibelParameter(gainParam); }
+	ZenDecibelParameter* getTargetParam() { return params.getDecibelParameter(targetGainParam); }
+	ZenBoolParameter* getAutoGainEnableParam() { return params.getBoolParameter(autoGainParam); }
+	ZenBoolParameter* getBypassParam() { return params.getBoolParameter(bypassParam); }
 
 	//==============================================================================
 
 	UndoManager undoManager;
 	ZenAudioProcessorValueTreeState params;
+	const String gainParam = "gainParam";
+	const String targetGainParam = "targetGainParam";
+	const String autoGainParam = "autoGainParam";
+	const String bypassParam = "bypassParam";
 
 private:
 	//friend class ZenAutoTrimAudioProcessorEditor;
@@ -100,6 +104,7 @@ private:
 	//ZenDecibelParameter* targetParam;
 	//ZenBoolParameter* autoGainEnableParam;
 	//ZenBoolParameter* bypassParam;
+	
 	AudioProcessorEditor* currentEditor;
 	LevelAnalysisManager levelAnalysisManager;
 	AudioPlayHead* aPlayHead;
