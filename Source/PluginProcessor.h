@@ -17,7 +17,12 @@
 #define PLUGINPROCESSOR_H_INCLUDED
 
 #include "JuceHeader.h"
-#include "ZenHeader.h"
+#include "parameters/ZenBoolParameter.h"
+#include "utilities/ZenConstants.h"
+#include "processing/RMSManager.h"
+#include "state/ZenAudioProcessorValueTreeState.h"
+#include "utilities/ZenTime.h"
+#include "debug/ZenDebugEditor.h"
 //using namespace Zen; test
 
 //==============================================================================
@@ -74,27 +79,27 @@ public:
 		levelAnalysisManager.setWindowSizeInMS(inTime);
 	}
 
-	bool isBypassed() const	{ return bypassParam->isOn(); }
+	bool isBypassed() { return params.getBoolParameter("bypassParam")->isOn(); }
 
-	bool isEnabled() const { return bypassParam->isOff(); }	
+	bool isEnabled() { return params.getBoolParameter("bypassParam")->isOff(); }
 
 	LevelAnalysisManager& getLevelAnalysisManager() { return levelAnalysisManager; }	
-	ZenDecibelParameter* getGainParam() { return gainParam; }
-	ZenBoolParameter* getAutoGainEnableParam() { return autoGainEnableParam; }
-	ZenDecibelParameter* getTargetParam() { return targetParam; }
-	ZenBoolParameter* getBypassParam() { return bypassParam; }
+	ZenDecibelParameter* getGainParam() { return params.getDecibelParameter("gainParam"); }
+	ZenDecibelParameter* getTargetParam() { return params.getDecibelParameter("targetGainParam"); }
+	ZenBoolParameter* getAutoGainEnableParam() { return params.getBoolParameter("autoGainParam"); }
+	ZenBoolParameter* getBypassParam() { return params.getBoolParameter("bypassParam"); }
 
 	//==============================================================================
 
 	UndoManager undoManager;
-	AudioProcessorValueTreeState apTree;
+	ZenAudioProcessorValueTreeState params;
 
 private:
 	//friend class ZenAutoTrimAudioProcessorEditor;
-	ZenDecibelParameter* gainParam; 
-	ZenDecibelParameter* targetParam;
-	ZenBoolParameter* autoGainEnableParam;
-	ZenBoolParameter* bypassParam;
+	//ZenDecibelParameter* gainParam; 
+	//ZenDecibelParameter* targetParam;
+	//ZenBoolParameter* autoGainEnableParam;
+	//ZenBoolParameter* bypassParam;
 	AudioProcessorEditor* currentEditor;
 	LevelAnalysisManager levelAnalysisManager;
 	AudioPlayHead* aPlayHead;

@@ -31,38 +31,39 @@
                 resource="0" file="Source/zen_utils/state/ZenAudioProcessorValueTreeState.h"/>
         </GROUP>
         <GROUP id="{94461374-DBD3-3317-35FB-9132725F001A}" name="components">
-          <GROUP id="{6CEDEC17-EC5D-DE9D-A63E-4F9AECEE4B8A}" name="notepadcomp">
-            <FILE id="BAtl3v" name="NotepadComponent.cpp" compile="1" resource="0"
-                  file="Source/zen_utils/components/notepadcomp/NotepadComponent.cpp"/>
-            <FILE id="jjTOor" name="NotepadComponent.h" compile="0" resource="0"
-                  file="Source/zen_utils/components/notepadcomp/NotepadComponent.h"/>
+          <GROUP id="{4E8F0B58-2E47-B813-7BAC-FE8C94DFEA88}" name="notepadcomp">
+            <FILE id="LJFWrt" name="NotepadComponent.cpp" compile="1" resource="0"
+                  file="../modules/zen_utils/components/notepadcomp/NotepadComponent.cpp"/>
+            <FILE id="bfaG2Q" name="NotepadComponent.h" compile="0" resource="0"
+                  file="../modules/zen_utils/components/notepadcomp/NotepadComponent.h"/>
           </GROUP>
-          <GROUP id="{9EDCC5F3-C20E-54A6-0AC3-73C17261A32F}" name="panslider">
-            <FILE id="XvwCjt" name="PanSlider.cpp" compile="1" resource="0" file="Source/zen_utils/components/panslider/PanSlider.cpp"/>
-            <FILE id="bb4t4Y" name="PanSlider.h" compile="0" resource="0" file="Source/zen_utils/components/panslider/PanSlider.h"/>
-          </GROUP>
-          <FILE id="l4oKBr" name="AssociatedButton.cpp" compile="1" resource="0"
-                file="Source/zen_utils/components/AssociatedButton.cpp"/>
-          <FILE id="m7UBvo" name="AssociatedButton.h" compile="0" resource="0"
-                file="Source/zen_utils/components/AssociatedButton.h"/>
-          <FILE id="iU1spB" name="AssociatedComponent.cpp" compile="1" resource="0"
-                file="Source/zen_utils/components/AssociatedComponent.cpp"/>
-          <FILE id="UlLcEu" name="AssociatedComponent.h" compile="0" resource="0"
-                file="Source/zen_utils/components/AssociatedComponent.h"/>
-          <FILE id="oBCTRQ" name="AssociatedSlider.cpp" compile="1" resource="0"
-                file="Source/zen_utils/components/AssociatedSlider.cpp"/>
-          <FILE id="nktzv4" name="AssociatedSlider.h" compile="0" resource="0"
-                file="Source/zen_utils/components/AssociatedSlider.h"/>
-          <FILE id="Ngjysi" name="AssociatedTextButton.cpp" compile="1" resource="0"
-                file="Source/zen_utils/components/AssociatedTextButton.cpp"/>
-          <FILE id="BqXXBJ" name="AssociatedTextButton.h" compile="0" resource="0"
-                file="Source/zen_utils/components/AssociatedTextButton.h"/>
-          <FILE id="gUsqSP" name="ZenComponentType.hpp" compile="0" resource="0"
-                file="Source/zen_utils/components/ZenComponentType.hpp"/>
-          <FILE id="YpuJeV" name="ZenDecibelTextEditor.cpp" compile="1" resource="0"
-                file="Source/zen_utils/components/ZenDecibelTextEditor.cpp"/>
-          <FILE id="YUyAdw" name="ZenDecibelTextEditor.h" compile="0" resource="0"
-                file="Source/zen_utils/components/ZenDecibelTextEditor.h"/>
+          <FILE id="X3ReOg" name="ZenComboBox.cpp" compile="1" resource="0" file="../modules/zen_utils/components/ZenComboBox.cpp"/>
+          <FILE id="tYVryb" name="ZenComboBox.h" compile="0" resource="0" file="../modules/zen_utils/components/ZenComboBox.h"/>
+          <FILE id="gwnHm4" name="ZenComponentType.hpp" compile="0" resource="0"
+                file="../modules/zen_utils/components/ZenComponentType.hpp"/>
+          <FILE id="sixm1I" name="ZenImageButton.cpp" compile="1" resource="0"
+                file="../modules/zen_utils/components/ZenImageButton.cpp"/>
+          <FILE id="QyEx8h" name="ZenImageButton.h" compile="0" resource="0"
+                file="../modules/zen_utils/components/ZenImageButton.h"/>
+          <FILE id="Lxi194" name="ZenLabelDisplay.cpp" compile="1" resource="0"
+                file="../modules/zen_utils/components/ZenLabelDisplay.cpp"/>
+          <FILE id="A5o6EQ" name="ZenLabelDisplay.h" compile="0" resource="0"
+                file="../modules/zen_utils/components/ZenLabelDisplay.h"/>
+          <FILE id="yHCjWb" name="ZenRotaryEditorLabel.cpp" compile="1" resource="0"
+                file="../modules/zen_utils/components/ZenRotaryEditorLabel.cpp"/>
+          <FILE id="ewx8Yq" name="ZenRotaryEditorLabel.h" compile="0" resource="0"
+                file="../modules/zen_utils/components/ZenRotaryEditorLabel.h"/>
+          <FILE id="GajApl" name="ZenRotaryFilmStripSlider.cpp" compile="1" resource="0"
+                file="../modules/zen_utils/components/ZenRotaryFilmStripSlider.cpp"/>
+          <FILE id="QAZE4G" name="ZenRotaryFilmStripSlider.h" compile="0" resource="0"
+                file="../modules/zen_utils/components/ZenRotaryFilmStripSlider.h"/>
+          <FILE id="Oxk4RC" name="ZenTextEditor.cpp" compile="1" resource="0"
+                file="../modules/zen_utils/components/ZenTextEditor.cpp"/>
+          <FILE id="HwBXfV" name="ZenTextEditor.h" compile="0" resource="0" file="../modules/zen_utils/components/ZenTextEditor.h"/>
+          <FILE id="fcmvNP" name="ZenDecibelTextEditor.cpp" compile="1" resource="0"
+                file="../modules/zen_utils/components/ZenDecibelTextEditor.cpp"/>
+          <FILE id="IhAlOo" name="ZenDecibelTextEditor.h" compile="0" resource="0"
+                file="../modules/zen_utils/components/ZenDecibelTextEditor.h"/>
         </GROUP>
         <GROUP id="{9656875B-B5DF-124C-FB58-31EFFD54DB94}" name="debug">
           <GROUP id="{F126D373-3878-53A2-7631-80829A66AA08}" name="GUI">
@@ -96,48 +97,20 @@
           <FILE id="ZQSv3k" name="ZenDebugPrinter.h" compile="0" resource="0"
                 file="Source/zen_utils/debug/ZenDebugPrinter.h"/>
         </GROUP>
-        <GROUP id="{F3FF8E42-8D3C-F6CB-6382-B2945402EFC5}" name="DSP">
-          <FILE id="Ru7tnz" name="RMSManager.cpp" compile="1" resource="0" file="Source/zen_utils/DSP/RMSManager.cpp"/>
-          <FILE id="WIhV8j" name="RMSManager.h" compile="0" resource="0" file="Source/zen_utils/DSP/RMSManager.h"/>
-        </GROUP>
         <GROUP id="{EADE7835-5D68-B58D-D607-ED8148215F58}" name="GUI">
-          <FILE id="XuJO3U" name="ZenBinaryData.cpp" compile="1" resource="0"
-                file="Source/zen_utils/GUI/ZenBinaryData.cpp"/>
-          <FILE id="KC2bKA" name="ZenBinaryData.h" compile="0" resource="0" file="Source/zen_utils/GUI/ZenBinaryData.h"/>
-          <FILE id="d5YExL" name="ZenBypassButton.cpp" compile="1" resource="0"
-                file="Source/zen_utils/GUI/ZenBypassButton.cpp"/>
-          <FILE id="uUxRzY" name="ZenBypassButton.h" compile="0" resource="0"
-                file="Source/zen_utils/GUI/ZenBypassButton.h"/>
-          <FILE id="YhUTSO" name="ZenComboBox.cpp" compile="1" resource="0" file="Source/zen_utils/GUI/ZenComboBox.cpp"/>
-          <FILE id="SSAypE" name="ZenComboBox.h" compile="0" resource="0" file="Source/zen_utils/GUI/ZenComboBox.h"/>
-          <FILE id="gZsQAk" name="ZenImageButton.cpp" compile="1" resource="0"
-                file="Source/zen_utils/GUI/ZenImageButton.cpp"/>
-          <FILE id="jhaPmf" name="ZenImageButton.h" compile="0" resource="0"
-                file="Source/zen_utils/GUI/ZenImageButton.h"/>
-          <FILE id="nb5oYV" name="ZenLabelDisplay.cpp" compile="1" resource="0"
-                file="Source/zen_utils/GUI/ZenLabelDisplay.cpp"/>
-          <FILE id="eD2Tgf" name="ZenLabelDisplay.h" compile="0" resource="0"
-                file="Source/zen_utils/GUI/ZenLabelDisplay.h"/>
-          <FILE id="yck2z6" name="ZenLookAndFeel.cpp" compile="1" resource="0"
-                file="Source/zen_utils/GUI/ZenLookAndFeel.cpp"/>
-          <FILE id="hvXKks" name="ZenLookAndFeel.h" compile="0" resource="0"
-                file="Source/zen_utils/GUI/ZenLookAndFeel.h"/>
-          <FILE id="kpKoKn" name="ZenMenuButton.cpp" compile="1" resource="0"
-                file="Source/zen_utils/GUI/ZenMenuButton.cpp"/>
-          <FILE id="MlNFNg" name="ZenMenuButton.h" compile="0" resource="0" file="Source/zen_utils/GUI/ZenMenuButton.h"/>
-          <FILE id="JOR0mS" name="ZenRotaryEditorLabel.cpp" compile="1" resource="0"
-                file="Source/zen_utils/GUI/ZenRotaryEditorLabel.cpp"/>
-          <FILE id="Zobiwt" name="ZenRotaryEditorLabel.h" compile="0" resource="0"
-                file="Source/zen_utils/GUI/ZenRotaryEditorLabel.h"/>
-          <FILE id="ALZ6kH" name="ZenRotaryFilmStripSlider.cpp" compile="1" resource="0"
-                file="Source/zen_utils/GUI/ZenRotaryFilmStripSlider.cpp"/>
-          <FILE id="CdRFsL" name="ZenRotaryFilmStripSlider.h" compile="0" resource="0"
-                file="Source/zen_utils/GUI/ZenRotaryFilmStripSlider.h"/>
-          <FILE id="z7AAxL" name="ZenTextEditor.cpp" compile="1" resource="0"
-                file="Source/zen_utils/GUI/ZenTextEditor.cpp"/>
-          <FILE id="pk7WXr" name="ZenTextEditor.h" compile="0" resource="0" file="Source/zen_utils/GUI/ZenTextEditor.h"/>
-          <FILE id="jkawSx" name="ZenTitleBar.cpp" compile="1" resource="0" file="Source/zen_utils/GUI/ZenTitleBar.cpp"/>
-          <FILE id="hJs6TL" name="ZenTitleBar.h" compile="0" resource="0" file="Source/zen_utils/GUI/ZenTitleBar.h"/>
+          <FILE id="xIa55A" name="ZenBypassButton.cpp" compile="1" resource="0"
+                file="../modules/zen_utils/GUI/ZenBypassButton.cpp"/>
+          <FILE id="Mjqvyh" name="ZenBypassButton.h" compile="0" resource="0"
+                file="../modules/zen_utils/GUI/ZenBypassButton.h"/>
+          <FILE id="XFtHxD" name="ZenLookAndFeel.cpp" compile="1" resource="0"
+                file="../modules/zen_utils/GUI/ZenLookAndFeel.cpp"/>
+          <FILE id="RTY1CD" name="ZenLookAndFeel.h" compile="0" resource="0"
+                file="../modules/zen_utils/GUI/ZenLookAndFeel.h"/>
+          <FILE id="jY3mVT" name="ZenMenuButton.cpp" compile="1" resource="0"
+                file="../modules/zen_utils/GUI/ZenMenuButton.cpp"/>
+          <FILE id="do5KjF" name="ZenMenuButton.h" compile="0" resource="0" file="../modules/zen_utils/GUI/ZenMenuButton.h"/>
+          <FILE id="iVrWOd" name="ZenTitleBar.cpp" compile="1" resource="0" file="../modules/zen_utils/GUI/ZenTitleBar.cpp"/>
+          <FILE id="GV5wgB" name="ZenTitleBar.h" compile="0" resource="0" file="../modules/zen_utils/GUI/ZenTitleBar.h"/>
         </GROUP>
         <GROUP id="{A7E696CC-B65F-A1E7-DBCA-B6560C8E73D0}" name="parameters">
           <FILE id="I5cyOI" name="ZenBoolParameter.cpp" compile="1" resource="0"
@@ -161,6 +134,8 @@
           <FILE id="USHYMY" name="ZenParameter.h" compile="0" resource="0" file="Source/zen_utils/parameters/ZenParameter.h"/>
         </GROUP>
         <GROUP id="{677C5D37-903E-D7BE-A457-97EB8FD57171}" name="processing">
+          <FILE id="ss27p3" name="RMSManager.cpp" compile="1" resource="0" file="../modules/zen_utils/processing/RMSManager.cpp"/>
+          <FILE id="oMa1j8" name="RMSManager.h" compile="0" resource="0" file="../modules/zen_utils/processing/RMSManager.h"/>
           <FILE id="N7ObjU" name="BufferSampleProcesses.cpp" compile="1" resource="0"
                 file="Source/zen_utils/processing/BufferSampleProcesses.cpp"/>
           <FILE id="HYv7Ls" name="BufferSampleProcesses.h" compile="0" resource="0"
@@ -170,6 +145,9 @@
           <FILE id="hISVYb" name="ZenUnitTest.hpp" compile="0" resource="0" file="Source/zen_utils/tests/ZenUnitTest.hpp"/>
         </GROUP>
         <GROUP id="{252145FB-B06D-50D9-6368-FB5A885EF656}" name="utilities">
+          <FILE id="jatbq3" name="ZenBinaryData.cpp" compile="1" resource="0"
+                file="../modules/zen_utils/utilities/ZenBinaryData.cpp"/>
+          <FILE id="SnKr5N" name="ZenBinaryData.h" compile="0" resource="0" file="../modules/zen_utils/utilities/ZenBinaryData.h"/>
           <FILE id="pYmg8D" name="ZenConstants.h" compile="0" resource="0" file="Source/zen_utils/utilities/ZenConstants.h"/>
           <FILE id="NT8aq8" name="ZenDecibelConversions.hpp" compile="0" resource="0"
                 file="Source/zen_utils/utilities/ZenDecibelConversions.hpp"/>
@@ -181,12 +159,7 @@
           <FILE id="DQQb2K" name="ZenUtils.hpp" compile="0" resource="0" file="Source/zen_utils/utilities/ZenUtils.hpp"/>
         </GROUP>
         <FILE id="qFOxni" name="ZenHeader.h" compile="0" resource="0" file="Source/zen_utils/ZenHeader.h"/>
-        <FILE id="LCsptW" name="zen_utils.h" compile="0" resource="0" file="Source/zen_utils/zen_utils.h"/>
       </GROUP>
-      <FILE id="rPMXjB" name="DummyComponent.cpp" compile="0" resource="0"
-            file="Source/DummyComponent.cpp"/>
-      <FILE id="rocl2R" name="DummyComponent.h" compile="0" resource="0"
-            file="Source/DummyComponent.h"/>
       <FILE id="w3tMFs" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="QNnvjL" name="PluginProcessor.h" compile="0" resource="0"

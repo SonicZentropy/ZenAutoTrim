@@ -16,8 +16,14 @@
 #define PLUGINEDITOR_H_INCLUDED
 
 //#include "JuceHeader.h"
-#include "ZenHeader.h"
+#include "JuceHeader.h"
 #include "PluginProcessor.h"
+#include "GUI/ZenTitleBar.h"
+#include "components/ZenDecibelTextEditor.h"
+#include "components/ZenLabelDisplay.h"
+#include "components/ZenImageButton.h"
+#include "components/ZenComboBox.h"
+#include "GUI/ZenLookAndFeel.h"
 
 
 using drow::SegmentedMeter;
@@ -27,7 +33,6 @@ class ZenAutoTrimAudioProcessorEditor
 	public TextEditor::Listener,
 	public TextButton::Listener,
 	public ComboBox::Listener,
-	//public ZenLabelDisplay::Listener,
 	public Timer
 {
 public:
