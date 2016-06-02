@@ -28,13 +28,13 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	// #TODO: swap to audioprocessorvaluetreestate to save GUI component params by connecting
 
 
-	addParameter(gainParam = new ZenDecibelParameter("gainParam", "Gain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, true, 50.0f));
-	addParameter(targetParam = new ZenDecibelParameter("targetGain", "TargetGain", -96.0f, 18.0f, 0.0f, 0.0f, -18.0f, false));
-	addParameter(autoGainEnableParam = new ZenBoolParameter("autoGainParam", "AutoGain", false, ""));
-	addParameter(bypassParam = new ZenBoolParameter("bypassParam", "Bypass", false, ""));
+	//addParameter(gainParam = new ZenDecibelParameter("gainParam", "Gain", -96.0f, 18.0f, 0.0f, 0.0f, 0.0f, true, 50.0f));
+	//addParameter(targetParam = new ZenDecibelParameter("targetGain", "TargetGain", -96.0f, 18.0f, 0.0f, 0.0f, -18.0f, false));
+	//addParameter(autoGainEnableParam = new ZenBoolParameter("autoGainParam", "AutoGain", false, ""));
+	//addParameter(bypassParam = new ZenBoolParameter("bypassParam", "Bypass", false, ""));
 
 
-	apTree.createAndAddParameter("gainParam", "Gain", "Gain", NormalisableRange<float>(0.0f, 1.0f), 0.0f)
+	//apTree.createAndAddParameter("gainParam", "Gain", "Gain", NormalisableRange<float>(0.0f, 1.0f), 0.0f)
 
 	//AudioProcessorParameter* AudioProcessorValueTreeState::createAndAddParameter(String  	parameterID,
 	//	String  	parameterName,

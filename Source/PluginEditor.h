@@ -15,9 +15,10 @@
 #ifndef PLUGINEDITOR_H_INCLUDED
 #define PLUGINEDITOR_H_INCLUDED
 
-#include "JuceHeader.h"
+//#include "JuceHeader.h"
+#include "ZenHeader.h"
 #include "PluginProcessor.h"
-//#include "dRowAudio/dRowAudio/gui/dRowAudio_SegmentedMeter.h"
+
 
 using drow::SegmentedMeter;
 

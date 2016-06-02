@@ -17,6 +17,7 @@
 #define PLUGINPROCESSOR_H_INCLUDED
 
 #include "JuceHeader.h"
+#include "ZenHeader.h"
 //using namespace Zen; test
 
 //==============================================================================
