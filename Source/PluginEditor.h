@@ -15,9 +15,16 @@
 #ifndef PLUGINEDITOR_H_INCLUDED
 #define PLUGINEDITOR_H_INCLUDED
 
+//#include "JuceHeader.h"
 #include "JuceHeader.h"
 #include "PluginProcessor.h"
-//#include "dRowAudio/dRowAudio/gui/dRowAudio_SegmentedMeter.h"
+#include "GUI/ZenTitleBar.h"
+#include "components/ZenDecibelTextEditor.h"
+#include "components/ZenLabelDisplay.h"
+#include "components/ZenImageButton.h"
+#include "components/ZenComboBox.h"
+#include "GUI/ZenLookAndFeel.h"
+
 
 using drow::SegmentedMeter;
 
@@ -26,7 +33,6 @@ class ZenAutoTrimAudioProcessorEditor
 	public TextEditor::Listener,
 	public TextButton::Listener,
 	public ComboBox::Listener,
-	//public ZenLabelDisplay::Listener,
 	public Timer
 {
 public:
@@ -56,17 +62,26 @@ private:
 	ScopedPointer<TimeSliceThread> graphicalManager;
 	
 	ScopedPointer<ZenTitleBar> titleBar;
-	ScopedPointer<ZenDecibelTextEditor> targetEditor;
 	ScopedPointer<ZenLabelDisplay> gainEditor;
 	ScopedPointer<ZenLabelDisplay> leftAvgRMSLabel, rightAvgRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftMaxRMSLabel, rightMaxRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftPeakLabel, rightPeakLabel;
 	ScopedPointer<ZenLabelDisplay> leftWindowRMSLabel, rightWindowRMSLabel;
 	ScopedPointer<Label> maxBox, peakBox, avgBox, gainLabel, winBox;	
+	
+	ScopedPointer<ZenDecibelTextEditor> targetEditor;
 	ScopedPointer<ZenImageButton> resetBtn, autoGainBtn;
 	ScopedPointer<ZenComboBox> targetComboBox, rmsWindowComboBox;
 	
 	ScopedPointer<ZenLookAndFeel> zenLookAndFeel;
+
+	ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> resetBtnAttachment;
+	ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> autoGainBtnAttachment;
+	ScopedPointer<ZenAudioProcessorValueTreeState::ComboBoxAttachment> targetComboBoxAttachment;
+	ScopedPointer<ZenAudioProcessorValueTreeState::ComboBoxAttachment> rmsWindowComboBoxAttachment;
+
+
+
 
 	Colour textColour;
 

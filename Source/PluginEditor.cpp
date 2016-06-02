@@ -312,6 +312,12 @@ void ZenAutoTrimAudioProcessorEditor::updateUIFromProcessor()
 	leftPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftPeak())), dontSendNotification);
 	rightPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getRightPeak())), dontSendNotification);
 
+	if (processor.getTargetParam()->getNeedsUIUpdate())
+	{
+		String temp = String(processor.params.getDecibelParameter(processor.targetGainParam)->getValueInDecibels());
+		targetEditor->setText(String(processor.params.getDecibelParameter(processor.targetGainParam)->getValueInDecibels()));
+		processor.getTargetParam()->setNeedsUIUpdate(false);
+	}
 }
 
 void ZenAutoTrimAudioProcessorEditor::timerCallback()
