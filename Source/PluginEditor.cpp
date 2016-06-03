@@ -239,7 +239,7 @@ void ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(TextEditor& ed
 	{		
 		float targetGain = static_cast<ZenDecibelTextEditor&>(editorChanged).getDecibelValueFromText();
 		DBG("Setting target gain in DB to: " << targetGain);
-		processor.getTargetParam()->setValueNotifyingHost(targetGain);
+		processor.getTargetParam()->setValueFromDecibelsNotifyingHost(targetGain);
 	}
 }
 
@@ -290,36 +290,37 @@ void ZenAutoTrimAudioProcessorEditor::comboBoxChanged(ComboBox* comboBoxThatHasC
 }
 
 void ZenAutoTrimAudioProcessorEditor::updateUIFromProcessor()
-{
-	if (processor.getGainParam()->needsUIUpdate())
-	{
-		gainEditor->setText(String(processor.getGainParam()->getValueInDecibels(), 2), dontSendNotification);
-		//gainEditor->setTextWith2Precision<double>(processor.gainParam->getValueInDecibels());
-		processor.getGainParam()->setNeedsUIUpdate(false);
-	}
+{	
+		if (processor.getGainParam()->needsUIUpdate())
+		{
+			gainEditor->setText(String(processor.getGainParam()->getValueInDecibels(), 2), dontSendNotification);
+			//gainEditor->setTextWith2Precision<double>(processor.gainParam->getValueInDecibels());
+			processor.getGainParam()->setNeedsUIUpdate(false);
+		}
 
-	//Grabs instantaneous RMS of whichever process block most recently completed IGNORING WINDOW SIZE
-	//leftWindowRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getLeftCurrentRms())), dontSendNotification);
-	//rightWindowRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getRightCurrentRms())), dontSendNotification);
+		//Grabs instantaneous RMS of whichever process block most recently completed IGNORING WINDOW SIZE
+		//leftWindowRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getLeftCurrentRms())), dontSendNotification);
+		//rightWindowRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getRightCurrentRms())), dontSendNotification);
 
-	//Window RMS now calculates proper full-length average RMS. Here just for informational purposes	
-	leftAvgRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftCurrentRunningRms())), dontSendNotification);
-	rightAvgRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getRightCurrentRunningRms())), dontSendNotification);
+		//Window RMS now calculates proper full-length average RMS. Here just for informational purposes	
+		leftAvgRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftCurrentRunningRms())), dontSendNotification);
+		rightAvgRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getRightCurrentRunningRms())), dontSendNotification);
 
-	// Max RMS is the current maximum found RMS of a single window, used to set proper trim level
-	leftMaxRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftMaxRms())), dontSendNotification);
-	rightMaxRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getRightMaxRms())), dontSendNotification);
+		// Max RMS is the current maximum found RMS of a single window, used to set proper trim level
+		leftMaxRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftMaxRms())), dontSendNotification);
+		rightMaxRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getRightMaxRms())), dontSendNotification);
 
-	// Peak single sample found
-	leftPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftPeak())), dontSendNotification);
-	rightPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getRightPeak())), dontSendNotification);
+		// Peak single sample found
+		leftPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftPeak())), dontSendNotification);
+		rightPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getRightPeak())), dontSendNotification);
 
-	if (processor.getTargetParam()->getNeedsUIUpdate())
-	{
-		targetEditor->setText(String(processor.params->getDecibelParameter(processor.targetGainParam)->getValueInDecibels()));
-		//String temp = String(processor.params->getDecibelParameter(processor.targetGainParam)->getValueInDecibels());
-		processor.getTargetParam()->setNeedsUIUpdate(false);
-	}
+		if (processor.getTargetParam()->getNeedsUIUpdate())
+		{
+			targetEditor->setText(String(processor.params->getDecibelParameter(processor.targetGainParam)->getValueInDecibels()));
+			//String temp = String(processor.params->getDecibelParameter(processor.targetGainParam)->getValueInDecibels());
+			processor.getTargetParam()->setNeedsUIUpdate(false);
+		}
+	
 }
 
 void ZenAutoTrimAudioProcessorEditor::timerCallback()

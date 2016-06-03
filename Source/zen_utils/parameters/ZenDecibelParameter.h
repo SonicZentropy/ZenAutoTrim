@@ -72,6 +72,7 @@ public:
 	* it promptly notifies the host of the change. */
 	void setValueNotifyingHost(float inValue) override;
 
+	void setValueFromDecibelsNotifyingHost(float inDBValue);
 	/** Returns value properly normalized between 0 and 1 with the set midpoint.
 	 ** Handles smoothed and non-smoothed values innately*/
 	float getValue();
@@ -132,9 +133,12 @@ public:
 	
 	String getText(float inValue, int maxStringLength = 60) const override;
 
-	String getTextInDB() const { return String(getValueInDecibels(), 2) + " " + String(unitLabel); }
+	String getTextInDB() const {
+		String result = String(getValueInDecibels(), 2) + " " + String(unitLabel); 
+		return result;
+	}
 	
-	void setValueTree() override;
+	//void setValueTree() override;
 	
 	void setNewState(const ValueTree& v) override;
 	
