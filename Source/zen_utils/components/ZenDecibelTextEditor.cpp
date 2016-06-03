@@ -18,7 +18,7 @@ ZenDecibelTextEditor::ZenDecibelTextEditor(String compName, ZenDecibelParameter*
 	:ZenTextEditor(compName),
 	nRange(param->getMinDecibels(), param->getMaxDecibels(), 0.01f)
 {
-	
+	//this->
 }
 
 float ZenDecibelTextEditor::getNormalizedValueFromText() const
@@ -36,4 +36,10 @@ void ZenDecibelTextEditor::formatTextAfterEntry()
    
 	String dbText(getText().getFloatValue(), 2);
 	setText(dbText, false);
+}
+
+void ZenDecibelTextEditor::textWasChangedByValue()
+{
+	if (textValue.getValueSource().getReferenceCount() > 1)
+		setText(textValue.getValue());
 }

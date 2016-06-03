@@ -43,6 +43,9 @@ public:
 		this->setText(String(inText, 2));
 	}
 
+	void textWasChangedByValue();
+	
+
 private:
 	NormalisableRange<float> nRange;
 };

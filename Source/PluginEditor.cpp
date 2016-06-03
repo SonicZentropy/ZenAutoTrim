@@ -156,7 +156,11 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	targetEditor->setReadOnly(false);
 	targetEditor->setScrollbarsShown(false);
 	targetEditor->setCaretVisible(true);
+	
 	targetEditor->setSelectAllWhenFocused(true);
+	//processor.getTargetParam()->setValueFromDecibels(-23.0f);
+	float valueInDB = processor.getTargetParam()->getValueInDecibels();
+	String textInDB = processor.getTargetParam()->getTextInDB();
 	targetEditor->setText(processor.getTargetParam()->getTextInDB());
 	targetEditor->setBounds(75, 218, 71, 24);
 	targetEditor->addListener(this);

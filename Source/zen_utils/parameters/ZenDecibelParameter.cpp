@@ -46,7 +46,7 @@ void ZenDecibelParameter::setValue(float inNormValue)
 {
 	//float newValue = DecibelConversions::mapProperNormalizedValueToDecibels(getClamped(inNormValue, 0.0f, 1.0f), range.start, range.end);
 	
-	float renorm = DecibelConversions::
+	
 	//DBG("In ZenDecibelParameter::setValue(inValue) of " << this->paramID  << " and storing: " << inNormValue);
 	if (inNormValue != value.load() || listenersNeedCalling)
 	{
@@ -271,7 +271,7 @@ void ZenDecibelParameter::updateFromValueTree()
 {
 	float updateVal = state.getProperty(owner.valuePropertyID, defaultValue);
 	////DBG("In updateFromValueTree of " << this->paramID << " setting from state to: " << updateVal);
-	setValueFromDecibels(state.getProperty(owner.valuePropertyID, defaultValue));
+	setValue(state.getProperty(owner.valuePropertyID, defaultValue));
 	//setUnnormalisedValue(state.getProperty(owner.valuePropertyID, defaultValue));
 }
 
@@ -279,7 +279,7 @@ void ZenDecibelParameter::copyValueToValueTree()
 {
 	////DBG("In copyValueToValueTree of " << this->paramID << " setting property to: " << value.load());
 	if (state.isValid())
-		state.setProperty(owner.valuePropertyID, value.load(), owner.undoManager);
+		state.setProperty(owner.valuePropertyID, getValue(), owner.undoManager);
 }
 
 void ZenDecibelParameter::valueTreePropertyChanged(ValueTree& vt, const Identifier& prop)
