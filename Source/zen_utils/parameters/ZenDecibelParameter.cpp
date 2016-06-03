@@ -21,13 +21,15 @@ ZenDecibelParameter::ZenDecibelParameter(ZenAudioProcessorValueTreeState& owner,
 	float minValue, float maxValue,  
 	float inDefaultValue /*= 0.0f*/, bool shouldBeSmoothed /*= false*/, 
 	float smoothingTime /*= 50.0f*/) 
-	: ZenParameter(owner, ZenParamType::ZENDECIBEL, paramID, paramName, inDefaultValue, "dB", shouldBeSmoothed, smoothingTime),
+	: ZenParameter(owner, ZenParamType::ZENDECIBEL, paramID, paramName, 
+		inDefaultValue
+		, "dB", shouldBeSmoothed, smoothingTime),
 	unityDecibels(0.0f), midValue(0.0f)
 {
-	float normalizedValue = DecibelConversions::mapDecibelsToProperNormalizedValue(inDefaultValue, range.start, range.end, unityDecibels);
+	range = NormalisableRange<float>(minValue, maxValue);
+	float normalizedValue = DecibelConversions::mapDecibelsToProperNormalizedValue(inDefaultValue, minValue, maxValue, unityDecibels);
 	currentSmoothedValue = normalizedValue;
 	targetValue = normalizedValue;
-	range = NormalisableRange<float>(minValue, maxValue);
 }
 
 
@@ -40,11 +42,13 @@ void ZenDecibelParameter::setValue(float inValue)
 {
 	float newValue = DecibelConversions::mapProperNormalizedValueToDecibels(getClamped(inValue, 0.0f, 1.0f), range.start, range.end);
 	
+	//DBG("In ZenDecibelParameter::setValue(inValue) of " << this->paramID << " with inValue: " << inValue << " and storing: " << newValue);
 	if (newValue != value.load() || listenersNeedCalling)
 	{
 		value.store(newValue);
 	
-		listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, value);
+		// #BUG: This should use value.load or newValue rather than value
+		listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, value.load());
 		listenersNeedCalling = false;
 
 		needsUpdate.set(1);
@@ -54,20 +58,31 @@ void ZenDecibelParameter::setValue(float inValue)
 
 void ZenDecibelParameter::setValueRaw(float inValue)
 {
+	//DBG("In ZenDecibelParameter::setValueRaw(inValue) of " << this->paramID << " with inValue: " << inValue << " and storing: " << getClamped(inValue, range.start, range.end));
 	value.store(getClamped(inValue, range.start, range.end));
+	listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, value.load());
+	listenersNeedCalling = false;
+
+	needsUpdate.set(1);
 	if (shouldBeSmoothed) setTargetValue(DecibelConversions::mapDecibelsToProperNormalizedValue(
 		inValue, range.start, range.end, midValue));
 }
 
 void ZenDecibelParameter::setValueFromDecibels(float inValue)
 {
+	//DBG("In ZenDecibelParameter::setValueFromDecibels(inValue) of " << this->paramID << " with inValue: " << inValue);
 	setValueRaw(inValue);
 }
 
 void ZenDecibelParameter::setValueFromGain(float inValue)
 {
 	float newValue = getClamped(Decibels::gainToDecibels(inValue), range.start, range.end);
+	//DBG("In ZenDecibelParameter::setValueFromGain(inValue) of " << this->paramID << " with inValue: " << inValue << " and storing dbValue: " << newValue);
 	value.store(newValue);
+	listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, value.load());
+	listenersNeedCalling = false;
+
+	needsUpdate.set(1);
 	if (shouldBeSmoothed)
 	{
 		setTargetValue(DecibelConversions::mapDecibelsToProperNormalizedValue(
@@ -78,14 +93,24 @@ void ZenDecibelParameter::setValueFromGain(float inValue)
 void ZenDecibelParameter::setValueFromGainNotifyingHost(float inValue)
 {
 	float dbValue = Decibels::gainToDecibels(inValue);
+	//DBG("In ZenDecibelParameter::setValueFromGainNotifyingHost(inValue) of " << this->paramID << " with invalue: " << inValue << " and calling setValueNotifyingHost with decibel value: " << dbValue);
+	
 	setValueNotifyingHost(dbValue);
+
 }
 
+//inValue expected to be in Decibels
 void ZenDecibelParameter::setValueNotifyingHost(float inValue)
 {
 	float clampedValue = range.snapToLegalValue(inValue);
 	clampedValue = DecibelConversions::mapDecibelsToProperNormalizedValue(clampedValue, range.start, range.end, midValue);
+	
+	//DBG("In ZenDecibelParameter::setValueNotifyingHost(inValue) of " << this->paramID << " with invalue: " << inValue << " and setParameterNotifyingHost with: " << clampedValue);
 	processor->setParameterNotifyingHost(getParameterIndex(), clampedValue);
+	listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, clampedValue);
+	listenersNeedCalling = false;
+
+	needsUpdate.set(1);
 	/*if (shouldBeSmoothed)
 	{
 		setTargetValue(clampedValue);
@@ -98,42 +123,56 @@ float ZenDecibelParameter::getValue()
 	if (shouldBeSmoothed)
 	{
 		//return DecibelConversions::mapProperNormalizedValueToRawDecibelGain(getNextSmoothedValue(), range.start, range.end, midValue);
+		//DBG("In ZenDecibelParameter::getValue() of " << this->paramID << " returning smoothed value: " << getNextSmoothedValue());
 		return getNextSmoothedValue();
 	}
+	//DBG("In ZenDecibelParameter::getValue() of " << this->paramID << " returning: " << DecibelConversions::mapDecibelsToProperNormalizedValue(
+		//value.load(), range.start, range.end, midValue));
 	return DecibelConversions::mapDecibelsToProperNormalizedValue(
 		value.load(), range.start, range.end, midValue);
 }
 
 float ZenDecibelParameter::getValue() const
 {
+	//DBG("In ZenDecibelParameter::getValue() of " << this->paramID << " returning: " << DecibelConversions::mapDecibelsToProperNormalizedValue(
+		//value.load(), range.start, range.end, midValue));
+
 	return DecibelConversions::mapDecibelsToProperNormalizedValue(
 		value.load(), range.start, range.end, midValue);
 }
 
 float ZenDecibelParameter::getValueRaw() const
 {
+	//DBG("In ZenDecibelParameter::getValueRaw() of " << this->paramID << "returning: " << value.load());
 	return value.load();
 }
 
 float ZenDecibelParameter::getValueInGain()
 {
 	// #TODO: get rid of this
+	float result;
 	if (shouldBeSmoothed)
 	{
-		return DecibelConversions::mapProperNormalizedValueToRawDecibelGain(getNextSmoothedValue(), range.start, range.end, midValue);
+		result = DecibelConversions::mapProperNormalizedValueToRawDecibelGain(getNextSmoothedValue(), range.start, range.end, midValue);
 	}
-	return DecibelConversions::decibelsToDBGain<float>(value.load(), -96.0f);
+	else
+		result = DecibelConversions::decibelsToDBGain<float>(value.load(), -96.0f);
+
+	////DBG("In ZenDecibelParameter::getValueInGain() of " << this->paramID << "returning result: " << result);
+	return result;
 }
 
 float ZenDecibelParameter::getValueInGain() const
 {
-	//DBG("In const gain");
+	////DBG("In ZenDecibelParameter::getValueInGain() of " << this->paramID << "with value: " << value.load() << " and returning: " << DecibelConversions::decibelsTo//DBGain<float>(value.load(), -96.0f));
+	////DBG("In const gain");
 	return DecibelConversions::decibelsToDBGain<float>(value.load(), -96.0f);
 }
 
 //Returns NORMALIZED float value for input DECIBEL text value
 float ZenDecibelParameter::getValueForText(const String& text) const
 {
+	//DBG("In ZenDecibelParameter::getValueForText(text)of " << this->paramID << " with input text: " << text);
 	//return range.convertTo0to1(	text.getFloatValue());
 	if (textToValueFunction != nullptr)
 		return textToValueFunction(text);
@@ -147,11 +186,12 @@ float ZenDecibelParameter::getValueForText(const String& text) const
 
 String ZenDecibelParameter::getText(float inValue, int maxStringLength) const
 {	
+	//DBG("In ZenDecibelParameter::getText(inValue, maxStringLength) ");
 	if (valueToTextFunction != nullptr)
 		return valueToTextFunction(DecibelConversions::mapProperNormalizedValueToDecibels(
 			inValue, range.start, range.end, midValue));
 	else
-		return String(getValueInDecibels(), 2) + " " + String(unitLabel);
+		return String(value.load(), 2) + " " + String(unitLabel);
 }
 
 float ZenDecibelParameter::getRawValueForText(const String& text) const
@@ -160,14 +200,14 @@ float ZenDecibelParameter::getRawValueForText(const String& text) const
 }
 
 
-String ZenDecibelParameter::getTextFromValue(int length) const
+String ZenDecibelParameter::getTextFromValue() const
 {
-	return String(value.load());
+	return String(value.load(), 2) + " " + String(unitLabel);
 }
 
 float ZenDecibelParameter::getValueInDecibels() const
 {
-	return Decibels::gainToDecibels(value.load(), -96.0f);
+	return value.load();
 }
 
 void ZenDecibelParameter::setMinDecibels(const float inMinDecibels)
@@ -203,34 +243,71 @@ float ZenDecibelParameter::getDefaultValue() const
 
 void ZenDecibelParameter::valueChanged(Value& inValue)
 {
-	// DBG("In ZenParameter::valueChanged(value) ");
+	 //DBG("In ZenDecibelParameter::valueChanged(value) ");
 	setValueTree();
 }
 
-void ZenDecibelParameter::writeToXML(XmlElement& inXML)
+// void ZenDecibelParameter::writeToXML(XmlElement& inXML)
+// {
+// 	////DBG("In DecibelParameter::writeToXML(inXML) ");
+// 	XmlElement* thisXML = inXML.createNewChildElement(this->name);
+// 	thisXML->setAttribute("parameterValue", getValue());
+// 	thisXML->setAttribute("defaultValue", getDefaultValue());
+// 	thisXML->setAttribute("isSmoothed", getShouldBeSmoothed());
+// 	thisXML->setAttribute("minDecibels", getMinDecibels());
+// 	thisXML->setAttribute("maxDecibels", getMaxDecibels());
+// 	thisXML->setAttribute("unityDecibels", getUnityDecibels());
+// 	thisXML->setAttribute("midValue", getMidValue());
+// }
+// 
+// void ZenDecibelParameter::setFromXML(const XmlElement& inXML)
+// {
+// 	////DBG("In DecibelParameter::setFromXML(inXML) ");
+// 	XmlElement* thisXML = inXML.getChildByName(this->name);
+// 	setValue(thisXML->getDoubleAttribute("parameterValue", -9876.5));
+// 	setDefaultValue(thisXML->getDoubleAttribute("defaultValue", -9876.5));
+// 	setShouldBeSmoothed(thisXML->getBoolAttribute("isSmoothed", false));
+// 	setMinDecibels(thisXML->getDoubleAttribute("minDecibels", -9876.5));
+// 	setMaxDecibels(thisXML->getDoubleAttribute("maxDecibels", -9876.5));
+// 	setUnityDecibels(thisXML->getDoubleAttribute("unityDecibels", -9876.5));
+// 	setMidValue(thisXML->getDoubleAttribute("midValue", -9876.5));
+// }
+
+void ZenDecibelParameter::setNewState(const ValueTree& v)
 {
-	//DBG("In DecibelParameter::writeToXML(inXML) ");
-	XmlElement* thisXML = inXML.createNewChildElement(this->name);
-	thisXML->setAttribute("parameterValue", getValue());
-	thisXML->setAttribute("defaultValue", getDefaultValue());
-	thisXML->setAttribute("isSmoothed", getShouldBeSmoothed());
-	thisXML->setAttribute("minDecibels", getMinDecibels());
-	thisXML->setAttribute("maxDecibels", getMaxDecibels());
-	thisXML->setAttribute("unityDecibels", getUnityDecibels());
-	thisXML->setAttribute("midValue", getMidValue());
+	state = v;
+	updateFromValueTree();
 }
 
-void ZenDecibelParameter::setFromXML(const XmlElement& inXML)
+void ZenDecibelParameter::updateFromValueTree()
 {
-	//DBG("In DecibelParameter::setFromXML(inXML) ");
-	XmlElement* thisXML = inXML.getChildByName(this->name);
-	setValue(thisXML->getDoubleAttribute("parameterValue", -9876.5));
-	setDefaultValue(thisXML->getDoubleAttribute("defaultValue", -9876.5));
-	setShouldBeSmoothed(thisXML->getBoolAttribute("isSmoothed", false));
-	setMinDecibels(thisXML->getDoubleAttribute("minDecibels", -9876.5));
-	setMaxDecibels(thisXML->getDoubleAttribute("maxDecibels", -9876.5));
-	setUnityDecibels(thisXML->getDoubleAttribute("unityDecibels", -9876.5));
-	setMidValue(thisXML->getDoubleAttribute("midValue", -9876.5));
+	float updateVal = state.getProperty(owner.valuePropertyID, defaultValue);
+	//DBG("In updateFromValueTree of " << this->paramID << " setting from state to: " << updateVal);
+	setValueFromDecibels(state.getProperty(owner.valuePropertyID, defaultValue));
+	//setUnnormalisedValue(state.getProperty(owner.valuePropertyID, defaultValue));
+}
+
+void ZenDecibelParameter::copyValueToValueTree()
+{
+	//DBG("In copyValueToValueTree of " << this->paramID << " setting property to: " << value.load());
+	if (state.isValid())
+		state.setProperty(owner.valuePropertyID, value.load(), owner.undoManager);
+}
+
+void ZenDecibelParameter::valueTreePropertyChanged(ValueTree& vt, const Identifier& prop)
+{
+	if (prop == owner.valuePropertyID)
+		updateFromValueTree();
+}
+
+void ZenDecibelParameter::setUnnormalisedValue(float newUnnormalisedValue)
+{
+	//DBG("In setUnnormalizedvalue of " << this->paramID << " calling setValueNotifyingHost(decibelValueIn) with: " << newUnnormalisedValue);
+	if (value.load() != newUnnormalisedValue)
+	{
+		//const float newValue = range.convertTo0to1(newUnnormalisedValue);
+		setValueNotifyingHost(newUnnormalisedValue);
+	}
 }
 
 //==============================================================================

@@ -301,9 +301,9 @@ void ZenAudioProcessorValueTreeState::updateParameterConnectionsToChildTrees()
 	}
 }
 
-void ZenAudioProcessorValueTreeState::valueTreePropertyChanged(ValueTree& tree, const Identifier& property)
+void ZenAudioProcessorValueTreeState::valueTreePropertyChanged(ValueTree& tree, const Identifier& prop)
 {
-	if (property == idPropertyID && tree.hasType(valueType) && tree.getParent() == state)
+	if (prop == idPropertyID && tree.hasType(valueType) && tree.getParent() == state)
 		updateParameterConnectionsToChildTrees();
 }
 

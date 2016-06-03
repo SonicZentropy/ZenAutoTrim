@@ -144,9 +144,9 @@ String ZenFloatParameter::getText(float inValue, int length/*maximumStringLength
 	return length > 0 ? asText.substring(0, length) : asText;
 }
 
-String ZenFloatParameter::getTextFromValue(int length /*Max string length*/) const
+String ZenFloatParameter::getTextFromValue() const
 {
-	return getText(value, length);
+	return getText(value, 0);
 }
 
 void ZenFloatParameter::writeToXML(XmlElement& inXML)

@@ -22,6 +22,7 @@
 
 #include "ZenBoolParameter.h"
 #include "utilities/ZenUtils.hpp"
+#include "tests/ZenUnitTest.hpp"
 
 ZenBoolParameter::ZenBoolParameter(ZenAudioProcessorValueTreeState& inOwner, 
 	String parameterID, String paramName, float inDefaultValue /*= 0.0*/, String unitLabel /*= ""*/)
@@ -45,15 +46,22 @@ ZenBoolParameter::ZenBoolParameter(ZenAudioProcessorValueTreeState& inOwner,
 void ZenBoolParameter::setValue(float newValue)
 {
 	if (newValue == 0.0f)
+	{
 		value.store(0.0f);
-	else value.store(1.0f);
+		listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, 0.0f);
+	}
+	else
+	{
+		value.store(1.0f);
+		listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, 1.0f);
+	}
+	listenersNeedCalling = false;
+	needsUpdate.set(1);
 }
 
 void ZenBoolParameter::setValueRaw(float newValue)
 {
-	if (newValue == 0.0f)
-		value.store(0.0f);
-	else value.store(1.0f);
+	setValue(newValue);
 }
 
 void ZenBoolParameter::toggleValue()
@@ -61,8 +69,15 @@ void ZenBoolParameter::toggleValue()
 	if (value.load() == 0.0f)
 	{
 		value.store(1.0f);
+		listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, 1.0f);
 	}
-	else value.store(0.0f);
+	else
+	{
+		value.store(0.0f);
+		listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, 0.0f);
+	}
+	listenersNeedCalling = false;
+	needsUpdate.set(1);
 }
 
 void ZenBoolParameter::setValueNotifyingHost(float inValue)
@@ -123,23 +138,23 @@ bool ZenBoolParameter::getDefaultValueAsBool() const
 	return convertFloatToBoolean(getDefaultValue());
 }
 
-void ZenBoolParameter::writeToXML(XmlElement& inXML)
-{
-	// DBG("In ZenParameter::writeToXML(inXML) ");
-	XmlElement* thisXML = inXML.createNewChildElement(this->name);
-	thisXML->setAttribute("parameterValue", getValue());
-	thisXML->setAttribute("defaultValue", getDefaultValue());
-	//thisXML->setAttribute("isSmoothed", getShouldBeSmoothed());
-}
-
-void ZenBoolParameter::setFromXML(const XmlElement& inXML)
-{
-	// DBG("In ZenParameter::setFromXML(inXML) ");
-	XmlElement* thisXML = inXML.getChildByName(this->name);
-	setValue(thisXML->getDoubleAttribute("parameterValue", false));
-	setDefaultValue(thisXML->getDoubleAttribute("defaultValue", false));
-	//setShouldBeSmoothed(thisXML->getBoolAttribute("isSmoothed", false));
-}
+// void ZenBoolParameter::writeToXML(XmlElement& inXML)
+// {
+// 	// DBG("In ZenParameter::writeToXML(inXML) ");
+// 	XmlElement* thisXML = inXML.createNewChildElement(this->name);
+// 	thisXML->setAttribute("parameterValue", getValue());
+// 	thisXML->setAttribute("defaultValue", getDefaultValue());
+// 	//thisXML->setAttribute("isSmoothed", getShouldBeSmoothed());
+// }
+// 
+// void ZenBoolParameter::setFromXML(const XmlElement& inXML)
+// {
+// 	// DBG("In ZenParameter::setFromXML(inXML) ");
+// 	XmlElement* thisXML = inXML.getChildByName(this->name);
+// 	setValue(thisXML->getDoubleAttribute("parameterValue", false));
+// 	setDefaultValue(thisXML->getDoubleAttribute("defaultValue", false));
+// 	//setShouldBeSmoothed(thisXML->getBoolAttribute("isSmoothed", false));
+// }
 
 String ZenBoolParameter::getText(float inValue, int length) const
 {	
@@ -160,7 +175,7 @@ float ZenBoolParameter::getValueForText(const String& text) const
 	return 0.0f;
 }
 
-String ZenBoolParameter::getTextFromValue(int length) const
+String ZenBoolParameter::getTextFromValue() const
 {
 	if (value.load() == 0.0f) return "False";
 	return "True";
@@ -169,8 +184,38 @@ String ZenBoolParameter::getTextFromValue(int length) const
 void ZenBoolParameter::setValueFromBool(bool newBool)
 {
 	setValue(convertBooleanToFloat(newBool));
-	setNeedsUIUpdate(true);
+	//setNeedsUIUpdate(true);
 }
+
+void ZenBoolParameter::updateFromValueTree()
+{
+	float prop = state.getProperty(owner.valuePropertyID, defaultValue);
+	//DBG("In ZenBoolParameter::updateFromValueTree() of " << this->paramID << " calling setValue with: " << prop);
+	setValue(state.getProperty(owner.valuePropertyID, defaultValue));
+	//setUnnormalisedValue(state.getProperty(owner.valuePropertyID, defaultValue));
+}
+
+void ZenBoolParameter::copyValueToValueTree()
+{
+	//DBG("In ZenParameter::copyValueToValueTree() of " << paramID << " setting state to: " << value.load());
+	if (state.isValid())
+		state.setProperty(owner.valuePropertyID, value.load(), owner.undoManager);
+}
+
+void ZenBoolParameter::valueTreePropertyChanged(ValueTree& vt, const Identifier& prop)
+{
+	if (prop == owner.valuePropertyID)
+		updateFromValueTree();
+}
+
+// void ZenParameter::setUnnormalisedValue(float newUnnormalisedValue)
+// {
+// 	if (value.load() != newUnnormalisedValue)
+// 	{
+// 		const float newValue = range.convertTo0to1(newUnnormalisedValue);
+// 		setValueNotifyingHost(newValue);
+// 	}
+// }
 
 //==============================================================================
 //==============================================================================
@@ -185,7 +230,9 @@ public:
 	{
 		beginTest("Get&Set Bool Values");
 
-		ZenBoolParameter boolParam("boolTest", "Bool Test", false);
+		ZenAudioProcessorValueTreeState* avt = new ZenAudioProcessorValueTreeState()
+
+		ZenBoolParameter boolParam(ZenAudioProcessorValueTreeState, "boolTest", "Bool Test", false);
 
 		expectAlmostEqual(boolParam.getDefaultValue(), 0.0f);
 		expectAlmostEqual(boolParam.getValue(), 0.0f);

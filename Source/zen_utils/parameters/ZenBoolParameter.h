@@ -78,10 +78,13 @@ public:
 
 	float getValueForText(const String& text) const override;
 
-	String getTextFromValue(int length) const override;
+	String getTextFromValue() const override;
 
 	virtual void setValueFromBool(bool newBool);
 
+	void updateFromValueTree();
+	void copyValueToValueTree();
+	void valueTreePropertyChanged(ValueTree& vt, const Identifier& prop);
 	/** This assumes inValue is NOT normalized and coming from NOT the host, since
 	* it promptly notifies the host of the change. */
 	virtual void setValueNotifyingHost(bool newBoolValue);
@@ -104,9 +107,9 @@ public:
 
 	virtual bool getDefaultValueAsBool() const;
 
-	void writeToXML(XmlElement& inXML) override;
+	//void writeToXML(XmlElement& inXML) override;
 
-	void setFromXML(const XmlElement& inXML) override;
+	//void setFromXML(const XmlElement& inXML) override;
 
 	/** Returns the number of discrete interval steps that this parameter's range
 	should be quantised into.

@@ -92,7 +92,7 @@ public:
 
 	/** Zen::ZenFloatParameter::getTextFromValue
 	* Returns this parameter's current value as text */
-	String getTextFromValue(int length /*Max string length*/) const override;
+	String getTextFromValue() const override;
 
 	void writeToXML(XmlElement& inXML) override;
 

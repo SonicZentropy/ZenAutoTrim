@@ -79,20 +79,21 @@ public:
 		levelAnalysisManager.setWindowSizeInMS(inTime);
 	}
 
-	bool isBypassed() { return params.getBoolParameter(bypassParam)->isOn(); }
+	bool isBypassed() { return params->getBoolParameter(bypassParam)->isOn(); }
 
-	bool isEnabled() { return params.getBoolParameter(bypassParam)->isOff(); }
+	bool isEnabled() { return params->getBoolParameter(bypassParam)->isOff(); }
 
 	LevelAnalysisManager& getLevelAnalysisManager() { return levelAnalysisManager; }	
-	ZenDecibelParameter* getGainParam() { return params.getDecibelParameter(gainParam); }
-	ZenDecibelParameter* getTargetParam() { return params.getDecibelParameter(targetGainParam); }
-	ZenBoolParameter* getAutoGainEnableParam() { return params.getBoolParameter(autoGainParam); }
-	ZenBoolParameter* getBypassParam() { return params.getBoolParameter(bypassParam); }
+	ZenDecibelParameter* getGainParam() { return params->getDecibelParameter(gainParam); }
+	ZenDecibelParameter* getTargetParam() { return params->getDecibelParameter(targetGainParam); }
+	ZenBoolParameter* getAutoGainEnableParam() { return params->getBoolParameter(autoGainParam); }
+	ZenBoolParameter* getBypassParam() { return params->getBoolParameter(bypassParam); }
 
 	//==============================================================================
 
-	UndoManager undoManager;
-	ZenAudioProcessorValueTreeState params;
+	ScopedPointer<ZenAudioProcessorValueTreeState> params;
+	ScopedPointer<UndoManager> undoManager;
+
 	const String gainParam = "gainParam";
 	const String targetGainParam = "targetGainParam";
 	const String autoGainParam = "autoGainParam";

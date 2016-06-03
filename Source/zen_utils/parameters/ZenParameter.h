@@ -32,7 +32,7 @@ enum ZenParamType
 };
 
 
-class ZenParameter 
+class ZenParameter
 	: public AudioProcessorParameterWithID
 	, public ReferenceCountedObject
 	//, public ValueListener //Might not need this anymore?
@@ -43,8 +43,8 @@ public:
 
 	virtual ~ZenParameter() = 0;
 
-/** Set this parameter's value from 0to1 normalized input value.
-* Should be called only by HOST/Process Block, never GUI */
+	/** Set this parameter's value from 0to1 normalized input value.
+	* Should be called only by HOST/Process Block, never GUI */
 	virtual void setValue(float newValue) override = 0;
 
 	/** Directly sets value from raw input, called by GUI */
@@ -82,11 +82,11 @@ public:
 	float getValueForText(const String& text) const override = 0;
 
 	/** Returns this parameter's current value as text string */
-	virtual String getTextFromValue(int length /*Max string length*/) const = 0;
+	virtual String getTextFromValue() const = 0;
 
-	virtual void writeToXML(XmlElement& inXML) = 0;
+	virtual void writeToXML(XmlElement& inXML) {};
 
-	virtual void setFromXML(const XmlElement& inXML) = 0;
+	virtual void setFromXML(const XmlElement& inXML) {};
 
 	virtual void setDefaultValue(float inValue) = 0;
 
@@ -167,8 +167,8 @@ public:
 	
 	virtual void copyValueToValueTree();
 
+	//ValueTree::Listener overrides
 	void valueTreePropertyChanged(ValueTree&, const Identifier& property) override;
-
 	void valueTreeChildAdded(ValueTree&, ValueTree&) override {}
 	void valueTreeChildRemoved(ValueTree&, ValueTree&, int) override {}
 	void valueTreeChildOrderChanged(ValueTree&, int, int) override {}
@@ -232,6 +232,7 @@ protected:
 private:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ZenParameter);
+	void setUnnormalisedValue(float newUnnormalisedValue);
 };
 
 #endif // ZEN_PARAMETER_H_INCLUDED

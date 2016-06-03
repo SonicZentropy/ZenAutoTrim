@@ -20,6 +20,7 @@
 #include "ZenParameter.h"
 //#include "state/ZenAudioProcessorValueTreeState.h"
 #include "utilities/ZenDecibelConversions.hpp"
+#include "parameters/ZenLinearSmoothedValue.h"
 
 //class ZenAudioProcessorValueTreeState;
 
@@ -28,13 +29,13 @@ class ZenDecibelParameter : public ZenParameter
 public:
 
 	/// Constructor for <see cref="ZenDecibelParameter"/> class.
-	/// <param name="paramID" type="String">The parameter identifier.</param>
+	/// <param name="paramID" type="String">UNIQUE parameter identifier used to retrieve from value tree state</param>
 	/// <param name="paramName" type="String">Name of the parameter.</param>
-	/// <param name="minValue" type="float">The minimum value.</param>
-	/// <param name="maxValue" type="float">The maximum value.</param>
-	/// <param name="inDefaultValue" type="float">The in default value.</param>
-	/// <param name="shouldBeSmoothed" type="bool">The should be smoothed.</param>
-	/// <param name="smoothingTime" type="float">The smoothing time.</param>
+	/// <param name="minValue" type="float">Min value of decibel range</param>
+	/// <param name="maxValue" type="float">Max value of decibel range</param>
+	/// <param name="inDefaultValue" type="float">Default value IN DECIBELS</param>
+	/// <param name="shouldBeSmoothed" type="bool">Whether to smooth value changes</param>
+	/// <param name="smoothingTime" type="float">Time (in MS) to smooth value changes</param>
 	explicit ZenDecibelParameter(ZenAudioProcessorValueTreeState& owner, String paramID, String paramName, float minValue, float maxValue,
 		/*float midValue, float unityDecibels, */float inDefaultValue = 0.0f,
 		bool shouldBeSmoothed = false, float smoothingTime = 50.0f);
@@ -44,9 +45,9 @@ public:
 
 	void valueChanged(Value& inValue) override;
 
-	void writeToXML(XmlElement& inXML) override;
+	//void writeToXML(XmlElement& inXML) override;
 
-	void setFromXML(const XmlElement& inXML) override;
+	//void setFromXML(const XmlElement& inXML) override;
 	
 	//void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
 
@@ -95,7 +96,7 @@ public:
 	
 	virtual float getRawValueForText(const String& text) const;
 	
-	String getTextFromValue(int length) const override;
+	String getTextFromValue() const override;
 
 	virtual float getValueInDecibels() const;
 
@@ -135,11 +136,15 @@ public:
 	
 	void setValueTree() override;
 	
-	//void setNewState(const ValueTree& v) override;
+	void setNewState(const ValueTree& v) override;
 	
-	//void updateFromValueTree() override;
+	void updateFromValueTree() override;
 	
-	//void copyValueToValueTree() override;
+	void copyValueToValueTree() override;
+
+	void valueTreePropertyChanged(ValueTree& vt, const Identifier& prop) override;
+
+	void setUnnormalisedValue(float newUnnormalisedValue);
 
 protected:
 	

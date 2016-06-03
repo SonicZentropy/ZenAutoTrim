@@ -43,7 +43,8 @@ void ZenParameter::setNewState(const ValueTree& v)
 
 void ZenParameter::updateFromValueTree()
 {
-	setValue(state.getProperty(owner.valuePropertyID, defaultValue));
+	//setValue(state.getProperty(owner.valuePropertyID, defaultValue));
+	setUnnormalisedValue(state.getProperty(owner.valuePropertyID, defaultValue));
 }
 
 void ZenParameter::copyValueToValueTree()
@@ -56,4 +57,13 @@ void ZenParameter::valueTreePropertyChanged(ValueTree& vt, const Identifier& pro
 {
 	if (prop == owner.valuePropertyID)
 		updateFromValueTree();
+}
+
+void ZenParameter::setUnnormalisedValue(float newUnnormalisedValue)
+{
+	if (value.load() != newUnnormalisedValue)
+	{
+		const float newValue = range.convertTo0to1(newUnnormalisedValue);
+		setValueNotifyingHost(newValue);
+	}
 }

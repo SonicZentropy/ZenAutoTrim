@@ -55,11 +55,11 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 
 	addAndMakeVisible(gainLabel = new Label("Gain Text", "Gain:"));
 	gainLabel->setColour(Label::textColourId, textColour);
-	gainLabel->setBounds(40, 35, 50, 24);
+	gainLabel->setBounds(40, 40, 50, 48);
 
 	addAndMakeVisible(gainEditor = new ZenLabelDisplay("Calculated Gain Label", "0.00"));
 	gainEditor->setGetTextFunction(MakeGetTextParserLambda);
-	gainEditor->setBounds(90, 35, 75, 24);
+	gainEditor->setBounds(90, 40, 75, 48);
 	
 	//addAndMakeVisible(leftWindowRMSLabel = new ZenLabelDisplay("Left Window RMS Out", "00"));
 	//leftWindowRMSLabel->setColour(Label::textColourId, textColour);
@@ -291,8 +291,8 @@ void ZenAutoTrimAudioProcessorEditor::updateUIFromProcessor()
 {
 	if (processor.getGainParam()->needsUIUpdate())
 	{
-		//gainEditor->setTextWith2Precision<double>(processor.gainParam->getValueInDecibels());
 		gainEditor->setText(String(processor.getGainParam()->getValueInDecibels(), 2), dontSendNotification);
+		//gainEditor->setTextWith2Precision<double>(processor.gainParam->getValueInDecibels());
 		processor.getGainParam()->setNeedsUIUpdate(false);
 	}
 
@@ -314,8 +314,8 @@ void ZenAutoTrimAudioProcessorEditor::updateUIFromProcessor()
 
 	if (processor.getTargetParam()->getNeedsUIUpdate())
 	{
-		String temp = String(processor.params.getDecibelParameter(processor.targetGainParam)->getValueInDecibels());
-		targetEditor->setText(String(processor.params.getDecibelParameter(processor.targetGainParam)->getValueInDecibels()));
+		targetEditor->setText(String(processor.params->getDecibelParameter(processor.targetGainParam)->getValueInDecibels()));
+		//String temp = String(processor.params->getDecibelParameter(processor.targetGainParam)->getValueInDecibels());
 		processor.getTargetParam()->setNeedsUIUpdate(false);
 	}
 }
