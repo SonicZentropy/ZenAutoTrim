@@ -43,10 +43,10 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 
 #ifdef JUCE_DEBUG
 	// #TODO: Change this to use Juce SharedResourcePointer - https://forum.juce.com/t/juce-singleton-implementation-confusion/17847/6
-	//debugWindow = ZenDebugEditor::getInstance();
-	//debugWindow->setSize(650, 400);
+	debugWindow = ZenDebugEditor::getInstance();
+	debugWindow->setSize(650, 400);
 	//Open in bottom right corner
-	//debugWindow->setTopLeftPosition(1900 - debugWindow->getWidth(), 1040 - debugWindow->getHeight());
+	debugWindow->setTopLeftPosition(1900 - debugWindow->getWidth(), 1040 - debugWindow->getHeight());
 	// #TODO: add JUCE REF COUNTED OBJECT to zen GUI
 #endif
 }

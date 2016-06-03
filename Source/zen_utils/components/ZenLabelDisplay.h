@@ -20,6 +20,8 @@
 using std::function;
 using std::string;
 
+class ZenLookAndFeel;
+
 /// ZenLabelDisplay: Creates a non-editable label display area.
 /// This is for purposes of displaying relevant information from a plugin
 /// with no chance of someone mistaking it for a field that can be 
@@ -46,6 +48,12 @@ public:
 
 	const String getText();
 
+	void setFontSizeForBounds();
+	void setFontSizeForBounds(int margin);
+	void setFontSizeForBounds(int w, int h, const String& text, int margin /*= 0*/);
+	void setFontSizeAndScaleForBounds();
+	void setFontSizeAndScaleForBounds(int margin);
+	void setFontSizeAndScaleForBounds(int w, int h, const String& text, float minScale /*= 0.8f*/);
 	void setGetTextFunction(function<String(ZenLabelDisplay*)> f)
 	{
 		getTextFunction = f;
@@ -55,14 +63,22 @@ public:
 	const float getValueAsFloat() 
 	{
 		return this->getTextValue().getValue();
-	}
+	}	
 
-	
+	bool getShouldScaleText() const { return shouldScaleText; }
+	void setShouldScaleText(bool inValue) { shouldScaleText = inValue; }
+
+	int getFontMarginSize() const { return fontMarginSize; }
+	void setFontMarginSize(int inValue) { fontMarginSize = inValue; }
 
 protected:
+	friend class ZenLookAndFeel;
 	Image labelTLCornerImage, labelTRCornerImage, labelBLCornerImage, labelBRCornerImage;
 	Image labelTopLineImg, labelBottomLineImg, labelLeftLineImg, labelRightLineImg;
 	Image labelInteriorImg;
+
+	bool shouldScaleText;
+	int fontMarginSize;
 
 	function<String(ZenLabelDisplay*)> getTextFunction;
 	bool hasGetTextFunction;

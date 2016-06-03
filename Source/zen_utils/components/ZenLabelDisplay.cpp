@@ -14,9 +14,12 @@
 
 #include "ZenLabelDisplay.h"
 #include "utilities/ZenBinaryData.h"
+#include "ZenCompUtils.hpp"
 
 ZenLabelDisplay::ZenLabelDisplay(const String& componentName /* = String::empty */, const String& labelText /* = String::empty */)
 	:Label(componentName, labelText),
+	shouldScaleText(false),
+	fontMarginSize(0),
 	hasGetTextFunction(false)
 {
 	setEditable(false, false, false);
@@ -56,6 +59,75 @@ const String ZenLabelDisplay::getText()
 	}
 	return Label::getText();
 	
+}
+
+void ZenLabelDisplay::setFontSizeForBounds()
+{
+	if (shouldScaleText)
+		setFontSizeForBounds(getWidth(), getHeight(), getText(), fontMarginSize);
+}
+
+void ZenLabelDisplay::setFontSizeAndScaleForBounds()
+{
+	if (shouldScaleText)
+		setFontSizeAndScaleForBounds(getWidth(), getHeight(), getText(), fontMarginSize);
+}
+
+void ZenLabelDisplay::setFontSizeForBounds(int margin)
+{
+	if(shouldScaleText)
+		setFontSizeForBounds(getWidth(), getHeight(), getText(), margin);
+}
+
+void ZenLabelDisplay::setFontSizeAndScaleForBounds(int margin)
+{
+	if (shouldScaleText)
+		setFontSizeAndScaleForBounds(getWidth(), getHeight(), getText(), margin);
+}
+
+void ZenLabelDisplay::setFontSizeForBounds(int w, int h, const String& text, int margin /*= 0*/)
+{
+// 	font.setHeight(h);
+// 	font.setHorizontalScale(1);
+// 
+// 	// round up to pixel 
+// 	int fw = font.getStringWidthFloat(text) + 0.5f;
+// 
+// 	if (fw + margin > w)
+// 	{
+// 		float s = (w - margin) / (float)fw;
+// 		h = h*s; // round down to pixel
+// 	}
+// 	font.setHeight(h);
+	if (shouldScaleText)
+		ZenCompUtils::setFontSizeForBounds(font, w, h, text, margin);
+}
+
+void ZenLabelDisplay::setFontSizeAndScaleForBounds(int w, int h,
+	const String& text,
+	float minScale /*= 0.8f*/)
+{
+// 	font.setHeight(h);
+// 	font.setHorizontalScale(1);
+// 
+// 	float scale = 1;
+// 	float fw = font.getStringWidth(text);
+// 	if (fw > w)
+// 		scale = w / fw;
+// 
+// 	if (scale < minScale)
+// 	{
+// 		int h2 = (int)((w / minScale) / fw * h);
+// 		font.setHeight(h2);
+// 
+// 		fw = font.getStringWidth(text);
+// 		if (fw > w)
+// 			scale = w / fw;
+// 	}
+// 
+// 	font.setHorizontalScale(scale);
+	if (shouldScaleText)
+		ZenCompUtils::setFontSizeAndScaleForBounds(font, w, h, text, minScale);
 }
 
 // void ZenLabelDisplay::setSize(int newWidth, int newHeight)

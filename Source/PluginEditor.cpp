@@ -53,13 +53,15 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	};
 	
 
-	addAndMakeVisible(gainLabel = new Label("Gain Text", "Gain:"));
+	addAndMakeVisible(gainLabel = new Label("Gain Text", "Applied Gain:"));
 	gainLabel->setColour(Label::textColourId, textColour);
-	gainLabel->setBounds(40, 40, 50, 48);
+	gainLabel->setBounds(12, 40, 130, 48);
 
 	addAndMakeVisible(gainEditor = new ZenLabelDisplay("Calculated Gain Label", "0.00"));
 	gainEditor->setGetTextFunction(MakeGetTextParserLambda);
-	gainEditor->setBounds(90, 40, 75, 48);
+	gainEditor->setShouldScaleText(true);
+	gainEditor->setFontMarginSize(35);
+	gainEditor->setBounds(120, 40, 75, 48);
 	
 	//addAndMakeVisible(leftWindowRMSLabel = new ZenLabelDisplay("Left Window RMS Out", "00"));
 	//leftWindowRMSLabel->setColour(Label::textColourId, textColour);
@@ -165,7 +167,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	//openGLContext = new OpenGLContext();
 	//openGLContext->attachTo(*this);
 
-	//ZEN_COMPONENT_DEBUG_ATTACH(this);
+	ZEN_COMPONENT_DEBUG_ATTACH(this);
 	//addAndMakeVisible(leftWindowRMS = new ZenLabelDisplay("Left Window RMS Label", TRANS("00")));
 	//leftWindowRMS->setColour(Label::textColourId, Colours::white);
 	//leftWindowRMS->setBounds();

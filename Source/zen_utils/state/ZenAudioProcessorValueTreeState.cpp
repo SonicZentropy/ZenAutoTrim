@@ -20,136 +20,7 @@
 
 #if JUCE_COMPILER_SUPPORTS_LAMBDAS
 
-//PARAMETER===========================================================
-/*
-struct ZenAudioProcessorValueTreeState::Parameter : public AudioProcessorParameter,
-	private ValueTree::Listener
-{
-	Parameter(ZenAudioProcessorValueTreeState& s,
-		String parameterID, String paramName, String labelText,
-		NormalisableRange<float> r, float defaultVal,
-		std::function<String(float)> valueToText,
-		std::function<float(const String&)> textToValue)
-		: owner(s), paramID(parameterID), name(paramName), label(labelText),
-		valueToTextFunction(valueToText),
-		textToValueFunction(textToValue),
-		range(r), value(defaultVal), defaultValue(defaultVal),
-		listenersNeedCalling(true)
-	{
-		state.addListener(this);
-		needsUpdate.set(1);
-	}
 
-	~Parameter()
-	{
-		// should have detached all callbacks before destroying the parameters!
-		jassert(listeners.size() <= 1);
-	}
-
-	float getValue() const override { return range.convertTo0to1(value); }
-	float getDefaultValue() const override { return range.convertTo0to1(defaultValue); }
-	String getName(int maximumStringLength) const override { return name.substring(0, maximumStringLength); }
-	String getLabel() const override { return label; }
-
-	float getValueForText(const String& text) const override
-	{
-		return range.convertTo0to1(textToValueFunction != nullptr ? textToValueFunction(text)
-			: text.getFloatValue());
-	}
-
-	String getText(float v, int length) const override
-	{
-		return valueToTextFunction != nullptr ? valueToTextFunction(range.convertFrom0to1(v))
-			: AudioProcessorParameter::getText(v, length);
-	}
-
-	void setValue(float newValue) override
-	{
-		newValue = range.snapToLegalValue(range.convertFrom0to1(newValue));
-
-		if (value != newValue || listenersNeedCalling)
-		{
-			value = newValue;
-
-			listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, value);
-			listenersNeedCalling = false;
-
-			needsUpdate.set(1);
-		}
-	}
-
-	void setNewState(const ValueTree& v)
-	{
-		state = v;
-		updateFromValueTree();
-	}
-
-	void setUnnormalisedValue(float newUnnormalisedValue)
-	{
-		if (value != newUnnormalisedValue)
-		{
-			const float newValue = range.convertTo0to1(newUnnormalisedValue);
-			setValueNotifyingHost(newValue);
-		}
-	}
-
-	void updateFromValueTree()
-	{
-		setUnnormalisedValue(state.getProperty(owner.valuePropertyID, defaultValue));
-	}
-
-	void copyValueToValueTree()
-	{
-		if (state.isValid())
-			state.setProperty(owner.valuePropertyID, value, owner.undoManager);
-	}
-
-	void valueTreePropertyChanged(ValueTree&, const Identifier& property) override
-	{
-		if (property == owner.valuePropertyID)
-			updateFromValueTree();
-	}
-
-	void valueTreeChildAdded(ValueTree&, ValueTree&) override {}
-	void valueTreeChildRemoved(ValueTree&, ValueTree&, int) override {}
-	void valueTreeChildOrderChanged(ValueTree&, int, int) override {}
-	void valueTreeParentChanged(ValueTree&) override {}
-
-	static Parameter* getParameterForID(AudioProcessor& processor, StringRef paramID) noexcept
-	{
-		const int numParams = processor.getParameters().size();
-
-		for (int i = 0; i < numParams; ++i)
-		{
-			AudioProcessorParameter* const ap = processor.getParameters().getUnchecked(i);
-
-			// When using this class, you must allow it to manage all the parameters in your AudioProcessor, and
-			// not add any parameter objects of other types!
-			jassert(dynamic_cast<Parameter*> (ap) != nullptr);
-
-			Parameter* const p = static_cast<Parameter*> (ap);
-
-			if (paramID == p->paramID)
-				return p;
-		}
-
-		return nullptr;
-	}
-
-	ZenAudioProcessorValueTreeState& owner;
-	ValueTree state;
-	String paramID, name, label;
-	ListenerList<ZenAudioProcessorValueTreeState::Listener> listeners;
-	std::function<String(float)> valueToTextFunction;
-	std::function<float(const String&)> textToValueFunction;
-	NormalisableRange<float> range;
-	float value, defaultValue;
-	Atomic<int> needsUpdate;
-	bool listenersNeedCalling;
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Parameter)
-};
-*/
 
 //==============================================================================
 ZenAudioProcessorValueTreeState::ZenAudioProcessorValueTreeState(AudioProcessor& p, UndoManager* um)
@@ -161,7 +32,7 @@ ZenAudioProcessorValueTreeState::ZenAudioProcessorValueTreeState(AudioProcessor&
 	updatingConnections(false)
 {
 	startTimerHz(10);
-	state.addListener(this);
+	state.addListener(this);	
 }
 
 ZenAudioProcessorValueTreeState::~ZenAudioProcessorValueTreeState() {}

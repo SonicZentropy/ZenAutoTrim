@@ -127,7 +127,9 @@ void ZenLookAndFeel::drawLabel(Graphics& g, Label& label)
 		g.fillRect(cornerTLWidth, cornerTLHeight, labelWidth - cornerTLWidth - cornerTRWidth, labelHeight - cornerTLHeight - cornerBLHeight);
 		
 		//Draw Text
-		g.setFont(getLabelFont(*zenLabelDisplay));		
+		//setFontSizeForBounds(zenLabelDisplay->font, zenLabelDisplay->getWidth(), zenLabelDisplay->getHeight(), zenLabelDisplay->getText());
+		zenLabelDisplay->setFontSizeForBounds();
+		g.setFont(zenLabelDisplay->getFont());		
 		g.setColour(zenLabelDisplay->findColour(ZenLabelDisplay::ColourIds::textColourId));
 		g.drawFittedText(zenLabelDisplay->getText(), 7, 0, zenLabelDisplay->getWidth()-14, zenLabelDisplay->getHeight(), zenLabelDisplay->getJustificationType(), 1, 0.01f);
 		return;
@@ -781,5 +783,3 @@ Font ZenLookAndFeel::getZenImageButtonFont(ZenImageButton& zenbtn)
 		return theFont;
 	}
 }
-
-

@@ -64,6 +64,9 @@ protected:
 	Image topImage;
 	Font defaultFont;
 
+	//void setFontSizeForBounds(Font& font, int w, int h, const String& text, int margin = 0);
+	//void setFontSizeAndScaleForBounds(Font& font, int w, int h, const String& text, float minScale = 0.8f);
+
 	
 	Image testImg, bypassImg, knobImage;
 
