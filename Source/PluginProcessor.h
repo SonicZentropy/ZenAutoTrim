@@ -32,7 +32,7 @@ public:
     //==============================================================================
     ZenAutoTrimAudioProcessor();
     ~ZenAutoTrimAudioProcessor();
-
+	
 	//==============================================================================
 	enum CalibrationTarget
 	{
@@ -68,7 +68,9 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	//==============================================================================
+	void resetCalculation();
 
+	//==============================================================================
 	void setCurrentEditor(AudioProcessorEditor* inEditor) { currentEditor = inEditor; }
 
 	CalibrationTarget getTargetForAutoTrim() const { return targetForAutoTrim; }
@@ -82,6 +84,8 @@ public:
 	bool isBypassed() { return params->getBoolParameter(bypassParam)->isOn(); }
 
 	bool isEnabled() { return params->getBoolParameter(bypassParam)->isOff(); }
+
+	void setEnabled(bool shouldBeEnabled) { getBypassParam()->setValueFromBool(shouldBeEnabled); }
 
 	LevelAnalysisManager& getLevelAnalysisManager() { return levelAnalysisManager; }	
 	ZenDecibelParameter* getGainParam() { return params->getDecibelParameter(gainParam); }

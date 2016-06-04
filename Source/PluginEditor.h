@@ -45,7 +45,7 @@ public:
     void resized() override;
 
 	void textEditorReturnKeyPressed(TextEditor& editorChanged) override;
-	void textEditorFocusLost(TextEditor& editorChanged) override;
+	//void textEditorFocusLost(TextEditor& editorChanged) override;
 	void textEditorUpdateDueToChange(TextEditor& editorChanged);
 	void buttonClicked(Button*) override;
 	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;

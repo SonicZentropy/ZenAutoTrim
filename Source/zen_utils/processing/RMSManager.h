@@ -205,6 +205,10 @@ private:
 	double decibelRMSCalibration = 0.0f;
 
 	std::unique_ptr<boost::circular_buffer<double>> prevLeftBuf, prevRightBuf;
+
+	//prevent processing while reset is happening -- used SpinLock instead of
+	//CriticalSection because it's only contested during Reset button press
+	SpinLock processLock;
 };
 
 #endif // RMSMANAGER_H_INCLUDED

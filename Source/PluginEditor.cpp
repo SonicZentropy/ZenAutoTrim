@@ -228,17 +228,21 @@ void ZenAutoTrimAudioProcessorEditor::resized()
 
 void ZenAutoTrimAudioProcessorEditor::textEditorReturnKeyPressed(TextEditor& editorChanged)
 {
+	DBG("In ZenAutoTrimAudioProcessorEditor::textEditorReturnKeyPressed(editorChanged) with editor: " << editorChanged.getName());
+	editorChanged.giveAwayFocus(true);
 	textEditorUpdateDueToChange(editorChanged);
 }
 
 
-void ZenAutoTrimAudioProcessorEditor::textEditorFocusLost(TextEditor& editorChanged)
-{
-	textEditorUpdateDueToChange(editorChanged);
-}
+//void ZenAutoTrimAudioProcessorEditor::textEditorFocusLost(TextEditor& editorChanged)
+//{
+//	DBG("In ZenAutoTrimAudioProcessorEditor::textEditorFocusLost(editorChanged) with editor: " << editorChanged.getName());
+//	textEditorUpdateDueToChange(editorChanged);
+//}
 
 void ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(TextEditor& editorChanged)
 {
+	DBG("In ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(editorChanged) with editor: " << editorChanged.getName());
 	if (&editorChanged == targetEditor)
 	{		
 		float targetGain = static_cast<ZenDecibelTextEditor&>(editorChanged).getDecibelValueFromText();
@@ -252,7 +256,8 @@ void ZenAutoTrimAudioProcessorEditor::buttonClicked(Button* pressedBtn)
 {
 	if (pressedBtn == resetBtn)
 	{
-		processor.getLevelAnalysisManager().resetCalculation();
+		//processor.getLevelAnalysisManager().resetCalculation();
+		processor.resetCalculation();
 		updateUIFromProcessor();
 	} else if (pressedBtn == autoGainBtn)
 		processor.getAutoGainEnableParam()->toggleValue();

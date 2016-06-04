@@ -33,34 +33,6 @@ ZenLookAndFeel::ZenLookAndFeel()
 	setColour(PopupMenu::headerTextColourId, Colours::red);
 }
 
-void ZenLookAndFeel::drawZenRotarySlider(Graphics& g, int x, int y, int width, int height, float sliderPos, ZenRotaryFilmStripSlider& zenSlider)
-{
-	g.setOpacity(1.0f);
-	//ZenRotaryFilmStripSlider* zenSlider = dynamic_cast<ZenRotaryFilmStripSlider*>(&slider);
-// 	if (zenSlider != nullptr)
-// 	{
-		if (zenSlider.hasValidFilmStrip())
-		{
-			Rectangle<int> sliderRect = zenSlider.getSliderRect();
-
-			int value = (zenSlider.getValue() - zenSlider.getMinimum()) / (zenSlider.getMaximum() - zenSlider.getMinimum()) * (zenSlider.getNumFrames() - 1);
-
-			if (zenSlider.getFilmstripIsHorizontal())
-			{
-				g.drawImage(zenSlider.getFilmStrip(), sliderRect.getX(), sliderRect.getY(), zenSlider.getKnobWidth(), zenSlider.getKnobHeight(), value * zenSlider.getFrameWidth(), 0, zenSlider.getFrameWidth(), zenSlider.getFrameHeight());
-			}
-			else
-			{
-				g.drawImage(zenSlider.getFilmStrip(), sliderRect.getX(), sliderRect.getY(), zenSlider.getKnobWidth(), zenSlider.getKnobHeight(), 0, value * zenSlider.getFrameHeight(), zenSlider.getFrameWidth(), zenSlider.getFrameHeight());
-			}
-		}
-	//}
-// 	else //If not Zen Slider
-// 	{
-// 		LookAndFeel_V2::drawRotarySlider(g, x, y, width, height, sliderPos, rotaryStartAngle, rotaryEndAngle, slider);
-// 	}
-}
-
 void ZenLookAndFeel::drawLabel(Graphics& g, Label& label)
 {
 	//Draw non-editable label
@@ -173,56 +145,40 @@ void ZenLookAndFeel::drawLabel(Graphics& g, Label& label)
 	g.drawRect(label.getLocalBounds());
 }
 
-void ZenLookAndFeel::drawButtonBackground(Graphics& g, Button& button, const Colour& backgroundColour,
-                                          bool isMouseOverButton, bool isButtonDown)
+Font ZenLookAndFeel::getLabelFont(Label& label)
 {
-	g.setOpacity(1.0f);
-	Colour darkColor(40, 40, 40);
-
-	Colour baseColour(darkColor.withMultipliedSaturation(button.hasKeyboardFocus(true) ? 1.3f : 0.9f)
-	                           .withMultipliedAlpha(button.isEnabled() ? 0.9f : 0.5f));
-
-	if (isButtonDown || isMouseOverButton) baseColour = baseColour.contrasting(isButtonDown ? 0.2f : 0.1f);
-
-	const bool flatOnLeft = button.isConnectedOnLeft();
-	const bool flatOnRight = button.isConnectedOnRight();
-	const bool flatOnTop = button.isConnectedOnTop();
-	const bool flatOnBottom = button.isConnectedOnBottom();
-
-	const float width = button.getWidth() - 1.0f;
-	const float height = button.getHeight() - 1.0f;
-
-	if (width > 0 && height > 0)
-	{
-		const float cornerSize = 4.0f;
-
-		Path outline;
-		outline.addRoundedRectangle(0.5f, 0.5f, width, height, cornerSize, cornerSize,
-		                            !(flatOnLeft || flatOnTop),
-		                            !(flatOnRight || flatOnTop),
-		                            !(flatOnLeft || flatOnBottom),
-		                            !(flatOnRight || flatOnBottom));
-
-		drawButtonShape(g, outline, baseColour, height);
-	}
+	if (label.getWidth() > 30)
+		return Font("Futura Book", 16, Font::plain);
+	else
+		return Font("Futura Book", 12, Font::plain);
 }
 
-void ZenLookAndFeel::drawButtonShape(Graphics& g, const Path& outline, Colour baseColour, float height)
+void ZenLookAndFeel::drawZenRotarySlider(Graphics& g, int x, int y, int width, int height, float sliderPos, ZenRotaryFilmStripSlider& zenSlider)
 {
 	g.setOpacity(1.0f);
-	const float mainBrightness = baseColour.getBrightness();
-	const float mainAlpha = baseColour.getFloatAlpha();
+	//ZenRotaryFilmStripSlider* zenSlider = dynamic_cast<ZenRotaryFilmStripSlider*>(&slider);
+// 	if (zenSlider != nullptr)
+// 	{
+		if (zenSlider.hasValidFilmStrip())
+		{
+			Rectangle<int> sliderRect = zenSlider.getSliderRect();
 
-	g.setGradientFill(ColourGradient(baseColour.brighter(0.2f), 0.0f, 0.0f,
-	                                 baseColour.darker(0.25f), 0.0f, height, false));
-	g.fillPath(outline);
+			int value = (zenSlider.getValue() - zenSlider.getMinimum()) / (zenSlider.getMaximum() - zenSlider.getMinimum()) * (zenSlider.getNumFrames() - 1);
 
-	g.setColour(Colours::white.withAlpha(0.4f * mainAlpha * mainBrightness * mainBrightness));
-	g.strokePath(outline, PathStrokeType(1.0f), AffineTransform::translation(0.0f, 1.0f)
-	             .scaled(1.0f, (height - 1.6f) / height));
-
-	g.setColour(Colours::black.withAlpha(0.4f * mainAlpha));
-	g.strokePath(outline, PathStrokeType(1.0f));
+			if (zenSlider.getFilmstripIsHorizontal())
+			{
+				g.drawImage(zenSlider.getFilmStrip(), sliderRect.getX(), sliderRect.getY(), zenSlider.getKnobWidth(), zenSlider.getKnobHeight(), value * zenSlider.getFrameWidth(), 0, zenSlider.getFrameWidth(), zenSlider.getFrameHeight());
+			}
+			else
+			{
+				g.drawImage(zenSlider.getFilmStrip(), sliderRect.getX(), sliderRect.getY(), zenSlider.getKnobWidth(), zenSlider.getKnobHeight(), 0, value * zenSlider.getFrameHeight(), zenSlider.getFrameWidth(), zenSlider.getFrameHeight());
+			}
+		}
+	//}
+// 	else //If not Zen Slider
+// 	{
+// 		LookAndFeel_V2::drawRotarySlider(g, x, y, width, height, sliderPos, rotaryStartAngle, rotaryEndAngle, slider);
+// 	}
 }
 
 Slider::SliderLayout ZenLookAndFeel::getSliderLayout(Slider& slider)
@@ -497,6 +453,58 @@ void ZenLookAndFeel::drawImageButton(Graphics& g, Image* imageToDraw, int imageX
 	}
 }
 
+void ZenLookAndFeel::drawButtonBackground(Graphics& g, Button& button, const Colour& backgroundColour,
+                                          bool isMouseOverButton, bool isButtonDown)
+{
+	g.setOpacity(1.0f);
+	Colour darkColor(40, 40, 40);
+
+	Colour baseColour(darkColor.withMultipliedSaturation(button.hasKeyboardFocus(true) ? 1.3f : 0.9f)
+	                           .withMultipliedAlpha(button.isEnabled() ? 0.9f : 0.5f));
+
+	if (isButtonDown || isMouseOverButton) baseColour = baseColour.contrasting(isButtonDown ? 0.2f : 0.1f);
+
+	const bool flatOnLeft = button.isConnectedOnLeft();
+	const bool flatOnRight = button.isConnectedOnRight();
+	const bool flatOnTop = button.isConnectedOnTop();
+	const bool flatOnBottom = button.isConnectedOnBottom();
+
+	const float width = button.getWidth() - 1.0f;
+	const float height = button.getHeight() - 1.0f;
+
+	if (width > 0 && height > 0)
+	{
+		const float cornerSize = 4.0f;
+
+		Path outline;
+		outline.addRoundedRectangle(0.5f, 0.5f, width, height, cornerSize, cornerSize,
+		                            !(flatOnLeft || flatOnTop),
+		                            !(flatOnRight || flatOnTop),
+		                            !(flatOnLeft || flatOnBottom),
+		                            !(flatOnRight || flatOnBottom));
+
+		drawButtonShape(g, outline, baseColour, height);
+	}
+}
+
+void ZenLookAndFeel::drawButtonShape(Graphics& g, const Path& outline, Colour baseColour, float height)
+{
+	g.setOpacity(1.0f);
+	const float mainBrightness = baseColour.getBrightness();
+	const float mainAlpha = baseColour.getFloatAlpha();
+
+	g.setGradientFill(ColourGradient(baseColour.brighter(0.2f), 0.0f, 0.0f,
+	                                 baseColour.darker(0.25f), 0.0f, height, false));
+	g.fillPath(outline);
+
+	g.setColour(Colours::white.withAlpha(0.4f * mainAlpha * mainBrightness * mainBrightness));
+	g.strokePath(outline, PathStrokeType(1.0f), AffineTransform::translation(0.0f, 1.0f)
+	             .scaled(1.0f, (height - 1.6f) / height));
+
+	g.setColour(Colours::black.withAlpha(0.4f * mainAlpha));
+	g.strokePath(outline, PathStrokeType(1.0f));
+}
+
 void ZenLookAndFeel::drawZenImageButton(Graphics& g, ZenImageButton& buttonToDraw)
 {
 	Image left, center, right;
@@ -572,6 +580,23 @@ void ZenLookAndFeel::drawZenImageButton(Graphics& g, ZenImageButton& buttonToDra
 
 }
 
+Font ZenLookAndFeel::getZenImageButtonFont(ZenImageButton& zenbtn)
+{
+	if (zenbtn.getHeight() > 30)
+	{
+		
+		Font theFont("Futura Book", 18, Font::plain);
+		theFont.setExtraKerningFactor(0.06f);
+		return theFont;
+	}
+	else
+	{		
+		Font theFont("Futura Book", 14, Font::plain);
+		theFont.setExtraKerningFactor(0.06f);
+		return theFont;
+	}
+}
+
 void ZenLookAndFeel::drawZenComboBox(Graphics& g, int width, int height, bool isButtonDown, int buttonX, int buttonY, int buttonW, int buttonH, ZenComboBox& inBox)
 {
 	const Image& left = inBox.getLeftImage();
@@ -600,6 +625,11 @@ Label* ZenLookAndFeel::createComboBoxTextBox(ComboBox& inBox)
 	/* Overridden method
 	return new Label(String::empty, String::empty);
 	*/
+}
+
+Font ZenLookAndFeel::getComboBoxFont(ComboBox& inBox)
+{
+	return Font("Futura Book", jmin(15.0f, inBox.getHeight() * 0.85f), Font::plain);
 }
 
 void ZenLookAndFeel::positionComboBoxText(ComboBox& inBox, Label& inLabel)
@@ -752,34 +782,4 @@ void ZenLookAndFeel::drawPopupMenuUpDownArrow(Graphics& g, int width, int height
 
 	g.setColour(findColour(PopupMenu::textColourId).withAlpha(0.5f));
 	g.fillPath(p);
-}
-
-Font ZenLookAndFeel::getComboBoxFont(ComboBox& inBox)
-{
-	return Font("Futura Book", jmin(15.0f, inBox.getHeight() * 0.85f), Font::plain);
-}
-
-Font ZenLookAndFeel::getLabelFont(Label& label)
-{
-	if (label.getWidth() > 30)
-		return Font("Futura Book", 16, Font::plain);
-	else
-		return Font("Futura Book", 12, Font::plain);
-}
-
-Font ZenLookAndFeel::getZenImageButtonFont(ZenImageButton& zenbtn)
-{
-	if (zenbtn.getHeight() > 30)
-	{
-		
-		Font theFont("Futura Book", 18, Font::plain);
-		theFont.setExtraKerningFactor(0.06f);
-		return theFont;
-	}
-	else
-	{		
-		Font theFont("Futura Book", 14, Font::plain);
-		theFont.setExtraKerningFactor(0.06f);
-		return theFont;
-	}
 }

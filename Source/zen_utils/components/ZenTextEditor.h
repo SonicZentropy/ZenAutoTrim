@@ -50,10 +50,13 @@ public: //150 24
 
 protected:
 	Image leftEndImage, rightEndImage, centerImage, fullImage;
+	//void returnPressed() override;
 
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ZenTextEditor)
 	
+
+
 };
 
 

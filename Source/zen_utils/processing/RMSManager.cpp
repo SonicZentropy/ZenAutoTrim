@@ -30,6 +30,7 @@ LevelAnalysisManager::~LevelAnalysisManager()
 
 void LevelAnalysisManager::processSamples(AudioBuffer<float>* buffer, AudioPlayHead::CurrentPositionInfo inPosInfo)
 {
+	const GenericScopedLock<SpinLock> sl(processLock);
 	unsigned int _numIncomingSamples = buffer->getNumSamples();
 	const float* inSamplesL = buffer->getReadPointer(0);
 	const float* inSamplesR = buffer->getReadPointer(1);
@@ -81,14 +82,13 @@ void LevelAnalysisManager::processSamples(AudioBuffer<float>* buffer, AudioPlayH
 
 		// Calc current RMS, can Add 3db to meet AES17-2015 specification, so calibration sine wave peaks at 0
 		//leftCurrRMS = sqrt(leftSumSquares / getMinOfTotalWindowSamples());// +decibelRMSCalibration;
-		//rightCurrRMS = sqrt(rightSumSquares / getMinOfTotalWindowSamples());// +decibelRMSCalibration;
-		
+		//rightCurrRMS = sqrt(rightSumSquares / getMinOfTotalWindowSamples());// +decibelRMSCalibration;		
 
 		//Check for max RMS window found so far
 		if (leftSumSquares > leftMaxSamplesSquaredWindowFound) leftMaxSamplesSquaredWindowFound = leftSumSquares;
 		if (rightSumSquares > rightMaxSamplesSquaredWindowFound) rightMaxSamplesSquaredWindowFound = rightSumSquares;
 
-	#ifdef JUCE_DEBUG	
+		#ifdef JUCE_DEBUG	
 		if (countTotalRunningSamples % sampleRate == 0) // happens once per second
 		{
 			++secondsOfAudioCalculated;
@@ -100,10 +100,8 @@ void LevelAnalysisManager::processSamples(AudioBuffer<float>* buffer, AudioPlayH
 			rmsPair.second = Xrms;
 
 			rmsMap.insert_or_assign(rmsPair.first, rmsPair.second);
-
-			//DBG("inDB at " << String(secondsOfAudioCalculated) << " Seconds is: " << Xrms);
 		}
-	#endif // JUCE_DEBUG
+		#endif // JUCE_DEBUG
 	}
 }
 
@@ -137,8 +135,10 @@ void LevelAnalysisManager::resetCalculation()
 	leftCurrRMS = 0;
 	rightCurrRMS = 0;
 
-	rmsMap.clear();
 	secondsOfAudioCalculated = 0;
+
+	const GenericScopedLock<SpinLock> sl(processLock);
+	rmsMap.clear();
 	prevLeftBuf->clear();
 	prevRightBuf->clear();
 }

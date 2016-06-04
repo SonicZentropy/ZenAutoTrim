@@ -58,89 +58,93 @@ ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
 
 void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-	aPlayHead = getPlayHead();
-	AudioPlayHead::CurrentPositionInfo posInfo;
-	aPlayHead->getCurrentPosition(posInfo);
-	//bool posFound = aPlayHead->getCurrentPosition(posInfo);
-
-	//float* leftData = buffer.getWritePointer(0); //leftData references left channel now
-	//float* rightData = buffer.getWritePointer(1); //right data references right channel now
-	//unsigned int numSamples = buffer.getNumSamples();
-
-	if (prevSampleRate != this->getSampleRate())
+	if (isEnabled())
 	{
-		prevSampleRate = this->getSampleRate();
-		levelAnalysisManager.sampleRateChanged(prevSampleRate);
-	}
+		aPlayHead = getPlayHead();
+		AudioPlayHead::CurrentPositionInfo posInfo;
+		aPlayHead->getCurrentPosition(posInfo);
+		//bool posFound = aPlayHead->getCurrentPosition(posInfo);
 
-	
-	if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f) 
-		levelAnalysisManager.processSamples(&buffer, posInfo);
+		//float* leftData = buffer.getWritePointer(0); //leftData references left channel now
+		//float* rightData = buffer.getWritePointer(1); //right data references right channel now
+		//unsigned int numSamples = buffer.getNumSamples();
 
-	if (params->getBoolParameter(autoGainParam)->isOn())
-	{
-		// Calibrate gain param based on which value is target
-		double peakToHit = -1000;
-		if (targetForAutoTrim == Peak)
+		if (prevSampleRate != this->getSampleRate())
 		{
-			peakToHit = levelAnalysisManager.getMaxChannelPeak();
-		}
-		else if (targetForAutoTrim == MaxRMS)
-		{
-			peakToHit = levelAnalysisManager.getMaxChannelRMS();
-		}
-		else if (targetForAutoTrim == AverageRMS)
-		{
-			peakToHit = levelAnalysisManager.getMaxCurrentRunningRMS();
-		}
-		else
-		{
-			jassertfalse;
+			prevSampleRate = this->getSampleRate();
+			levelAnalysisManager.sampleRateChanged(prevSampleRate);
 		}
 
-		double targParamGain = params->getDecibelParameter(targetGainParam)->getValueInGain();
 
-		//division in log equiv to subtract in base
-		double gainValueToAdd = targParamGain / peakToHit;
+		if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f)
+			levelAnalysisManager.processSamples(&buffer, posInfo);
 
-		//float maxPeakInDB = Decibels::gainToDecibels(levelAnalysisManager.getMaxChannelPeak());
-		//double targParamGainInDB =  Decibels::gainToDecibels(targetParam->getValueInGain());
-		//double gainValueToAddInDB = Decibels::gainToDecibels(targParamGain) - Decibels::gainToDecibels(maxPeak);
-		//DBG("Max peak is: " << maxPeak);
-		if (!almostEqual(gainValueToAdd, params->getDecibelParameter(gainParam)->getValueInGain()) && targParamGain > -900) // gain value changed
+		if (params->getBoolParameter(autoGainParam)->isOn())
 		{
-			//DBG("\nGain To Add In DB: " << Decibels::gainToDecibels(maxPeak + gainValueToAdd) << " gainValueToAdd: " << gainValueToAdd << " != (gainParam)" << gainParam->getValueInGain());
-			//DBG("Max peak is: " << maxPeak << " and gainValueToAdd value is (targParamGain)" << targParamGain << " - (maxPeak)" << maxPeak << " = (gainValueToAdd)" << gainValueToAdd);
-			//DBG("Targ param gain in DB: " << Decibels::gainToDecibels(targParamGain) << " max peak in db: " << Decibels::gainToDecibels(maxPeak) << " gain to add in db: " << Decibels::gainToDecibels(abs(gainValueToAdd)));
-			//DBG("MaxPeak in DB: " << maxPeakInDB << " and gainValueToAddInDB value is (targParamGainInDB)" << targParamGainInDB << " - (maxPeakInDB)" << maxPeakInDB << " = (gainValueToAddInDB)" << gainValueToAddInDB);
-			//DBG("gainvaluetoaddindb to gain:" << Decibels::decibelsToGain(gainValueToAddInDB));
-			//DBG("Setting gain to add to: " << gainValueToAdd << " or in DB: " << Decibels::gainToDecibels(gainValueToAdd));
-			//gainParam->setValueFromDecibels(gainValueToAddInDB);
-			params->getDecibelParameter(gainParam)->setValueFromGainNotifyingHost(gainValueToAdd);
+			// Calibrate gain param based on which value is target
+			double peakToHit = -1000;
+			if (targetForAutoTrim == Peak)
+			{
+				peakToHit = levelAnalysisManager.getMaxChannelPeak();
+			}
+			else if (targetForAutoTrim == MaxRMS)
+			{
+				peakToHit = levelAnalysisManager.getMaxChannelRMS();
+			}
+			else if (targetForAutoTrim == AverageRMS)
+			{
+				peakToHit = levelAnalysisManager.getMaxCurrentRunningRMS();
+			}
+			else
+			{
+				jassertfalse;
+			}
+
+			double targParamGain = params->getDecibelParameter(targetGainParam)->getValueInGain();
+
+			//division in log equiv to subtract in base
+			double gainValueToAdd = targParamGain / peakToHit;
+
+			//float maxPeakInDB = Decibels::gainToDecibels(levelAnalysisManager.getMaxChannelPeak());
+			//double targParamGainInDB =  Decibels::gainToDecibels(targetParam->getValueInGain());
+			//double gainValueToAddInDB = Decibels::gainToDecibels(targParamGain) - Decibels::gainToDecibels(maxPeak);
+			//DBG("Max peak is: " << maxPeak);
+			if (!almostEqual(gainValueToAdd, params->getDecibelParameter(gainParam)->getValueInGain()) && targParamGain > -900) // gain value changed
+			{
+				//DBG("\nGain To Add In DB: " << Decibels::gainToDecibels(maxPeak + gainValueToAdd) << " gainValueToAdd: " << gainValueToAdd << " != (gainParam)" << gainParam->getValueInGain());
+				//DBG("Max peak is: " << maxPeak << " and gainValueToAdd value is (targParamGain)" << targParamGain << " - (maxPeak)" << maxPeak << " = (gainValueToAdd)" << gainValueToAdd);
+				//DBG("Targ param gain in DB: " << Decibels::gainToDecibels(targParamGain) << " max peak in db: " << Decibels::gainToDecibels(maxPeak) << " gain to add in db: " << Decibels::gainToDecibels(abs(gainValueToAdd)));
+				//DBG("MaxPeak in DB: " << maxPeakInDB << " and gainValueToAddInDB value is (targParamGainInDB)" << targParamGainInDB << " - (maxPeakInDB)" << maxPeakInDB << " = (gainValueToAddInDB)" << gainValueToAddInDB);
+				//DBG("gainvaluetoaddindb to gain:" << Decibels::decibelsToGain(gainValueToAddInDB));
+				//DBG("Setting gain to add to: " << gainValueToAdd << " or in DB: " << Decibels::gainToDecibels(gainValueToAdd));
+				//gainParam->setValueFromDecibels(gainValueToAddInDB);
+				params->getDecibelParameter(gainParam)->setValueFromGainNotifyingHost(gainValueToAdd);
+			}
+
+			params->getDecibelParameter(gainParam)->setNeedsUIUpdate(true);
+
+
+			//buffer.applyGain(gainParam->getValueInGain());
+			//THIS IS RIGHT in db
+			//float gainToAdd = gainParam->getValueInDecibels();
+			//for(unsigned int i = 0; i < numSamples; ++i)
+			//{
+			//	leftData[i] = Decibels::decibelsToGain(Decibels::gainToDecibels(leftData[i]) + gainToAdd);
+			//	rightData[i] = Decibels::decibelsToGain( Decibels::gainToDecibels(rightData[i]) + gainToAdd);
+			//}
+
+			//in gain, multiply in log equivalent to add in base
+			float gainToAdd = params->getDecibelParameter(gainParam)->getValueInGain();
+
+			//for (unsigned int i = 0; i < numSamples; ++i)
+			//{
+			//	leftData[i] = leftData[i] * gainToAdd;
+			//	rightData[i] = rightData[i] * gainToAdd;
+			//}
+
+			buffer.applyGain(gainToAdd);
+
 		}
-
-		params->getDecibelParameter(gainParam)->setNeedsUIUpdate(true);
-
-
-		//buffer.applyGain(gainParam->getValueInGain());
-		//THIS IS RIGHT in db
-		//float gainToAdd = gainParam->getValueInDecibels();
-		//for(unsigned int i = 0; i < numSamples; ++i)
-		//{
-		//	leftData[i] = Decibels::decibelsToGain(Decibels::gainToDecibels(leftData[i]) + gainToAdd);
-		//	rightData[i] = Decibels::decibelsToGain( Decibels::gainToDecibels(rightData[i]) + gainToAdd);
-		//}
-
-		//in gain, multiply in log equivalent to add in base
-		float gainToAdd = params->getDecibelParameter(gainParam)->getValueInGain();
-
-		//for (unsigned int i = 0; i < numSamples; ++i)
-		//{
-		//	leftData[i] = leftData[i] * gainToAdd;
-		//	rightData[i] = rightData[i] * gainToAdd;
-		//}
-
-		buffer.applyGain(gainToAdd);
 	}
 }
 
@@ -186,6 +190,13 @@ void ZenAutoTrimAudioProcessor::setStateInformation(const void* data, int sizeIn
 	if (tree.isValid()) {
 		params->state = tree;
 	}
+}
+
+void ZenAutoTrimAudioProcessor::resetCalculation()
+{
+	//setEnabled(false);
+	levelAnalysisManager.resetCalculation();
+	//setEnabled(true);
 }
 
 //==============================================================================

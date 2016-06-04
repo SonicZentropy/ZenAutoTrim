@@ -75,8 +75,9 @@ public:
 	/// <returns>Decibel input normalized to value between 0 and 1.0 for VST host use</returns>
 	static double mapDecibelsToProperNormalizedValue(const double& inDecibels, const double& decibelMinimum, const double& decibelMaximum, const double& decibelValueForMidpoint)
 	{
-		jassert(inDecibels >= decibelMinimum && inDecibels <= decibelMaximum && decibelValueForMidpoint >= decibelMinimum && decibelValueForMidpoint <= decibelMaximum);
-		return ZenParamUtils::convertValueToWarpedLinearBasedOnMidpoint(inDecibels, decibelMinimum, decibelMaximum, decibelValueForMidpoint);
+		double clamped = getClamped(inDecibels, decibelMinimum, decibelMaximum);
+		jassert(clamped >= decibelMinimum && clamped <= decibelMaximum && decibelValueForMidpoint >= decibelMinimum && decibelValueForMidpoint <= decibelMaximum);
+		return ZenParamUtils::convertValueToWarpedLinearBasedOnMidpoint(clamped, decibelMinimum, decibelMaximum, decibelValueForMidpoint);
 	}
 
 	/// <summary>Map a normalized, linearly scaled input value between 0.0 and 1.0 to decibels in a given range (ex: -96 to 12)</summary>
@@ -98,6 +99,7 @@ public:
 	/// <returns>A de-normalized Gain value that can be used to process audio samples</returns>
 	static double mapProperNormalizedValueToRawDecibelGain(double normGainValue, float minimumDecibels, float maximumDecibels, float mappedMidpointOfRange)
 	{
+		jassert(normGainValue >= 0.0f && normGainValue <= 1.0f);
 		normGainValue = getClamped(normGainValue, 0.0f, 1.0f);
 		//auto valueInDecibels = ZenParamUtils::convertMidpointWarpedLinearNormalizedValueToRawRangeValue(normGainValue, minimumDecibels, maximumDecibels, mappedMidpointOfRange);
 		double valueInDecibels = mapProperNormalizedValueToDecibels(normGainValue, minimumDecibels, maximumDecibels, mappedMidpointOfRange);
