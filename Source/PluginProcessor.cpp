@@ -12,7 +12,6 @@
 //  Zentropia is hosted on Github at [https://github.com/SonicZentropy]
 ===============================================================================*/
 
-
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
@@ -31,13 +30,6 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	rmsWindowTimeParam = params->createAndAddIntParameter(rmsWindowTimeParamID, "RMS Window Time", 10, 5000, CalibrationTimeInMS::time300ms);
 
 	params->state = ValueTree("ZenAutoTrim");
-	
-
-#ifdef JUCE_MSVC
-	//Visual Studio mem leak diagnostics settings 
-	_CrtSetDbgFlag(0); //Turn off VS memory dump output
-	//_crtBreakAlloc = 5389;	//Break on this memory allocation number (When Debug)
-#endif
 
 #ifdef JUCE_DEBUG
 	// #TODO: Change this to use Juce SharedResourcePointer - https://forum.juce.com/t/juce-singleton-implementation-confusion/17847/6
@@ -46,6 +38,11 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	//Open in bottom right corner
 	debugWindow->setTopLeftPosition(1900 - debugWindow->getWidth(), 1040 - debugWindow->getHeight());
 	// #TODO: add JUCE REF COUNTED OBJECT to zen GUI
+
+#ifdef JUCE_MSVC  //Visual Studio mem leak diagnostics settings 
+	_CrtSetDbgFlag(0); //Turn off VS memory dump output
+	//_crtBreakAlloc = 5389;	//Break on this memory allocation number (When Debug)
+#endif
 #endif
 }
 
@@ -53,7 +50,9 @@ ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
 {
 	params = nullptr;
 	undoManager = nullptr;
+#ifdef JUCE_DEBUG
 	debugWindow->deleteInstance();
+#endif
 }
 
 void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
@@ -63,8 +62,7 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 		aPlayHead = getPlayHead();
 		AudioPlayHead::CurrentPositionInfo posInfo;
 		aPlayHead->getCurrentPosition(posInfo);
-		//bool posFound = aPlayHead->getCurrentPosition(posInfo);
-
+		
 		//float* leftData = buffer.getWritePointer(0); //leftData references left channel now
 		//float* rightData = buffer.getWritePointer(1); //right data references right channel now
 		//unsigned int numSamples = buffer.getNumSamples();
@@ -75,14 +73,13 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 			levelAnalysisManager.sampleRateChanged(prevSampleRate);
 		}
 
-
-		if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f)
+		//don't process if all samples are 0 or if autogain button is off
+		if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f && autoGainEnableParam->isOn())
 			levelAnalysisManager.processSamples(&buffer, posInfo);
 
-		if (autoGainEnableParam->isOn())
-		{
+		
 			// Calibrate gain param based on which value is target
-			double peakToHit = -1000;
+			double peakToHit;
 			int targetType = targetTypeParam->getValueAsInt();
 			if (targetType == Peak)
 			{
@@ -98,28 +95,24 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 			}
 			else
 			{
-				//jassertfalse;
 				peakToHit = levelAnalysisManager.getMaxChannelPeak();
+				jassertfalse;
 			}
 
 			//double targParamGain = params->getDecibelParameter(targetGainParamID)->getValueInGain();
-			double targParamGain = targetGainParam->getValueInGain();
+			
 
 			//division in log equiv to subtract in base
-			double gainValueToAdd = targParamGain / peakToHit;
+			double gainValueToAdd = targetGainParam->getValueInGain() / peakToHit;
 
-			if (!almostEqual(gainValueToAdd, gainParam->getValueInGain()) && targParamGain > -900) // gain value changed
+			if (!almostEqual(gainValueToAdd, gainParam->getValueInGain())) // gain value changed
 			{
-				gainParam->setValueFromGainNotifyingHost(gainValueToAdd);
+				gainParam->setValueFromGain(gainValueToAdd);
+				//gainParam->setNeedsUIUpdate(true); // removed because done in setValueFromGain
 			}
 
-			gainParam->setNeedsUIUpdate(true);
-
 			//in gain, multiply in log equivalent to add in base
-			float gainToAdd = gainParam->getValueInGain();
-
-			buffer.applyGain(gainToAdd);
-		}
+			buffer.applyGain(gainParam->getValueInGain());		
 	}
 }
 
