@@ -23,6 +23,37 @@
 #include "components/ZenLabelDisplay.h"
 #include "components/ZenTextEditor.h"
 
+namespace LookAndFeelHelpers
+{
+	static Colour createBaseColour(Colour buttonColour,
+		bool hasKeyboardFocus,
+		bool isMouseOverButton,
+		bool isButtonDown) noexcept
+	{
+		const float sat = hasKeyboardFocus ? 1.3f : 0.9f;
+		const Colour baseColour(buttonColour.withMultipliedSaturation(sat));
+
+		if (isButtonDown)      return baseColour.contrasting(0.2f);
+		if (isMouseOverButton) return baseColour.contrasting(0.1f);
+
+		return baseColour;
+	}
+
+	static TextLayout layoutTooltipText(const String& text, Colour colour) noexcept
+	{
+		const float tooltipFontSize = 13.0f;
+		const int maxToolTipWidth = 400;
+
+		AttributedString s;
+		s.setJustification(Justification::centred);
+		s.append(text, Font(tooltipFontSize, Font::bold), colour);
+
+		TextLayout tl;
+		tl.createLayoutWithBalancedLineLengths(s, (float)maxToolTipWidth);
+		return tl;
+	}
+}
+
 ZenLookAndFeel::ZenLookAndFeel()
 {
 	defaultFont = Typeface::createSystemTypefaceFor(ZenBinaryData::futurabook_ttf, ZenBinaryData::futurabook_ttfSize);
@@ -782,4 +813,20 @@ void ZenLookAndFeel::drawPopupMenuUpDownArrow(Graphics& g, int width, int height
 
 	g.setColour(findColour(PopupMenu::textColourId).withAlpha(0.5f));
 	g.fillPath(p);
+}
+
+void ZenLookAndFeel::drawTooltip(Graphics& g, const String& text, int width, int height)
+{
+	//g.fillAll(findColour(TooltipWindow::backgroundColourId));
+	g.fillAll(Colour(0xFF303030));
+
+#if ! JUCE_MAC // The mac windows already have a non-optional 1 pix outline, so don't double it here..
+	//g.setColour(findColour(TooltipWindow::outlineColourId));
+	g.setColour(Colour(0xFFFFFFFF));
+	g.drawRect(0, 0, width, height, 1);
+#endif
+
+	//LookAndFeelHelpers::layoutTooltipText(text, findColour(TooltipWindow::textColourId))
+	LookAndFeelHelpers::layoutTooltipText(text, Colour(0xFFDDDDDD))
+		.draw(g, Rectangle<float>((float)width, (float)height));
 }

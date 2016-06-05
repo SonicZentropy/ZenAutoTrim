@@ -17,13 +17,30 @@
 #define PLUGINPROCESSOR_H_INCLUDED
 
 #include "JuceHeader.h"
+#include "debug/ZenDebugEditor.h"
 #include "parameters/ZenBoolParameter.h"
-#include "utilities/ZenConstants.h"
+#include "parameters/ZenIntParameter.h"
 #include "processing/RMSManager.h"
 #include "state/ZenAudioProcessorValueTreeState.h"
-#include "utilities/ZenTime.h"
-#include "debug/ZenDebugEditor.h"
-//using namespace Zen; test
+// #include "utilities/ZenConstants.h"
+// #include "utilities/ZenTime.h"
+
+enum CalibrationTarget
+{
+	AverageRMS = 1,
+	MaxRMS,
+	Peak,
+	targetCount = 3
+};
+
+enum CalibrationTimeInMS
+{
+	time10ms = 1,
+	time300ms,
+	time1000ms,
+	time5000ms,
+	timeCount = 4
+};
 
 //==============================================================================
 class ZenAutoTrimAudioProcessor  : public AudioProcessor
@@ -33,13 +50,6 @@ public:
     ZenAutoTrimAudioProcessor();
     ~ZenAutoTrimAudioProcessor();
 	
-	//==============================================================================
-	enum CalibrationTarget
-	{
-		AverageRMS,
-		MaxRMS,
-		Peak
-	};
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -71,51 +81,78 @@ public:
 	void resetCalculation();
 
 	//==============================================================================
-	void setCurrentEditor(AudioProcessorEditor* inEditor) { currentEditor = inEditor; }
+	//void setCurrentEditor(AudioProcessorEditor* inEditor) { currentEditor = inEditor; }
 
-	CalibrationTarget getTargetForAutoTrim() const { return targetForAutoTrim; }
-	void setTargetForAutoTrim(CalibrationTarget inValue) { targetForAutoTrim = inValue; }
-	void setRMSWindowTimeInMS(TimeValue inTime)
+	//CalibrationTarget getTargetForAutoTrim() const { return targetForAutoTrim; }
+	//void setTargetForAutoTrim(CalibrationTarget inValue) { targetForAutoTrim = inValue; }
+	void setRMSWindowTimeInMS(int inCalibrationTime)
 	{
-		rmsWindowTime.setValueFromMS(inTime);
-		levelAnalysisManager.setWindowSizeInMS(inTime);
+		//rmsWindowTime.setValueFromMS(inTime);
+		int timeInMS;
+		switch(inCalibrationTime)
+		{
+		case time10ms:
+			timeInMS = 10;
+			break;
+		case time300ms:
+			timeInMS = 300;
+			break;
+		case time1000ms:
+			timeInMS = 1000;
+			break;
+		case time5000ms:
+			timeInMS = 5000;
+			break;
+		default:
+			timeInMS = 300;
+			jassertfalse;
+		}
+
+		levelAnalysisManager.setWindowSizeInMS(timeInMS);
+		rmsWindowTimeParam->setValue((int)timeInMS);
 	}
 
-	bool isBypassed() { return params->getBoolParameter(bypassParam)->isOn(); }
+	bool isBypassed() { return bypassParam->isOn(); }
 
-	bool isEnabled() { return params->getBoolParameter(bypassParam)->isOff(); }
+	bool isEnabled() { return bypassParam->isOff(); }
 
-	void setEnabled(bool shouldBeEnabled) { getBypassParam()->setValueFromBool(shouldBeEnabled); }
+	void setEnabled(bool shouldBeEnabled) { bypassParam->setValueFromBool(shouldBeEnabled); }
 
 	LevelAnalysisManager& getLevelAnalysisManager() { return levelAnalysisManager; }	
-	ZenDecibelParameter* getGainParam() { return params->getDecibelParameter(gainParam); }
-	ZenDecibelParameter* getTargetParam() { return params->getDecibelParameter(targetGainParam); }
-	ZenBoolParameter* getAutoGainEnableParam() { return params->getBoolParameter(autoGainParam); }
-	ZenBoolParameter* getBypassParam() { return params->getBoolParameter(bypassParam); }
+	ZenDecibelParameter* getGainParam() { return gainParam; }
+	ZenDecibelParameter* getTargetParam() { return targetGainParam; }
+	ZenBoolParameter* getAutoGainEnableParam() { return autoGainEnableParam; }
+	ZenBoolParameter* getBypassParam() { return bypassParam; }
+	ZenIntParameter* getTargetTypeParam() { return targetTypeParam; }
+	ZenIntParameter* getRMSWindowTimeParam() { return rmsWindowTimeParam; }
 
 	//==============================================================================
 
 	ScopedPointer<ZenAudioProcessorValueTreeState> params;
 	ScopedPointer<UndoManager> undoManager;
 
-	const String gainParam = "gainParam";
-	const String targetGainParam = "targetGainParam";
-	const String autoGainParam = "autoGainParam";
-	const String bypassParam = "bypassParam";
+	const String gainParamID = "gainParam";
+	const String targetGainParamID = "targetGainParam";
+	const String autoGainEnableParamID = "autoGainParam";
+	const String bypassParamID = "bypassParam";
+	const String targetTypeParamID = "targetTypeParam";
+	const String rmsWindowTimeParamID = "rmsWindowTimeParam";
 
 private:
 	//friend class ZenAutoTrimAudioProcessorEditor;
-	//ZenDecibelParameter* gainParam; 
-	//ZenDecibelParameter* targetParam;
-	//ZenBoolParameter* autoGainEnableParam;
-	//ZenBoolParameter* bypassParam;
+	ZenDecibelParameter* gainParam; 
+	ZenDecibelParameter* targetGainParam;
+	ZenBoolParameter* autoGainEnableParam;
+	ZenBoolParameter* bypassParam;
+	ZenIntParameter*  targetTypeParam;
+	ZenIntParameter*  rmsWindowTimeParam;
 	
-	AudioProcessorEditor* currentEditor;
+	//AudioProcessorEditor* currentEditor;
 	LevelAnalysisManager levelAnalysisManager;
 	AudioPlayHead* aPlayHead;
 	
-	ZenTime rmsWindowTime;	
-	CalibrationTarget targetForAutoTrim = Peak;
+	//ZenTime rmsWindowTime;	
+	//CalibrationTarget targetForAutoTrim = Peak;
 
 	double prevSampleRate = 44100;
     //==============================================================================

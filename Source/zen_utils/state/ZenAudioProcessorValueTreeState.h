@@ -16,6 +16,7 @@
 #define ZEN_AUDIOPROCESSORVALUETREESTATE_H_INCLUDED
 
 #include "JuceHeader.h"
+//#include <parameters/ZenIntParameter.h>
 //#include "parameters/ZenParameter.h"
 //#include "parameters/ZenBoolParameter.h"
 //#include "parameters/ZenDecibelParameter.h"
@@ -23,6 +24,7 @@
 class ZenParameter;
 class ZenBoolParameter;
 class ZenDecibelParameter;
+class ZenIntParameter;
 
 #if JUCE_COMPILER_SUPPORTS_LAMBDAS || defined (DOXYGEN)
 
@@ -59,33 +61,23 @@ public:
 	/** Destructor. */
 	~ZenAudioProcessorValueTreeState();
 
-	AudioProcessorParameter* createAndAddDecibelParameter(String paramID, String paramName, 
+	ZenDecibelParameter* createAndAddDecibelParameter(String paramID, String paramName, 
 		float minValue, float maxValue, float defaultValue, 
 		bool shouldBeSmoothed = false, float smoothingTime = 0.0f, 
 		std::function<String(float)> valueToTextFunction = nullptr, 
 		std::function<float(const String&)> textToValueFunction = nullptr);
 	
-	AudioProcessorParameter* createAndAddBoolParameter(String paramID, String paramName, 
+	ZenDecibelParameter* addDecibelParameter(ZenDecibelParameter* inDecibelParam, 
+		std::function<String(float)> valueToTextFunction = nullptr, 
+		std::function<float(const String&)> textToValueFunction = nullptr);
+
+	ZenBoolParameter* createAndAddBoolParameter(String paramID, String paramName,
 		float inDefaultValue, String unitLabel = "");
 	
-	/** Creates and returns a new parameter object for controlling a parameter
-	with the given ID.
+	ZenBoolParameter* addBoolParameter(ZenBoolParameter* inBoolParam);
 
-	Calling this will create and add a special type of AudioProcessorParameter to the
-	AudioProcessor to which this state is attached.
-
-	@param parameterID          A unique string ID for the new parameter
-	@param parameterName        The name that the parameter will return from AudioProcessorParameter::getName()
-	@param labelText            The label that the parameter will return from AudioProcessorParameter::getLabel()
-	@param valueRange           A mapping that will be used to determine the value range which this parameter uses
-	@param defaultValue         A default value for the parameter (in non-normalised units)
-	@param valueToTextFunction  A function that will convert a non-normalised value to a string for the
-	AudioProcessorParameter::getText() method. This can be nullptr to use the
-	default implementation
-	@param textToValueFunction  The inverse of valueToTextFunction
-	@returns the parameter object that was created
-	*/
-
+	ZenIntParameter* createAndAddIntParameter(String paramID, String paramName, int minValue, int maxValue, int inDefaultValue, String unitLabel = "");
+	ZenIntParameter* addIntParameter(ZenIntParameter* inIntParam);
 	/** Returns a parameter by its ID string. */
 	AudioProcessorParameter* getParameter(StringRef parameterID) const noexcept;
 

@@ -25,10 +25,11 @@ using AtomicBool = std::atomic<bool>;
 
 enum ZenParamType
 {
-	ZENFLOAT,
+	ZENFLOAT = 0,
 	ZENDECIBEL,
 	ZENBOOL,
-	NONE
+	ZENINT,
+	COUNT
 };
 
 
@@ -110,19 +111,20 @@ public:
 		return precision;
 	}
 
-	void setNeedsUIUpdate(bool needsUpdate) noexcept
+	void setNeedsUIUpdate(bool inNeedsUpdate) noexcept
 	{
-		UIUpdate.store(needsUpdate);
+		//needsUpdate.store(needsUpdate);
+		needsUpdate.set(inNeedsUpdate);
 	}
 
 	bool getNeedsUIUpdate() const noexcept
 	{
-		return UIUpdate.load();
+		return needsUpdate.get() == 1;
 	}
 
 	bool needsUIUpdate() const noexcept
 	{
-		return UIUpdate.load();
+		return getNeedsUIUpdate();
 	}
 
 	virtual bool needsUIUpdate()
@@ -195,11 +197,12 @@ public:
 		return nullptr;
 	}	
 
-	
+	//ZenAudioProcessorValueTreeState& getOwner() { return owner; }
+	//void setOwner(ZenAudioProcessorValueTreeState* inOwner) { owner = inOwner; }
 
 protected:
 	AtomicFloat value;
-	AtomicBool UIUpdate;
+	//AtomicBool UIUpdate;
 	unsigned int precision = 2;
 	String unitLabel = "", description = "";
 	ScopedPointer<ValueTree> paramValueTree;

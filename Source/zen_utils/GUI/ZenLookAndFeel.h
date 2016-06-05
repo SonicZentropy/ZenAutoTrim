@@ -58,6 +58,9 @@ public:
 	Font getPopupMenuFont() override;	
 	void drawPopupMenuUpDownArrow(Graphics&, int width, int height, bool isScrollUpArrow) override;
 
+
+	virtual void drawTooltip(Graphics&, const String& text, int width, int height) override;
+
 	//void drawLabel(Graphics&, Label&) override;
 	//Label* createSliderTextBox(Slider&) override;
 protected:

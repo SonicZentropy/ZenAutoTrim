@@ -17,6 +17,7 @@
 #include "parameters/ZenParameter.h"
 #include "parameters/ZenDecibelParameter.h"
 #include "parameters/ZenBoolParameter.h"
+#include <parameters/ZenIntParameter.h>
 
 #if JUCE_COMPILER_SUPPORTS_LAMBDAS
 
@@ -58,7 +59,7 @@ ZenAudioProcessorValueTreeState::~ZenAudioProcessorValueTreeState() {}
 //	return p;
 //}
 
-AudioProcessorParameter* ZenAudioProcessorValueTreeState::createAndAddDecibelParameter(
+ZenDecibelParameter* ZenAudioProcessorValueTreeState::createAndAddDecibelParameter(
 	String paramID,	String paramName, float minValue, float maxValue, float defaultValue, 
 	bool shouldBeSmoothed, float smoothingTime,
 	std::function<String(float)> valueToTextFunction,
@@ -74,7 +75,20 @@ AudioProcessorParameter* ZenAudioProcessorValueTreeState::createAndAddDecibelPar
 	return p;
 }
 
-AudioProcessorParameter* ZenAudioProcessorValueTreeState::createAndAddBoolParameter(
+ZenDecibelParameter* ZenAudioProcessorValueTreeState::addDecibelParameter(
+	ZenDecibelParameter* inDecibelParam, 
+	std::function<String(float)> valueToTextFunction /*= nullptr*/,
+	std::function<float(const String&)> textToValueFunction /*= nullptr*/)
+{
+	// All parameters must be created before giving this manager a ValueTree state!
+	jassert(!state.isValid());
+	jassert(MessageManager::getInstance()->isThisTheMessageThread());
+
+	processor.addParameter(inDecibelParam);
+	return inDecibelParam;
+}
+
+ZenBoolParameter* ZenAudioProcessorValueTreeState::createAndAddBoolParameter(
 	String paramID, String paramName, float inDefaultValue, String unitLabel)
 {
 	jassert(!state.isValid());
@@ -83,6 +97,39 @@ AudioProcessorParameter* ZenAudioProcessorValueTreeState::createAndAddBoolParame
 	ZenBoolParameter* p = new ZenBoolParameter(*this, paramID, paramName, inDefaultValue, unitLabel);
 	processor.addParameter(p);
 	return p;
+}
+
+ZenBoolParameter* ZenAudioProcessorValueTreeState::addBoolParameter(
+	ZenBoolParameter* inBoolParam)
+{
+	jassert(!state.isValid());
+	jassert(MessageManager::getInstance()->isThisTheMessageThread());
+		
+	processor.addParameter(inBoolParam);
+	return inBoolParam;
+}
+
+ZenIntParameter* ZenAudioProcessorValueTreeState::createAndAddIntParameter(
+	String paramID, String paramName, int minValue, int maxValue, int inValue, String unitLabel)
+{
+	jassert(!state.isValid());
+	jassert(MessageManager::getInstance()->isThisTheMessageThread());
+
+	ZenIntParameter* p = new ZenIntParameter(
+		*this, paramID, paramName, minValue, maxValue, inValue, unitLabel);
+	processor.addParameter(p);
+	return p;
+}
+//params->addIntParameter(targetTypeParam = new ZenIntParameter(*params, targetTypeParamID, "Target Type", 0, CalibrationTarget::Count, 0.0f));
+
+ZenIntParameter* ZenAudioProcessorValueTreeState::addIntParameter(
+	ZenIntParameter* inIntParam)
+{
+	jassert(!state.isValid());
+	jassert(MessageManager::getInstance()->isThisTheMessageThread());
+
+	processor.addParameter(inIntParam);
+	return inIntParam;
 }
 
 

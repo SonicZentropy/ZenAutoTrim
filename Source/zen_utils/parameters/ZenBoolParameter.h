@@ -82,9 +82,9 @@ public:
 
 	virtual void setValueFromBool(bool newBool);
 
-	void updateFromValueTree();
-	void copyValueToValueTree();
-	void valueTreePropertyChanged(ValueTree& vt, const Identifier& prop);
+	void updateFromValueTree() override;
+	void copyValueToValueTree() override;
+	void valueTreePropertyChanged(ValueTree& vt, const Identifier& prop) override; 
 	/** This assumes inValue is NOT normalized and coming from NOT the host, since
 	* it promptly notifies the host of the change. */
 	virtual void setValueNotifyingHost(bool newBoolValue);

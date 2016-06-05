@@ -121,6 +121,10 @@
                 file="Source/zen_utils/parameters/ZenFloatParameter.cpp"/>
           <FILE id="K07LlB" name="ZenFloatParameter.h" compile="0" resource="0"
                 file="Source/zen_utils/parameters/ZenFloatParameter.h"/>
+          <FILE id="PL3r5K" name="ZenIntParameter.cpp" compile="1" resource="0"
+                file="Source/zen_utils/parameters/ZenIntParameter.cpp"/>
+          <FILE id="lZi62b" name="ZenIntParameter.h" compile="0" resource="0"
+                file="Source/zen_utils/parameters/ZenIntParameter.h"/>
           <FILE id="V1DYBE" name="ZenLinearSmoothedValue.cpp" compile="1" resource="0"
                 file="Source/zen_utils/parameters/ZenLinearSmoothedValue.cpp"/>
           <FILE id="CTGoOV" name="ZenLinearSmoothedValue.h" compile="0" resource="0"

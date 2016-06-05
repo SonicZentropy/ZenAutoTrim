@@ -30,9 +30,10 @@ void ZenParameter::setValueTree()
 
 bool ZenParameter::checkUIUpdateAndReset()
 {
-	bool expected = true;
-	UIUpdate.compare_exchange_strong(expected, false);
-	return expected;
+	//bool expected = true;
+	//UIUpdate.compare_exchange_strong(expected, false);
+	//return expected;
+	return needsUpdate.compareAndSetBool(0, 1);
 }
 
 void ZenParameter::setNewState(const ValueTree& v)

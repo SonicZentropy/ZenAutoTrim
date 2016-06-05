@@ -24,25 +24,14 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	LookAndFeel::setDefaultLookAndFeel(zenLookAndFeel);
 	setSize(222, 250);
 		
-	backgroundImg = ImageFileFormat::loadFrom(BinaryData::backgroundImg_png, (size_t)BinaryData::backgroundImg_pngSize);
+	backgroundImg = ImageFileFormat::loadFrom(
+		BinaryData::backgroundImg_png, (size_t)BinaryData::backgroundImg_pngSize);
 	
 	addAndMakeVisible(titleBar = new ZenTitleBar("Zen Title Bar", this));
 	titleBar->setBounds(0, 0, getWidth(), 30);
 	titleBar->addBypassListener(this);
 
 	//https://www.reddit.com/r/cpp_questions/comments/4kisug/lambdastdfunction_this_access_confusion/
-	//auto MakeGetTextParserLambda = [] (ZenLabelDisplay* labelRef)
-	//{
-	//	return [labelRef]
-	//	{
-	//		float val = labelRef->getTextValue().getValue();
-	//		if (val < -96.0f)
-	//			return String("-Inf");
-	//		else
-	//			return String(val);
-	//	};
-	//};
-
 	auto MakeGetTextParserLambda = [] (ZenLabelDisplay* labelRef)
 	{
 		float val = labelRef->getTextValue().getValue();
@@ -61,12 +50,8 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	gainEditor->setGetTextFunction(MakeGetTextParserLambda);
 	gainEditor->setShouldScaleText(true);
 	gainEditor->setFontMarginSize(35);
+	gainEditor->setTooltip("The calculated amount of gain to be applied to the incoming signal.");
 	gainEditor->setBounds(120, 40, 75, 48);
-	
-	//addAndMakeVisible(leftWindowRMSLabel = new ZenLabelDisplay("Left Window RMS Out", "00"));
-	//leftWindowRMSLabel->setColour(Label::textColourId, textColour);
-	//leftWindowRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
-	//leftWindowRMSLabel->setBounds(8, 70, 72, 24);
 
 	addAndMakeVisible(leftAvgRMSLabel = new ZenLabelDisplay("Left Avg RMS Out", "00"));
 	leftAvgRMSLabel->setColour(Label::textColourId, textColour);
@@ -83,10 +68,6 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	leftPeakLabel->setGetTextFunction(MakeGetTextParserLambda);
 	leftPeakLabel->setBounds(8, 154, 72, 24);
 
-	//addAndMakeVisible(winBox = new Label("Window Label", "WIN"));
-	//winBox->setColour(Label::textColourId, textColour);
-	//winBox->setBounds(90, 70, 40, 24);
-
 	addAndMakeVisible(avgBox = new Label("Avg Label", "AVG"));
 	avgBox->setColour(Label::textColourId, textColour);
 	avgBox->setBounds(90, 98, 40, 24);
@@ -98,11 +79,6 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	addAndMakeVisible(peakBox = new Label("Peak Label", "PEAK"));
 	peakBox->setColour(Label::textColourId, textColour);
 	peakBox->setBounds(90, 154, 40, 24);
-
-	//addAndMakeVisible(rightWindowRMSLabel = new ZenLabelDisplay("Right Win RMS Out", "0.00"));
-	//rightWindowRMSLabel->setColour(Label::textColourId, Colours::white);
-	//rightWindowRMSLabel->setGetTextFunction(MakeGetTextParserLambda);
-	//rightWindowRMSLabel->setBounds(140, 70, 72, 24);
 	
 	addAndMakeVisible(rightAvgRMSLabel = new ZenLabelDisplay("Right Avg RMS Out", "0.00"));
 	rightAvgRMSLabel->setColour(Label::textColourId, Colours::white);
@@ -120,32 +96,37 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	rightPeakLabel->setBounds(140, 154, 72, 24);
 
 	addAndMakeVisible(targetComboBox = new ZenComboBox("Target Combo Box"));
-	targetComboBox->addItem("Avg RMS", 1);
-	targetComboBox->addItem("Max RMS", 2);
-	targetComboBox->addItem("Peak", 3);
+	targetComboBox->addItem("Avg RMS", CalibrationTarget::AverageRMS);
+	targetComboBox->addItem("Max RMS", CalibrationTarget::MaxRMS);
+	targetComboBox->addItem("Peak", CalibrationTarget::Peak);
 	targetComboBox->setTextWhenNothingSelected("Target");
 	targetComboBox->setBounds(9, 186, 90, 24);
-	//targetComboBox->setSelectedId(1, sendNotificationAsync);
+	targetComboBox->setSelectedId(processor.getTargetTypeParam()->getValueAsInt(), dontSendNotification);
+	targetComboBox->setTooltip("Target to automatically gain stage toward.");
 	targetComboBox->addListener(this);
 
 	addAndMakeVisible(rmsWindowComboBox = new ZenComboBox("RMS Window Combo Box"));
-	rmsWindowComboBox->addItem("10ms", 10);
-	rmsWindowComboBox->addItem("300ms", 300);
-	rmsWindowComboBox->addItem("1000ms", 1000);
-	rmsWindowComboBox->addItem("5000ms", 5000);
+	rmsWindowComboBox->addItem("10ms", CalibrationTimeInMS::time10ms);
+	rmsWindowComboBox->addItem("300ms", CalibrationTimeInMS::time300ms);
+	rmsWindowComboBox->addItem("1000ms", CalibrationTimeInMS::time1000ms);
+	rmsWindowComboBox->addItem("5000ms", CalibrationTimeInMS::time5000ms);
 	rmsWindowComboBox->setTextWhenNothingSelected("Window");
 	rmsWindowComboBox->setBounds(122, 186, 90, 24);
-	rmsWindowComboBox->setEnabled(false);
-	//rmsWindowComboBox->setSelectedId(300, sendNotificationAsync);
+	rmsWindowComboBox->setSelectedId(getCalibrationTimeFromMS(
+		processor.getRMSWindowTimeParam()->getValueAsInt()), dontSendNotification);
+	if (targetComboBox->getSelectedId() == CalibrationTarget::Peak) 
+		rmsWindowComboBox->setEnabled(false);
+	rmsWindowComboBox->setTooltip("Window time (in milliseconds) to use when calculating RMS");
 	rmsWindowComboBox->addListener(this);
 	
 	addAndMakeVisible(resetBtn = new ZenImageButton("Reset Button", "Reset"));
-	resetBtn->setTooltip("Reset RMS Calculation");
+	resetBtn->setTooltip("Reset all calculation.");
 	resetBtn->setBounds(16, 218, 51, 24);
 	resetBtn->addListener(this);	
 	
 	addAndMakeVisible(autoGainBtn = new ZenImageButton("Auto Gain Button", "AutoGain"));
 	autoGainBtn->setClickingTogglesState(true);
+	autoGainBtn->setTooltip("Enable automatic gain staging of incoming signals.");
 	autoGainBtn->setBounds(154, 218, 60, 24);
 	autoGainBtn->setToggleState(processor.getAutoGainEnableParam()->getValueAsBool(), dontSendNotification);
 	autoGainBtn->addListener(this);
@@ -156,40 +137,30 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	targetEditor->setReadOnly(false);
 	targetEditor->setScrollbarsShown(false);
 	targetEditor->setCaretVisible(true);
-	
 	targetEditor->setSelectAllWhenFocused(true);
-	//processor.getTargetParam()->setValueFromDecibels(-23.0f);
-	float valueInDB = processor.getTargetParam()->getValueInDecibels();
-	String textInDB = processor.getTargetParam()->getTextInDB();
-	targetEditor->setText(processor.getTargetParam()->getTextInDB());
+	targetEditor->setText(processor.getTargetParam()->getTextInDB(), dontSendNotification);
 	targetEditor->setBounds(75, 218, 71, 24);
+	targetEditor->setTooltip("Decibel value to gain stage the incoming signal toward.");
 	targetEditor->addListener(this);
 		
+	addChildComponent(bypassOverlay = new Label("Bypass Overlay", String()));
+	bypassOverlay->setEditable(false, false, false);
+	bypassOverlay->setColour(Label::backgroundColourId, Colour(0xCC202020));
+	bypassOverlay->setBounds(0, 31, 222, 220);
+	bypassOverlay->setVisible(!processor.isEnabled());
+
+	tooltipWindow.setMillisecondsBeforeTipAppears(2000);
+
 	startTimer(100);
-	processor.setCurrentEditor(this);
+	ZEN_COMPONENT_DEBUG_ATTACH(this);
 
 	//openGLContext = new OpenGLContext();
 	//openGLContext->attachTo(*this);
-
-	ZEN_COMPONENT_DEBUG_ATTACH(this);
-	//addAndMakeVisible(leftWindowRMS = new ZenLabelDisplay("Left Window RMS Label", TRANS("00")));
-	//leftWindowRMS->setColour(Label::textColourId, Colours::white);
-	//leftWindowRMS->setBounds();
-	//addAndMakeVisible(rightWindowRMS = new ZenLabelDisplay("Right Window RMS Label", TRANS("00")));
-	//rightWindowRMS->setColour(Label::textColourId, Colours::white);
-	//rightWindowRMS->setBounds();
-	//graphicalManager = new TimeSliceThread("graphicalManagerTrd");
-	//graphicalManager->startThread(2);
-	////addAndMakeVisible(vuMeter = new SegmentedMeter());
-	//addChildComponent(vuMeter = new SegmentedMeter());
-	//vuMeter->setNumDecibelsPerSeg(6);
-	//vuMeter->setBounds(200, 200, 100, 100);
-	//graphicalManager->addTimeSliceClient(vuMeter);
 }
 
 ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 {
-	processor.setCurrentEditor(nullptr);
+	titleBar = nullptr;
 	gainEditor = nullptr;
 	
 	leftAvgRMSLabel = nullptr;
@@ -198,19 +169,23 @@ ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 	
 	rightAvgRMSLabel = nullptr;
 	rightMaxRMSLabel = nullptr;
-	rightPeakLabel = nullptr;
-	
-	//leftWindowRMS = nullptr;
-	//rightWindowRMS = nullptr;
-	
+	rightPeakLabel = nullptr;	
+
 	maxBox = nullptr;
 	peakBox = nullptr;
 	avgBox = nullptr;
 	gainLabel = nullptr;
 	
+	targetEditor = nullptr;
 	resetBtn = nullptr;
 	autoGainBtn = nullptr;
-	targetEditor = nullptr;
+
+	targetComboBox = nullptr;
+	rmsWindowComboBox = nullptr;
+
+	zenLookAndFeel = nullptr;
+	bypassOverlay = nullptr;
+
 	//openGLContext->detach();
 	ZEN_COMPONENT_DEBUG_DETACH();
 }
@@ -233,13 +208,6 @@ void ZenAutoTrimAudioProcessorEditor::textEditorReturnKeyPressed(TextEditor& edi
 	textEditorUpdateDueToChange(editorChanged);
 }
 
-
-//void ZenAutoTrimAudioProcessorEditor::textEditorFocusLost(TextEditor& editorChanged)
-//{
-//	DBG("In ZenAutoTrimAudioProcessorEditor::textEditorFocusLost(editorChanged) with editor: " << editorChanged.getName());
-//	textEditorUpdateDueToChange(editorChanged);
-//}
-
 void ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(TextEditor& editorChanged)
 {
 	DBG("In ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(editorChanged) with editor: " << editorChanged.getName());
@@ -256,14 +224,19 @@ void ZenAutoTrimAudioProcessorEditor::buttonClicked(Button* pressedBtn)
 {
 	if (pressedBtn == resetBtn)
 	{
-		//processor.getLevelAnalysisManager().resetCalculation();
 		processor.resetCalculation();
 		updateUIFromProcessor();
-	} else if (pressedBtn == autoGainBtn)
+	}
+	else if (pressedBtn == autoGainBtn)
+	{
 		processor.getAutoGainEnableParam()->toggleValue();
+	}
 	else if (pressedBtn == titleBar->getBypassBtn())
+	{
 		//invert toggle state, since processor param is "Bypassed"
-		processor.getBypassParam()->setValueFromBool(! pressedBtn->getToggleState());
+		processor.getBypassParam()->setValueFromBool(!pressedBtn->getToggleState());
+		bypassOverlay->setVisible(!pressedBtn->getToggleState());
+	}
 }
 
 void ZenAutoTrimAudioProcessorEditor::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
@@ -271,25 +244,29 @@ void ZenAutoTrimAudioProcessorEditor::comboBoxChanged(ComboBox* comboBoxThatHasC
 	if (targetComboBox == comboBoxThatHasChanged)
 	{
 		int targetID = targetComboBox->getSelectedId();
-		if (targetID == 2)
+		if (targetID == 3)
 		{
 			//max RMS - enable the window combo box
-			rmsWindowComboBox->setEnabled(true);
+			rmsWindowComboBox->setEnabled(false);
+			//processor.setTargetForAutoTrim(CalibrationTarget::Peak);
+			processor.getTargetTypeParam()->setValueNotifyingHost(CalibrationTarget::Peak);
 			//rmsWindowComboBox->setVisible(true);
-			processor.setTargetForAutoTrim(processor.MaxRMS);
+			
 			// #TODO: clear window history in processor level mgr if target changes
 		} else
 		{
-			//Avg RMS or Peak - disable window
-			rmsWindowComboBox->setEnabled(false);
+			//RMS - enable window
+			rmsWindowComboBox->setEnabled(true);
 			//rmsWindowComboBox->setVisible(false);
 			if (targetID == 1)
 			{
-				processor.setTargetForAutoTrim(processor.AverageRMS);				
+				//processor.setTargetForAutoTrim(CalibrationTarget::AverageRMS);
+				processor.getTargetTypeParam()->setValueNotifyingHost(CalibrationTarget::AverageRMS);
 			}
 			else
 			{
-				processor.setTargetForAutoTrim(processor.Peak);
+				//processor.setTargetForAutoTrim(CalibrationTarget::MaxRMS);
+				processor.getTargetTypeParam()->setValueNotifyingHost(CalibrationTarget::MaxRMS);
 			}
 		}
 	} else if (rmsWindowComboBox == comboBoxThatHasChanged)
@@ -300,16 +277,10 @@ void ZenAutoTrimAudioProcessorEditor::comboBoxChanged(ComboBox* comboBoxThatHasC
 
 void ZenAutoTrimAudioProcessorEditor::updateUIFromProcessor()
 {	
-		if (processor.getGainParam()->needsUIUpdate())
+		if (processor.getGainParam()->checkUIUpdateAndReset())
 		{
 			gainEditor->setText(String(processor.getGainParam()->getValueInDecibels(), 2), dontSendNotification);
-			//gainEditor->setTextWith2Precision<double>(processor.gainParam->getValueInDecibels());
-			processor.getGainParam()->setNeedsUIUpdate(false);
 		}
-
-		//Grabs instantaneous RMS of whichever process block most recently completed IGNORING WINDOW SIZE
-		//leftWindowRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getLeftCurrentRms())), dontSendNotification);
-		//rightWindowRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.levelAnalysisManager.getRightCurrentRms())), dontSendNotification);
 
 		//Window RMS now calculates proper full-length average RMS. Here just for informational purposes	
 		leftAvgRMSLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftCurrentRunningRms())), dontSendNotification);
@@ -323,13 +294,48 @@ void ZenAutoTrimAudioProcessorEditor::updateUIFromProcessor()
 		leftPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getLeftPeak())), dontSendNotification);
 		rightPeakLabel->setText(convertTo2PrecisionString(Decibels::gainToDecibels(processor.getLevelAnalysisManager().getRightPeak())), dontSendNotification);
 
-		if (processor.getTargetParam()->getNeedsUIUpdate())
+		if (processor.getTargetParam()->checkUIUpdateAndReset())
 		{
-			targetEditor->setText(String(processor.params->getDecibelParameter(processor.targetGainParam)->getValueInDecibels()));
-			//String temp = String(processor.params->getDecibelParameter(processor.targetGainParam)->getValueInDecibels());
-			processor.getTargetParam()->setNeedsUIUpdate(false);
+			targetEditor->setText(String(processor.params->getDecibelParameter(processor.targetGainParamID)->getValueInDecibels()), dontSendNotification);			
+		}
+
+		if (processor.getTargetTypeParam()->checkUIUpdateAndReset())
+		{
+			targetComboBox->setSelectedId(processor.getTargetTypeParam()->getValueAsInt(), dontSendNotification);
+		}
+
+		if (processor.getRMSWindowTimeParam()->checkUIUpdateAndReset())
+		{
+			int timeInMSValue = processor.getRMSWindowTimeParam()->getValueAsInt();
+			CalibrationTimeInMS timeInMS = getCalibrationTimeFromMS(timeInMSValue);
+			rmsWindowComboBox->setSelectedId(timeInMS, dontSendNotification);
 		}
 	
+}
+
+CalibrationTimeInMS ZenAutoTrimAudioProcessorEditor::getCalibrationTimeFromMS(int inMS)
+{
+	CalibrationTimeInMS timeInMS;
+	switch (inMS)
+	{
+	case 10:
+		timeInMS = time10ms;
+		break;
+	case 300:
+		timeInMS = time300ms;
+		break;
+	case 1000:
+		timeInMS = time1000ms;
+		break;
+	case 5000:
+		timeInMS = time5000ms;
+		break;
+	default:
+		timeInMS = time300ms;
+		jassertfalse;
+	}
+
+	return timeInMS;
 }
 
 void ZenAutoTrimAudioProcessorEditor::timerCallback()

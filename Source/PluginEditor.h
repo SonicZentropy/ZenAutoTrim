@@ -26,7 +26,7 @@
 #include "GUI/ZenLookAndFeel.h"
 
 
-using drow::SegmentedMeter;
+//using drow::SegmentedMeter;
 
 class ZenAutoTrimAudioProcessorEditor 
 	: public AudioProcessorEditor,
@@ -50,6 +50,7 @@ public:
 	void buttonClicked(Button*) override;
 	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
 	void updateUIFromProcessor();
+	CalibrationTimeInMS getCalibrationTimeFromMS(int inMS);
 	void timerCallback() override;
 	
 	//ScopedPointer<SegmentedMeter> vuMeter;
@@ -59,27 +60,29 @@ private:
     ZenAutoTrimAudioProcessor& processor;
 	//ScopedPointer<OpenGLContext> openGLContext;
 	
-	ScopedPointer<TimeSliceThread> graphicalManager;
+	//ScopedPointer<TimeSliceThread> graphicalManager;
 	
 	ScopedPointer<ZenTitleBar> titleBar;
 	ScopedPointer<ZenLabelDisplay> gainEditor;
 	ScopedPointer<ZenLabelDisplay> leftAvgRMSLabel, rightAvgRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftMaxRMSLabel, rightMaxRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftPeakLabel, rightPeakLabel;
-	ScopedPointer<ZenLabelDisplay> leftWindowRMSLabel, rightWindowRMSLabel;
-	ScopedPointer<Label> maxBox, peakBox, avgBox, gainLabel, winBox;	
+	//ScopedPointer<ZenLabelDisplay> leftWindowRMSLabel, rightWindowRMSLabel;
+	ScopedPointer<Label> maxBox, peakBox, avgBox, gainLabel;	
 	
 	ScopedPointer<ZenDecibelTextEditor> targetEditor;
 	ScopedPointer<ZenImageButton> resetBtn, autoGainBtn;
 	ScopedPointer<ZenComboBox> targetComboBox, rmsWindowComboBox;
 	
 	ScopedPointer<ZenLookAndFeel> zenLookAndFeel;
+	ScopedPointer<Label> bypassOverlay;
 
-	ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> resetBtnAttachment;
-	ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> autoGainBtnAttachment;
-	ScopedPointer<ZenAudioProcessorValueTreeState::ComboBoxAttachment> targetComboBoxAttachment;
-	ScopedPointer<ZenAudioProcessorValueTreeState::ComboBoxAttachment> rmsWindowComboBoxAttachment;
+	TooltipWindow tooltipWindow;
 
+	//ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> resetBtnAttachment;
+	//ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> autoGainBtnAttachment;
+	//ScopedPointer<ZenAudioProcessorValueTreeState::ComboBoxAttachment> targetComboBoxAttachment;
+	//ScopedPointer<ZenAudioProcessorValueTreeState::ComboBoxAttachment> rmsWindowComboBoxAttachment;
 
 
 
