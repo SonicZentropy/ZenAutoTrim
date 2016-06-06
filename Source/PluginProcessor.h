@@ -17,7 +17,7 @@
 #define PLUGINPROCESSOR_H_INCLUDED
 
 #include "JuceHeader.h"
-#include "debug/ZenDebugEditor.h"
+//#include "debug/ZenDebugEditor.h"
 #include "parameters/ZenBoolParameter.h"
 #include "parameters/ZenIntParameter.h"
 #include "processing/RMSManager.h"
@@ -154,10 +154,10 @@ private:
 	//ZenTime rmsWindowTime;	
 	//CalibrationTarget targetForAutoTrim = Peak;
 
+	//ZenDebugEditor* debugWindow;
 	double prevSampleRate = 44100;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenAutoTrimAudioProcessor)
-		ZenDebugEditor* debugWindow;
 };
 
 

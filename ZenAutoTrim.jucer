@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="V5KOvs" name="ZenAutoTrim" projectType="audioplug" version="1.0.0"
+<JUCERPROJECT id="V5KOvs" name="ZenAutoTrim" projectType="audioplug" version="0.1.1"
               bundleIdentifier="com.zentropy.ZenAutoTrim" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="0" buildRTAS="0" buildAAX="0"
               pluginName="ZenAutoTrim" pluginDesc="Automatically calculates proper gain staging trim"
@@ -10,7 +10,7 @@
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="ZenAutoTrimAU"
               pluginRTASCategory="" aaxIdentifier="com.yourcompany.ZenTrim"
               pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="4.1.0"
-              companyWebsite="https://soundcloud.com/Zentropy" companyName="Zentropy"
+              companyWebsite="www.soniczentropy.com" companyName="SonicZentropy"
               companyEmail="SonicZentropy@gmail.com" userNotes="xcopy &quot;$(TargetPath)&quot; &quot;Z:\VSTs\Organized\Test\&quot;  /q /y"
               defines="ZEN_DEBUG">
   <MAINGROUP id="rkSyKN" name="ZenAutoTrim">
@@ -25,12 +25,6 @@
     <GROUP id="{EAD41354-CE9E-3D83-523D-F535CD5A63FA}" name="Source">
       <GROUP id="{7769BEF9-0311-9EAD-6ECE-151856BAE944}" name="zen_utils">
         <GROUP id="{5BA2F79F-371C-B00C-1919-5C518706A9A4}" name="components">
-          <GROUP id="{8B8B5F2D-C746-F394-239B-58D1E914B535}" name="notepadcomp">
-            <FILE id="HVz0Hh" name="NotepadComponent.cpp" compile="1" resource="0"
-                  file="Source/zen_utils/components/notepadcomp/NotepadComponent.cpp"/>
-            <FILE id="Y1Xgdy" name="NotepadComponent.h" compile="0" resource="0"
-                  file="Source/zen_utils/components/notepadcomp/NotepadComponent.h"/>
-          </GROUP>
           <FILE id="aDpZzV" name="ZenComboBox.cpp" compile="1" resource="0" file="Source/zen_utils/components/ZenComboBox.cpp"/>
           <FILE id="Ssy9ts" name="ZenComboBox.h" compile="0" resource="0" file="Source/zen_utils/components/ZenComboBox.h"/>
           <FILE id="eF3KWn" name="ZenComponentType.hpp" compile="0" resource="0"
@@ -60,38 +54,6 @@
           <FILE id="qa07fJ" name="ZenTextEditor.cpp" compile="1" resource="0"
                 file="Source/zen_utils/components/ZenTextEditor.cpp"/>
           <FILE id="IPugSu" name="ZenTextEditor.h" compile="0" resource="0" file="Source/zen_utils/components/ZenTextEditor.h"/>
-        </GROUP>
-        <GROUP id="{0CBFE2EE-461A-30CC-98DF-F2CF44551AEC}" name="debug">
-          <GROUP id="{64D236E2-B9B3-2FD0-BB59-6D79AD07F3F7}" name="GUI">
-            <FILE id="QcCdPp" name="buffer_visualiser.cpp" compile="1" resource="0"
-                  file="Source/zen_utils/debug/GUI/buffer_visualiser.cpp"/>
-            <FILE id="Fu19YY" name="buffer_visualiser.h" compile="0" resource="0"
-                  file="Source/zen_utils/debug/GUI/buffer_visualiser.h"/>
-            <FILE id="Fx3PEz" name="component_debugger.cpp" compile="1" resource="0"
-                  file="Source/zen_utils/debug/GUI/component_debugger.cpp"/>
-            <FILE id="kCYmSn" name="component_debugger.h" compile="0" resource="0"
-                  file="Source/zen_utils/debug/GUI/component_debugger.h"/>
-            <FILE id="M1PIpW" name="font_and_colour_designer.cpp" compile="1" resource="0"
-                  file="Source/zen_utils/debug/GUI/font_and_colour_designer.cpp"/>
-            <FILE id="ULmM9q" name="font_and_colour_designer.h" compile="0" resource="0"
-                  file="Source/zen_utils/debug/GUI/font_and_colour_designer.h"/>
-            <FILE id="oCEdq0" name="value_tree_editor.cpp" compile="1" resource="0"
-                  file="Source/zen_utils/debug/GUI/value_tree_editor.cpp"/>
-            <FILE id="tjxQA3" name="value_tree_editor.h" compile="0" resource="0"
-                  file="Source/zen_utils/debug/GUI/value_tree_editor.h"/>
-            <FILE id="QDzL78" name="ZenMidiVisualiserComponent.cpp" compile="1"
-                  resource="0" file="Source/zen_utils/debug/GUI/ZenMidiVisualiserComponent.cpp"/>
-            <FILE id="XiZeEZ" name="ZenMidiVisualiserComponent.h" compile="0" resource="0"
-                  file="Source/zen_utils/debug/GUI/ZenMidiVisualiserComponent.h"/>
-          </GROUP>
-          <FILE id="EpCSKt" name="ZenDebugEditor.cpp" compile="1" resource="0"
-                file="Source/zen_utils/debug/ZenDebugEditor.cpp"/>
-          <FILE id="X3DCT9" name="ZenDebugEditor.h" compile="0" resource="0"
-                file="Source/zen_utils/debug/ZenDebugEditor.h"/>
-          <FILE id="pORzdS" name="ZenDebugPrinter.cpp" compile="1" resource="0"
-                file="Source/zen_utils/debug/ZenDebugPrinter.cpp"/>
-          <FILE id="AAkJRx" name="ZenDebugPrinter.h" compile="0" resource="0"
-                file="Source/zen_utils/debug/ZenDebugPrinter.h"/>
         </GROUP>
         <GROUP id="{4BF21348-F4D9-AFD5-9B9F-C4E5A50C42D8}" name="GUI">
           <FILE id="kmZTt8" name="ZenBypassButton.cpp" compile="1" resource="0"
@@ -182,6 +144,9 @@
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="ZenAutoTrim" postbuildCommand="xcopy &quot;$(TargetPath)&quot; &quot;Z:\VSTs\Test\&quot;  /q /y"
                        binaryPath="" headerPath="..\..\Source\zen_utils;"/>
+        <CONFIGURATION name="DebugSOne" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="ZenAutoTrim" postbuildCommand="xcopy &quot;$(TargetPath)&quot; &quot;Z:\VSTs\Test\&quot;  /q /y"
+                       binaryPath="" headerPath="..\..\Source\zen_utils;"/>
         <CONFIGURATION name="DebugBit" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="ZenAutoTrim" postbuildCommand="xcopy &quot;$(TargetPath)&quot; &quot;Z:\VSTs\Test\&quot;  /q /y"
                        binaryPath="" headerPath="..\..\Source\zen_utils;"/>
@@ -192,36 +157,26 @@
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../JUCE/modules"/>
         <MODULEPATH id="juce_data_structures" path="../JUCE/modules"/>
         <MODULEPATH id="juce_events" path="../JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
-        <MODULEPATH id="dRowAudio" path="../JUCE/modules"/>
         <MODULEPATH id="juce_audio_plugin_client" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_opengl" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
       </MODULEPATHS>
     </VS2015>
   </EXPORTFORMATS>
   <MODULES>
-    <MODULE id="dRowAudio" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
-    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
-    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0"/>
-    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
-    <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_QUICKTIME="disabled" JUCE_PLUGINHOST_VST="enabled" JUCE_PLUGINHOST_VST3="enabled"
                JUCE_PLUGINHOST_AU="disabled" JUCE_WEB_BROWSER="disabled" DROWAUDIO_USE_FFTREAL="enabled"

@@ -18,12 +18,15 @@
 //==============================================================================
 ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 {
-	// #TODO: swap to audioprocessorvaluetreestate to save GUI component params by connecting
+	// #TODO: changing target doesn't re-calculate applied gain
+	// #TODO: default value showing up as -96 instead of -18/0
+	// #TODO: bitwig parameter text showing normalized instead of in db
+	// #TODO: changing target from avg rms to something else doesn't actually change anything
 	undoManager = new UndoManager();
 	params = new ZenAudioProcessorValueTreeState(*this, undoManager);
 	
 	gainParam = params->createAndAddDecibelParameter(gainParamID, "Gain", -96.0f, 18.0f, 0.0f);
-	targetGainParam = params->createAndAddDecibelParameter(targetGainParamID, "TargetGain", -96.0f, 18.0f, 0.0f);
+	targetGainParam = params->createAndAddDecibelParameter(targetGainParamID, "TargetGain", -96.0f, 18.0f, -18.0f);
 	autoGainEnableParam = params->createAndAddBoolParameter(autoGainEnableParamID, "AutoGain", false);
 	bypassParam = params->createAndAddBoolParameter(bypassParamID, "Bypass", false);
 	targetTypeParam = params->createAndAddIntParameter(targetTypeParamID, "Target Type", 0, CalibrationTarget::targetCount, CalibrationTarget::Peak);
@@ -32,12 +35,12 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	params->state = ValueTree("ZenAutoTrim");
 
 #ifdef JUCE_DEBUG
-	// #TODO: Change this to use Juce SharedResourcePointer - https://forum.juce.com/t/juce-singleton-implementation-confusion/17847/6
-	debugWindow = ZenDebugEditor::getInstance();
-	debugWindow->setSize(650, 400);
-	//Open in bottom right corner
-	debugWindow->setTopLeftPosition(1900 - debugWindow->getWidth(), 1040 - debugWindow->getHeight());
-	// #TODO: add JUCE REF COUNTED OBJECT to zen GUI
+	//// #TODO: Change this to use Juce SharedResourcePointer - https://forum.juce.com/t/juce-singleton-implementation-confusion/17847/6
+	//debugWindow = ZenDebugEditor::getInstance();
+	//debugWindow->setSize(650, 400);
+	////Open in bottom right corner
+	//debugWindow->setTopLeftPosition(1900 - debugWindow->getWidth(), 1040 - debugWindow->getHeight());
+	//// #TODO: add JUCE REF COUNTED OBJECT to zen GUI
 
 #ifdef JUCE_MSVC  //Visual Studio mem leak diagnostics settings 
 	_CrtSetDbgFlag(0); //Turn off VS memory dump output
@@ -51,7 +54,7 @@ ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
 	params = nullptr;
 	undoManager = nullptr;
 #ifdef JUCE_DEBUG
-	debugWindow->deleteInstance();
+	//debugWindow->deleteInstance();
 #endif
 }
 

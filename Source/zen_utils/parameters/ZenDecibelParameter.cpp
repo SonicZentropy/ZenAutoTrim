@@ -248,6 +248,11 @@ void ZenDecibelParameter::setMaxDecibels(const float inMaxDecibels)
 	range.end = inMaxDecibels;
 }
 
+void ZenDecibelParameter::setDefaultValue(float inDBValue)
+{
+	defaultValue = DecibelConversions::mapDecibelsToProperNormalizedValue(inDBValue, range.start, range.end, midValue);
+}
+
 float ZenDecibelParameter::getDefaultValue() const
 {
 	//return DecibelConversions::mapDecibelsToProperNormalizedValue(

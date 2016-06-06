@@ -119,7 +119,7 @@ public:
 	
 	void setMidValue(const float inMidValue) { midValue = inMidValue; }
 
-	void setDefaultValue(float inValue) override { defaultValue = inValue; }
+	void setDefaultValue(float inValue) override;
 
 	float getDefaultValue() const override;
 

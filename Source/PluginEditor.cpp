@@ -19,7 +19,8 @@
 ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p), textColour(Colours::lightgrey)
 {	
-	
+	// #TODO: ADD JUCE DETECT LEAKS TO MY ZEN_UTILS CLASSES
+
 	zenLookAndFeel = new ZenLookAndFeel();
 	LookAndFeel::setDefaultLookAndFeel(zenLookAndFeel);
 	setSize(222, 250);
@@ -152,7 +153,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	tooltipWindow.setMillisecondsBeforeTipAppears(2000);
 
 	startTimer(100);
-	ZEN_COMPONENT_DEBUG_ATTACH(this);
+	//ZEN_COMPONENT_DEBUG_ATTACH(this);
 
 	//openGLContext = new OpenGLContext();
 	//openGLContext->attachTo(*this);
@@ -187,7 +188,7 @@ ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 	bypassOverlay = nullptr;
 
 	//openGLContext->detach();
-	ZEN_COMPONENT_DEBUG_DETACH();
+	//ZEN_COMPONENT_DEBUG_DETACH();
 }
 
 
