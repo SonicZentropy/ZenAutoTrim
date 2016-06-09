@@ -18,10 +18,7 @@
 //==============================================================================
 ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 {
-	// #TODO: changing target doesn't re-calculate applied gain
-	// #TODO: default value showing up as -96 instead of -18/0
 	// #TODO: bitwig parameter text showing normalized instead of in db
-	// #TODO: changing target from avg rms to something else doesn't actually change anything
 	undoManager = new UndoManager();
 	params = new ZenAudioProcessorValueTreeState(*this, undoManager);
 	
@@ -132,9 +129,10 @@ void ZenAutoTrimAudioProcessor::getStateInformation(MemoryBlock& destData)
 /** Load plugin with settings from XML */
 void ZenAutoTrimAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-	DBG("In ZenTrimAudioProcessor::setStateInformation(data, sizeInBytes) ");
+	//DBG("In ZenTrimAudioProcessor::setStateInformation(data, sizeInBytes) ");
 	ValueTree tree = ValueTree::readFromData(data, sizeInBytes);
-	if (tree.isValid()) {
+	if (tree.isValid()) 
+	{
 		params->state = tree;
 	}
 }

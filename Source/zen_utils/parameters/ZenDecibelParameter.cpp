@@ -30,9 +30,12 @@ ZenDecibelParameter::ZenDecibelParameter(ZenAudioProcessorValueTreeState& owner,
 	float normalizedValue = DecibelConversions::mapDecibelsToProperNormalizedValue
 		(inDefaultValue, range.start, range.end, midValue);
 	//DBG("In ZenDecibelParam constructor of: " << paramID << " setting value to : " << normalizedValue);
-	setValue(normalizedValue);
+	defaultValue = normalizedValue;
+	ZenDecibelParameter::setValue(normalizedValue);
 	currentSmoothedValue = normalizedValue;
 	targetValue = normalizedValue;
+
+	//setValueInGainFromNormalised(value.load());
 }
 
 
@@ -44,21 +47,26 @@ ZenDecibelParameter::~ZenDecibelParameter()
 //Set from normalized invalue
 void ZenDecibelParameter::setValue(float inNormValue)
 {
-	//float newValue = DecibelConversions::mapProperNormalizedValueToDecibels(getClamped(inNormValue, 0.0f, 1.0f), range.start, range.end);
-	
-	
+	//float newValue = DecibelConversions::mapProperNormalizedValueToDecibels(getClamped(inNormValue, 0.0f, 1.0f), range.start, range.end);	
 	//DBG("In ZenDecibelParameter::setValue(inValue) of " << this->paramID  << " and storing: " << inNormValue);
+	//jassert(inNormValue >= 0 && inNormValue <= 1);
+	
+	if(inNormValue > 1 || inNormValue < 0)
+		DBG("In ZenDecibelParameter::setValue(inNormValue) and input value is not normalized properly");
+
 	if (inNormValue != value.load() || listenersNeedCalling)
 	{
 		value.store(inNormValue);
 	
-		// #BUG: This should use value.load or newValue rather than value
+		
 		listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, value.load());
 		listenersNeedCalling = false;
 
 		needsUpdate.set(1);
+		UIUpdate.store(true);
 		
 		if (shouldBeSmoothed) setTargetValue(inNormValue);
+		setValueInGainFromNormalised(inNormValue);
 	}
 }
 
@@ -80,7 +88,9 @@ void ZenDecibelParameter::setValueFromDecibels(float inDBValue)
 	listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, value.load());
 	listenersNeedCalling = false;
 	
+	setValueInGainFromNormalised(newNormalizedValue);
 	needsUpdate.set(1);
+	UIUpdate.store(true);
 }
 
 void ZenDecibelParameter::setValueFromGain(float inGainValue)
@@ -95,8 +105,9 @@ void ZenDecibelParameter::setValueFromGain(float inGainValue)
 	listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, value.load());
 	listenersNeedCalling = false;
 
+	setGainValue(inGainValue);
 	needsUpdate.set(1);
-	
+	UIUpdate.store(true);
 }
 
 void ZenDecibelParameter::setValueFromGainNotifyingHost(float inGainValue)
@@ -107,6 +118,7 @@ void ZenDecibelParameter::setValueFromGainNotifyingHost(float inGainValue)
 	//DBG("In ZenDecibelParameter::setValueFromGainNotifyingHost(inValue) of " << this->paramID << " with invalue: " << inGainValue << " and calling setValueNotifyingHost with value: " << newNormValue);
 	
 	setValueNotifyingHost(newNormValue);
+	setGainValue(inGainValue);
 
 }
 
@@ -122,12 +134,30 @@ void ZenDecibelParameter::setValueNotifyingHost(float inNormValue)
 
 	listeners.call(&ZenAudioProcessorValueTreeState::Listener::parameterChanged, paramID, clampedValue);
 	listenersNeedCalling = false;
+	setValueInGainFromNormalised(value.load());
 	needsUpdate.set(1);
+
 }
 
 void ZenDecibelParameter::setValueFromDecibelsNotifyingHost(float inDBValue)
 {
-	setValueNotifyingHost(DecibelConversions::mapDecibelsToProperNormalizedValue(inDBValue, range.start, range.end, midValue));
+	float normValue = DecibelConversions::mapDecibelsToProperNormalizedValue(
+		inDBValue, range.start, range.end, midValue);
+	setValueNotifyingHost(normValue);
+	setValueInGainFromNormalised(value.load());
+}
+
+void ZenDecibelParameter::setValueInGainFromNormalised(float inNormValue)
+{
+	float result = DecibelConversions::mapProperNormalizedValueToRawDecibelGain(inNormValue, range.start, range.end, midValue);
+	//DBG("In ZenDecibelParameter::getValueInGain() returning: " << result);
+	valueInGain.store(result);
+	UIUpdate.store(true);
+}
+
+void ZenDecibelParameter::setGainValue(float inGainValue)
+{
+	valueInGain.store(inGainValue);
 }
 
 float ZenDecibelParameter::getValue()
@@ -170,38 +200,39 @@ float ZenDecibelParameter::getValueInDecibels() const
 
 float ZenDecibelParameter::getValueInGain()
 {
-	// #TODO: get rid of this
 	float valConvert;
 	if (shouldBeSmoothed)
 	{
 		valConvert = getNextSmoothedValue();
+		return DecibelConversions::mapProperNormalizedValueToRawDecibelGain(valConvert, range.start, range.end, midValue);
 	}
 	else
 	{
-		valConvert = value.load();
-	}
-
-	float result = DecibelConversions::mapProperNormalizedValueToRawDecibelGain(valConvert, range.start, range.end, midValue);
-	
-	//if (result != 0) DBG("In ZenDecibelParameter::getValueInGain() of " << this->paramID << "returning result: " << result);
-	
-	return result;
-	
+		return valueInGain.load();
+	}	
+	//float oldresult = DecibelConversions::mapProperNormalizedValueToRawDecibelGain(value.load(), range.start, range.end, midValue);
+	//DBG("*In ZenDecibelParameter::getValueInGain() of " << this->paramID << "with oldresult: " << oldresult << " and new: " << result);			
+	//return result;	
 }
 
 float ZenDecibelParameter::getValueInGain() const
 {
-	//////DBG("In ZenDecibelParameter::getValueInGain() of " << this->paramID << "with value: " << value.load() << " and returning: " << DecibelConversions::decibelsTo////DBGain<float>(value.load(), -96.0f));
-	//////DBG("In const gain");
+	jassertfalse;
+	DBG("****In ZenDecibelParameter::getValueInGain() of " << this->paramID << "with value: " << value.load() << " and returning: " << DecibelConversions::decibelsToDBGain<float>(value.load(), -96.0f));
+	DBG("***Testing gain var: " << valueInGain.load());
 	float result = DecibelConversions::mapProperNormalizedValueToRawDecibelGain(value.load(), range.start, range.end, midValue);
-	//DBG("In ZenDecibelParameter::getValueInGain() returning: " << result);
 	return result;
 }
+
+// void ZenDecibelParameter::setValueInGainFromDB(float inDBValue)
+// {
+// 	valueInGain.store(DecibelConversions::)
+// }
 
 //Returns NORMALIZED float value for input DECIBEL text value
 float ZenDecibelParameter::getValueForText(const String& text) const
 {
-	////DBG("In ZenDecibelParameter::getValueForText(text)of " << this->paramID << " with input text: " << text);
+	DBG("In ZenDecibelParameter::getValueForText(text)of " << this->paramID << " with input text: " << text);
 	//return range.convertTo0to1(	text.getFloatValue());
 	if (textToValueFunction != nullptr)
 		return textToValueFunction(text);
@@ -210,7 +241,7 @@ float ZenDecibelParameter::getValueForText(const String& text) const
 		//return text.getFloatValue();
 		float result = DecibelConversions::mapDecibelsToProperNormalizedValue(
 			text.getFloatValue(), range.start, range.end, midValue);
-		//DBG("In ZenDecibelParameter::getValueForText(text) returning: " << result);
+		DBG("In ZenDecibelParameter::getValueForText(text) returning: " << result);
 		return result;
 	}
 }
@@ -275,14 +306,14 @@ void ZenDecibelParameter::setNewState(const ValueTree& v)
 void ZenDecibelParameter::updateFromValueTree()
 {
 	float updateVal = state.getProperty(owner.valuePropertyID, defaultValue);
-	////DBG("In updateFromValueTree of " << this->paramID << " setting from state to: " << updateVal);
+	DBG("In updateFromValueTree of " << this->paramID << " setting from state to: " << updateVal);
 	setValue(state.getProperty(owner.valuePropertyID, defaultValue));
 	//setUnnormalisedValue(state.getProperty(owner.valuePropertyID, defaultValue));
 }
 
 void ZenDecibelParameter::copyValueToValueTree()
 {
-	////DBG("In copyValueToValueTree of " << this->paramID << " setting property to: " << value.load());
+	//DBG("In copyValueToValueTree of " << this->paramID << " setting property to: " << getValue());
 	if (state.isValid())
 		state.setProperty(owner.valuePropertyID, getValue(), owner.undoManager);
 }
@@ -304,6 +335,8 @@ void ZenDecibelParameter::setUnnormalisedValue(float newUnnormalisedValue)
 		setValueNotifyingHost(newValue);
 	}
 }
+
+
 
 //==============================================================================
 //==============================================================================

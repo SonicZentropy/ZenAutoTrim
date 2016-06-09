@@ -150,9 +150,16 @@ public:
 
 	void setUnnormalisedValue(float newUnnormalisedValue);
 
+	//separate value entirely for gain b/c we need it in process block
+	void setValueInGainFromNormalised(float inNormValue);
+	void setGainValue(float inGainValue);
+	//void setValueInGainFromDB(float inDBValue);
+	
+
 protected:
 	
 	//NormalisableRange<float> range;
+	AtomicFloat valueInGain;
 	
 	float unityDecibels;
 	

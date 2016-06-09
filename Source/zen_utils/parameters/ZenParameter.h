@@ -114,12 +114,14 @@ public:
 	void setNeedsUIUpdate(bool inNeedsUpdate) noexcept
 	{
 		//needsUpdate.store(needsUpdate);
-		needsUpdate.set(inNeedsUpdate);
+		//needsUpdate.set(inNeedsUpdate);
+		UIUpdate.store(inNeedsUpdate);
 	}
 
 	bool getNeedsUIUpdate() const noexcept
 	{
-		return needsUpdate.get() == 1;
+		//return needsUpdate.get() == 1;
+		return UIUpdate.load();
 	}
 
 	bool needsUIUpdate() const noexcept
@@ -202,7 +204,7 @@ public:
 
 protected:
 	AtomicFloat value;
-	//AtomicBool UIUpdate;
+	AtomicBool UIUpdate;
 	unsigned int precision = 2;
 	String unitLabel = "", description = "";
 	ScopedPointer<ValueTree> paramValueTree;

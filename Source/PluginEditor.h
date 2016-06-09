@@ -63,7 +63,7 @@ private:
 	//ScopedPointer<TimeSliceThread> graphicalManager;
 	
 	ScopedPointer<ZenTitleBar> titleBar;
-	ScopedPointer<ZenLabelDisplay> gainEditor;
+	ScopedPointer<ZenLabelDisplay> calcGainDisplay;
 	ScopedPointer<ZenLabelDisplay> leftAvgRMSLabel, rightAvgRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftMaxRMSLabel, rightMaxRMSLabel;
 	ScopedPointer<ZenLabelDisplay> leftPeakLabel, rightPeakLabel;
