@@ -33,8 +33,8 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	
 	addAndMakeVisible(titleBar = new ZenTitleBar("Zen Title Bar", this));
 	titleBar->setBounds(0, 0, getWidth(), 30);
-	bypassBtnAttachment = new ZenAudioProcessorValueTreeState::ButtonAttachment(processor.getState(), processor.bypassParamID, *(titleBar->getBypassBtn()));
-	titleBar->addBypassListener(this);
+	enableBtnAttachment = new ZenAudioProcessorValueTreeState::ButtonAttachment(processor.getState(), processor.enableParamID, *(titleBar->getEnableBtn()));
+	titleBar->addEnableListener(this);
 
 	//https://www.reddit.com/r/cpp_questions/comments/4kisug/lambdastdfunction_this_access_confusion/
 	auto MakeGetTextParserLambda = [] (ZenLabelDisplay* labelRef)
@@ -149,18 +149,18 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	targetEditor->setTooltip("Decibel value to gain stage the incoming signal toward.");
 	targetEditor->addListener(this);
 		
-	addChildComponent(bypassOverlay = new Label("Bypass Overlay", String()));
-	bypassOverlay->setEditable(false, false, false);
-	bypassOverlay->setColour(Label::backgroundColourId, Colour(0xCC202020));
-	bypassOverlay->setBounds(0, 31, 222, 220);
-	bypassOverlay->setVisible(!processor.isEnabled());
+	addChildComponent(enableOverlay = new Label("Enable Overlay", String()));
+	enableOverlay->setEditable(false, false, false);
+	enableOverlay->setColour(Label::backgroundColourId, Colour(0xCC202020));
+	enableOverlay->setBounds(0, 31, 222, 220);
+	enableOverlay->setVisible(!processor.isEnabled());
 
 	tooltipWindow.setMillisecondsBeforeTipAppears(2000);
 
 	
 
 	startTimer(100);
-	//ZEN_COMPONENT_DEBUG_ATTACH(this);
+	ZEN_COMPONENT_DEBUG_ATTACH(this);
 
 	//openGLContext = new OpenGLContext();
 	//openGLContext->attachTo(*this);
@@ -168,7 +168,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 
 ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 {
-	bypassBtnAttachment = nullptr;
+	enableBtnAttachment = nullptr;
 	autoGainBtnAttachment = nullptr;
 
 	titleBar = nullptr;
@@ -196,7 +196,7 @@ ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 	rmsWindowComboBox = nullptr;
 
 	zenLookAndFeel = nullptr;
-	bypassOverlay = nullptr;
+	enableOverlay = nullptr;
 
 	//openGLContext->detach();
 	//ZEN_COMPONENT_DEBUG_DETACH();
@@ -255,11 +255,11 @@ void ZenAutoTrimAudioProcessorEditor::buttonClicked(Button* pressedBtn)
 	//{
 	//	processor.getAutoGainEnableParam()->toggleValue();
 	//}
-	else if (pressedBtn == titleBar->getBypassBtn())
+	else if (pressedBtn == titleBar->getEnableBtn())
 	{
-		//invert toggle state, since processor param is "Bypassed"
-		//processor.getBypassParam()->setValueFromBool(!pressedBtn->getToggleState());
-		bypassOverlay->setVisible(!pressedBtn->getToggleState());
+		//invert toggle state, since processor param is "Enabled"
+		//processor.getEnableParam()->setValueFromBool(!pressedBtn->getToggleState());
+		enableOverlay->setVisible(!pressedBtn->getToggleState());
 	}
 }
 

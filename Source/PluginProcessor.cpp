@@ -27,7 +27,7 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	gainParam = params->createAndAddDecibelParameter(gainParamID, "Gain", -96.0f, 18.0f, 0.0f);
 	gainParam->setIsAutomatable(false);
 	autoGainEnableParam = params->createAndAddBoolParameter(autoGainEnableParamID, "AutoGain", false);
-	bypassParam = params->createAndAddBoolParameter(bypassParamID, "Bypass", false);
+	enableParam = params->createAndAddBoolParameter(enableParamID, "Enable", false);
 	targetTypeParam = params->createAndAddIntParameter(targetTypeParamID, "Target Type", 0, CalibrationTarget::targetCount, CalibrationTarget::Peak);
 	rmsWindowTimeParam = params->createAndAddIntParameter(rmsWindowTimeParamID, "RMS Window Time", 10, 5000, CalibrationTimeInMS::time300ms);
 
@@ -36,12 +36,13 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	params->state = ValueTree("ZenAutoTrim");
 	
 #ifdef JUCE_DEBUG
-	//// #TODO: Change this to use Juce SharedResourcePointer - https://forum.juce.com/t/juce-singleton-implementation-confusion/17847/6
-	//debugWindow = ZenDebugEditor::getInstance();
-	//debugWindow->setSize(650, 400);
-	////Open in bottom right corner
-	//debugWindow->setTopLeftPosition(1900 - debugWindow->getWidth(), 1040 - debugWindow->getHeight());
-	//// #TODO: add JUCE REF COUNTED OBJECT to zen GUI
+	// #TODO: Change this to use Juce SharedResourcePointer - https://forum.juce.com/t/juce-singleton-implementation-confusion/17847/6
+	debugWindow = ZenDebugEditor::getInstance();
+	debugWindow->setSource(params->state);
+	debugWindow->setSize(650, 400);
+	//Open in bottom right corner
+	debugWindow->setTopLeftPosition(1900 - debugWindow->getWidth(), 1040 - debugWindow->getHeight());
+	// #TODO: add JUCE REF COUNTED OBJECT to zen GUI
 
 #ifdef JUCE_MSVC  //Visual Studio mem leak diagnostics settings 
 	_CrtSetDbgFlag(0); //Turn off VS memory dump output
@@ -55,7 +56,7 @@ ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
 	params = nullptr;
 	undoManager = nullptr;
 #ifdef JUCE_DEBUG
-	//debugWindow->deleteInstance();
+	debugWindow->deleteInstance();
 #endif
 }
 
@@ -65,6 +66,7 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 	currentSampleRate = getSampleRate();
 	if (isEnabled())
 	{
+		debugWindow->addOrSetTraceLabel("Enabled", "On");
 		//just flush denormals
 		ZenScopedNoDenormal csr;
 		const int totalNumInputChannels = getTotalNumInputChannels();
@@ -89,9 +91,21 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 		}
 
 		//don't process if all samples are 0 or if autogain button is off
-		if (buffer.getMagnitude(0, buffer.getNumSamples()) > ZEN_ABOVE_ZERO && autoGainEnableParam->isOn())
+		if (buffer.getMagnitude(0, buffer.getNumSamples()) > ZEN_ABOVE_ZERO )
 		{
-			levelAnalysisManager.processSamples(&buffer, posInfo);
+			debugWindow->addOrSetTraceLabel("BufferMagnitude", "Not Zero");
+			if (autoGainEnableParam->isOn())
+			{
+				levelAnalysisManager.processSamples(&buffer, posInfo);
+				debugWindow->addOrSetTraceLabel("AutoGainEnable", "On");
+			} else
+			{
+				debugWindow->addOrSetTraceLabel("AutoGainEnable", "Off");
+			}
+		}
+		else
+		{
+			debugWindow->addOrSetTraceLabel("BufferMagnitude", "Zero");
 		}
 
 
@@ -135,6 +149,9 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 			buffer.applyGain(gainParam->getValueInGain());
 			
 		}
+	} else // enable param off
+	{
+		debugWindow->addOrSetTraceLabel("Enabled", "Off");
 	}
 }
 

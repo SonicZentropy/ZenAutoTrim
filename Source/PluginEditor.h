@@ -76,11 +76,11 @@ private:
 	ScopedPointer<ZenComboBox> targetComboBox, rmsWindowComboBox;
 	
 	ScopedPointer<ZenLookAndFeel> zenLookAndFeel;
-	ScopedPointer<Label> bypassOverlay;
+	ScopedPointer<Label> enableOverlay;
 
 	TooltipWindow tooltipWindow;
 
-	ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> bypassBtnAttachment;
+	ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> enableBtnAttachment;
 	ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> autoGainBtnAttachment;
 	//ScopedPointer<ZenAudioProcessorValueTreeState::ComboBoxAttachment> targetComboBoxAttachment;
 	//ScopedPointer<ZenAudioProcessorValueTreeState::ComboBoxAttachment> rmsWindowComboBoxAttachment;
@@ -90,7 +90,7 @@ private:
 	Colour textColour;
 
 	//ScopedPointer<ImageCache> imageCache;
-	Image backgroundImg, bypassImg;
+	Image backgroundImg, enableImg;
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenAutoTrimAudioProcessorEditor)
 };

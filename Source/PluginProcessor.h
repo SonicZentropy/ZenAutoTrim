@@ -22,6 +22,8 @@
 #include "parameters/ZenIntParameter.h"
 #include "processing/RMSManager.h"
 #include "state/ZenAudioProcessorValueTreeState.h"
+#include "debug/ZenDebugEditor.h"
+
 // #include "utilities/ZenConstants.h"
 // #include "utilities/ZenTime.h"
 
@@ -116,17 +118,17 @@ public:
 		rmsWindowTimeParam->setValue((int)timeInMS);
 	}
 
-	bool isBypassed() { return bypassParam->isOn(); }
+	bool isEnabled() { return enableParam->isOn(); }
 
-	bool isEnabled() { return bypassParam->isOff(); }
+	bool isBypassed() { return enableParam->isOff(); }
 
-	void setEnabled(bool shouldBeEnabled) { bypassParam->setValueFromBool(shouldBeEnabled); }
+	void setEnabled(bool shouldBeEnabled) { enableParam->setValueFromBool(shouldBeEnabled); }
 
 	LevelAnalysisManager& getLevelAnalysisManager() { return levelAnalysisManager; }	
 	ZenDecibelParameter* getGainParam() { return gainParam; }
 	ZenDecibelParameter* getTargetParam() { return targetGainParam; }
 	ZenBoolParameter* getAutoGainEnableParam() { return autoGainEnableParam; }
-	ZenBoolParameter* getBypassParam() { return bypassParam; }
+	ZenBoolParameter* getEnableParam() { return enableParam; }
 	ZenIntParameter* getTargetTypeParam() { return targetTypeParam; }
 	ZenIntParameter* getRMSWindowTimeParam() { return rmsWindowTimeParam; }
 	ZenAudioProcessorValueTreeState& getState() const { return *params; }
@@ -139,7 +141,7 @@ public:
 	const String gainParamID = "gainParam";
 	const String targetGainParamID = "targetGainParam";
 	const String autoGainEnableParamID = "autoGainParam";
-	const String bypassParamID = "bypassParam";
+	const String enableParamID = "enableParam";
 	const String targetTypeParamID = "targetTypeParam";
 	const String rmsWindowTimeParamID = "rmsWindowTimeParam";
 
@@ -148,7 +150,7 @@ private:
 	ZenDecibelParameter* gainParam; 
 	ZenDecibelParameter* targetGainParam;
 	ZenBoolParameter* autoGainEnableParam;
-	ZenBoolParameter* bypassParam;
+	ZenBoolParameter* enableParam;
 	ZenIntParameter*  targetTypeParam;
 	ZenIntParameter*  rmsWindowTimeParam;
 	
@@ -159,7 +161,7 @@ private:
 	//ZenTime rmsWindowTime;	
 	//CalibrationTarget targetForAutoTrim = Peak;
 
-	//ZenDebugEditor* debugWindow;
+	ZenDebugEditor* debugWindow;
 	uint32 prevSampleRate;
 	uint32 currentSampleRate;
     //==============================================================================

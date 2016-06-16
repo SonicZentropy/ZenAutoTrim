@@ -25,6 +25,12 @@
     <GROUP id="{EAD41354-CE9E-3D83-523D-F535CD5A63FA}" name="Source">
       <GROUP id="{7769BEF9-0311-9EAD-6ECE-151856BAE944}" name="zen_utils">
         <GROUP id="{5BA2F79F-371C-B00C-1919-5C518706A9A4}" name="components">
+          <GROUP id="{F466B4EB-8371-222E-77DE-9176282636ED}" name="notepadcomp">
+            <FILE id="PYLyf9" name="NotepadComponent.cpp" compile="1" resource="0"
+                  file="Source/zen_utils/components/notepadcomp/NotepadComponent.cpp"/>
+            <FILE id="tpIrel" name="NotepadComponent.h" compile="0" resource="0"
+                  file="Source/zen_utils/components/notepadcomp/NotepadComponent.h"/>
+          </GROUP>
           <FILE id="aDpZzV" name="ZenComboBox.cpp" compile="1" resource="0" file="Source/zen_utils/components/ZenComboBox.cpp"/>
           <FILE id="Ssy9ts" name="ZenComboBox.h" compile="0" resource="0" file="Source/zen_utils/components/ZenComboBox.h"/>
           <FILE id="eF3KWn" name="ZenComponentType.hpp" compile="0" resource="0"
@@ -54,6 +60,38 @@
           <FILE id="qa07fJ" name="ZenTextEditor.cpp" compile="1" resource="0"
                 file="Source/zen_utils/components/ZenTextEditor.cpp"/>
           <FILE id="IPugSu" name="ZenTextEditor.h" compile="0" resource="0" file="Source/zen_utils/components/ZenTextEditor.h"/>
+        </GROUP>
+        <GROUP id="{BAE52728-AF8F-9A63-ACB4-427193658B17}" name="debug">
+          <GROUP id="{086000AE-A283-E9BC-4474-7A10AF9EBBA4}" name="GUI">
+            <FILE id="dtmUe4" name="buffer_visualiser.cpp" compile="1" resource="0"
+                  file="Source/zen_utils/debug/GUI/buffer_visualiser.cpp"/>
+            <FILE id="asAZbR" name="buffer_visualiser.h" compile="0" resource="0"
+                  file="Source/zen_utils/debug/GUI/buffer_visualiser.h"/>
+            <FILE id="o8JSlq" name="component_debugger.cpp" compile="1" resource="0"
+                  file="Source/zen_utils/debug/GUI/component_debugger.cpp"/>
+            <FILE id="eMcZcK" name="component_debugger.h" compile="0" resource="0"
+                  file="Source/zen_utils/debug/GUI/component_debugger.h"/>
+            <FILE id="gjRVq0" name="font_and_colour_designer.cpp" compile="1" resource="0"
+                  file="Source/zen_utils/debug/GUI/font_and_colour_designer.cpp"/>
+            <FILE id="pp1fq5" name="font_and_colour_designer.h" compile="0" resource="0"
+                  file="Source/zen_utils/debug/GUI/font_and_colour_designer.h"/>
+            <FILE id="Zyh15b" name="value_tree_editor.cpp" compile="1" resource="0"
+                  file="Source/zen_utils/debug/GUI/value_tree_editor.cpp"/>
+            <FILE id="zTopG3" name="value_tree_editor.h" compile="0" resource="0"
+                  file="Source/zen_utils/debug/GUI/value_tree_editor.h"/>
+            <FILE id="V6KNYG" name="ZenMidiVisualiserComponent.cpp" compile="1"
+                  resource="0" file="Source/zen_utils/debug/GUI/ZenMidiVisualiserComponent.cpp"/>
+            <FILE id="lVDsLe" name="ZenMidiVisualiserComponent.h" compile="0" resource="0"
+                  file="Source/zen_utils/debug/GUI/ZenMidiVisualiserComponent.h"/>
+          </GROUP>
+          <FILE id="sdLu6G" name="ZenDebugEditor.cpp" compile="1" resource="0"
+                file="Source/zen_utils/debug/ZenDebugEditor.cpp"/>
+          <FILE id="hWhYUn" name="ZenDebugEditor.h" compile="0" resource="0"
+                file="Source/zen_utils/debug/ZenDebugEditor.h"/>
+          <FILE id="HZNLaO" name="ZenDebugPrinter.cpp" compile="1" resource="0"
+                file="Source/zen_utils/debug/ZenDebugPrinter.cpp"/>
+          <FILE id="HCTqeN" name="ZenDebugPrinter.h" compile="0" resource="0"
+                file="Source/zen_utils/debug/ZenDebugPrinter.h"/>
         </GROUP>
         <GROUP id="{4BF21348-F4D9-AFD5-9B9F-C4E5A50C42D8}" name="GUI">
           <FILE id="kmZTt8" name="ZenBypassButton.cpp" compile="1" resource="0"
@@ -166,13 +204,19 @@
         <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../JUCE/modules"/>
       </MODULEPATHS>
     </VS2015>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="0"/>
