@@ -45,7 +45,8 @@ public:
     void resized() override;
 
 	void textEditorReturnKeyPressed(TextEditor& editorChanged) override;
-	//void textEditorFocusLost(TextEditor& editorChanged) override;
+	void textEditorFocusLost(TextEditor& editorChanged) override;
+	void textEditorEscapeKeyPressed(TextEditor& editorChanged)override;
 	void textEditorUpdateDueToChange(TextEditor& editorChanged);
 	void buttonClicked(Button*) override;
 	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
@@ -79,8 +80,8 @@ private:
 
 	TooltipWindow tooltipWindow;
 
-	//ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> resetBtnAttachment;
-	//ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> autoGainBtnAttachment;
+	ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> bypassBtnAttachment;
+	ScopedPointer<ZenAudioProcessorValueTreeState::ButtonAttachment> autoGainBtnAttachment;
 	//ScopedPointer<ZenAudioProcessorValueTreeState::ComboBoxAttachment> targetComboBoxAttachment;
 	//ScopedPointer<ZenAudioProcessorValueTreeState::ComboBoxAttachment> rmsWindowComboBoxAttachment;
 

@@ -14,6 +14,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "utilities/ZenDenormals.hpp"
 
 //==============================================================================
 ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
@@ -21,16 +22,19 @@ ZenAutoTrimAudioProcessor::ZenAutoTrimAudioProcessor()
 	// #TODO: bitwig parameter text showing normalized instead of in db
 	undoManager = new UndoManager();
 	params = new ZenAudioProcessorValueTreeState(*this, undoManager);
-	
-	gainParam = params->createAndAddDecibelParameter(gainParamID, "Gain", -96.0f, 18.0f, 0.0f);
+
 	targetGainParam = params->createAndAddDecibelParameter(targetGainParamID, "TargetGain", -96.0f, 18.0f, -18.0f);
+	gainParam = params->createAndAddDecibelParameter(gainParamID, "Gain", -96.0f, 18.0f, 0.0f);
+	gainParam->setIsAutomatable(false);
 	autoGainEnableParam = params->createAndAddBoolParameter(autoGainEnableParamID, "AutoGain", false);
 	bypassParam = params->createAndAddBoolParameter(bypassParamID, "Bypass", false);
 	targetTypeParam = params->createAndAddIntParameter(targetTypeParamID, "Target Type", 0, CalibrationTarget::targetCount, CalibrationTarget::Peak);
 	rmsWindowTimeParam = params->createAndAddIntParameter(rmsWindowTimeParamID, "RMS Window Time", 10, 5000, CalibrationTimeInMS::time300ms);
 
+	//Just give default value, this is updated in process block before any processing occurs
+	currentSampleRate = prevSampleRate = 44100;  
 	params->state = ValueTree("ZenAutoTrim");
-
+	
 #ifdef JUCE_DEBUG
 	//// #TODO: Change this to use Juce SharedResourcePointer - https://forum.juce.com/t/juce-singleton-implementation-confusion/17847/6
 	//debugWindow = ZenDebugEditor::getInstance();
@@ -57,62 +61,80 @@ ZenAutoTrimAudioProcessor::~ZenAutoTrimAudioProcessor()
 
 void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
+	prevSampleRate = currentSampleRate;
+	currentSampleRate = getSampleRate();
 	if (isEnabled())
 	{
+		//just flush denormals
+		ZenScopedNoDenormal csr;
+		const int totalNumInputChannels = getTotalNumInputChannels();
+		const int totalNumOutputChannels = getTotalNumOutputChannels();
+
+		// This code clears any output channels that didn't contain input data
+		for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+			buffer.clear(i, 0, buffer.getNumSamples());
+
 		aPlayHead = getPlayHead();
 		AudioPlayHead::CurrentPositionInfo posInfo;
 		aPlayHead->getCurrentPosition(posInfo);
-		
+
 		//float* leftData = buffer.getWritePointer(0); //leftData references left channel now
 		//float* rightData = buffer.getWritePointer(1); //right data references right channel now
 		//unsigned int numSamples = buffer.getNumSamples();
 
-		if (prevSampleRate != this->getSampleRate())
+		if (prevSampleRate != getSampleRate())
 		{
-			prevSampleRate = this->getSampleRate();
+			prevSampleRate = getSampleRate();
 			levelAnalysisManager.sampleRateChanged(prevSampleRate);
 		}
 
 		//don't process if all samples are 0 or if autogain button is off
-		if (buffer.getMagnitude(0, buffer.getNumSamples()) > 0.0f && autoGainEnableParam->isOn())
+		if (buffer.getMagnitude(0, buffer.getNumSamples()) > ZEN_ABOVE_ZERO && autoGainEnableParam->isOn())
+		{
 			levelAnalysisManager.processSamples(&buffer, posInfo);
+		}
 
-		
-			// Calibrate gain param based on which value is target
-			double peakToHit;
-			int targetType = targetTypeParam->getValueAsInt();
-			if (targetType == Peak)
-			{
-				peakToHit = levelAnalysisManager.getMaxChannelPeak();
-			}
-			else if (targetType == MaxRMS)
-			{
-				peakToHit = levelAnalysisManager.getMaxChannelRMS();
-			}
-			else if (targetType == AverageRMS)
-			{
-				peakToHit = levelAnalysisManager.getMaxCurrentRunningRMS();
-			}
-			else
-			{
-				peakToHit = levelAnalysisManager.getMaxChannelPeak();
-				jassertfalse;
-			}
 
-			//double targParamGain = params->getDecibelParameter(targetGainParamID)->getValueInGain();
-			
+		// Calibrate gain param based on which value is target
+		double peakToHit;
+		int targetType = targetTypeParam->getValueAsInt();
+		if (targetType == Peak)
+		{
+			peakToHit = levelAnalysisManager.getMaxChannelPeak();
+		}
+		else if (targetType == MaxRMS)
+		{
+			peakToHit = levelAnalysisManager.getMaxChannelRMS();
+		}
+		else if (targetType == AverageRMS)
+		{
+			peakToHit = levelAnalysisManager.getMaxCurrentRunningRMS();
+		}
+		else
+		{
+			peakToHit = levelAnalysisManager.getMaxChannelPeak();
+			jassertfalse;
+		}
 
-			//division in log equiv to subtract in base
-			double gainValueToAdd = targetGainParam->getValueInGain() / peakToHit;
+		//double targParamGain = params->getDecibelParameter(targetGainParamID)->getValueInGain();
 
-			if (!almostEqual(gainValueToAdd, gainParam->getValueInGain())) // gain value changed
-			{
-				gainParam->setValueFromGain(gainValueToAdd);
-				//gainParam->setNeedsUIUpdate(true); // removed because done in setValueFromGain
-			}
 
+		//division in log equiv to subtract in base
+		double gainValueToAdd = targetGainParam->getValueInGain() / peakToHit;
+
+		if (!almostEqual(gainValueToAdd, gainParam->getValueInGain())) // gain value changed
+		{
+			gainParam->setValueFromGain(gainValueToAdd);
+			//gainParam->setNeedsUIUpdate(true); // removed because done in setValueFromGain
+		}
+
+		// Make sure we don't apply any gain until we've collected enough samples to do it accurately.
+		if (levelAnalysisManager.getTotalSamplesProcessed() > currentSampleRate)
+		{
 			//in gain, multiply in log equivalent to add in base
-			buffer.applyGain(gainParam->getValueInGain());		
+			buffer.applyGain(gainParam->getValueInGain());
+			
+		}
 	}
 }
 
@@ -121,7 +143,7 @@ void ZenAutoTrimAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuff
 /** Copy current plugin state to XML */
 void ZenAutoTrimAudioProcessor::getStateInformation(MemoryBlock& destData)
 {
-	DBG("In ZenTrimAudioProcessor::getStateInformation(destData) ");	
+	DBG("In ZenTrimAudioProcessor::getStateInformation(destData) ");
 	MemoryOutputStream stream(destData, false);
 	params->state.writeToStream(stream);
 }
@@ -131,7 +153,7 @@ void ZenAutoTrimAudioProcessor::setStateInformation(const void* data, int sizeIn
 {
 	//DBG("In ZenTrimAudioProcessor::setStateInformation(data, sizeInBytes) ");
 	ValueTree tree = ValueTree::readFromData(data, sizeInBytes);
-	if (tree.isValid()) 
+	if (tree.isValid())
 	{
 		params->state = tree;
 	}
@@ -193,6 +215,31 @@ const String ZenAutoTrimAudioProcessor::getProgramName(int index)
 void ZenAutoTrimAudioProcessor::changeProgramName(int index, const String& newName)
 {
 }
+
+#ifndef JucePlugin_PreferredChannelConfigurations
+bool ZenAutoTrimAudioProcessor::setPreferredBusArrangement(bool isInput, int bus, const AudioChannelSet& preferredSet)
+{
+	// Reject any bus arrangements that are not compatible with your plugin
+
+	const int numChannels = preferredSet.size();
+
+#if JucePlugin_IsMidiEffect
+	if (numChannels != 0)
+		return false;
+#elif JucePlugin_IsSynth
+	if (isInput || (numChannels != 1 && numChannels != 2))
+		return false;
+#else
+	if (numChannels != 1 && numChannels != 2)
+		return false;
+
+	if (!AudioProcessor::setPreferredBusArrangement(!isInput, bus, preferredSet))
+		return false;
+#endif
+
+	return AudioProcessor::setPreferredBusArrangement(isInput, bus, preferredSet);
+}
+#endif
 
 //==============================================================================
 void ZenAutoTrimAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)

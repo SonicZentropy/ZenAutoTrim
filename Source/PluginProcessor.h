@@ -81,6 +81,10 @@ public:
 	void resetCalculation();
 
 	//==============================================================================
+#ifndef JucePlugin_PreferredChannelConfigurations
+	bool setPreferredBusArrangement(bool isInput, int bus, const AudioChannelSet& preferredSet) override;
+#endif
+	//==============================================================================
 	//void setCurrentEditor(AudioProcessorEditor* inEditor) { currentEditor = inEditor; }
 
 	//CalibrationTarget getTargetForAutoTrim() const { return targetForAutoTrim; }
@@ -125,6 +129,7 @@ public:
 	ZenBoolParameter* getBypassParam() { return bypassParam; }
 	ZenIntParameter* getTargetTypeParam() { return targetTypeParam; }
 	ZenIntParameter* getRMSWindowTimeParam() { return rmsWindowTimeParam; }
+	ZenAudioProcessorValueTreeState& getState() const { return *params; }
 
 	//==============================================================================
 
@@ -155,7 +160,8 @@ private:
 	//CalibrationTarget targetForAutoTrim = Peak;
 
 	//ZenDebugEditor* debugWindow;
-	double prevSampleRate = 44100;
+	uint32 prevSampleRate;
+	uint32 currentSampleRate;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenAutoTrimAudioProcessor)
 };

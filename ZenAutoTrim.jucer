@@ -9,10 +9,10 @@
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginSilenceInIsSilenceOut="1"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="ZenAutoTrimAU"
               pluginRTASCategory="" aaxIdentifier="com.yourcompany.ZenTrim"
-              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="4.1.0"
+              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="4.2.1"
               companyWebsite="www.soniczentropy.com" companyName="SonicZentropy"
               companyEmail="SonicZentropy@gmail.com" userNotes="xcopy &quot;$(TargetPath)&quot; &quot;Z:\VSTs\Organized\Test\&quot;  /q /y"
-              defines="ZEN_DEBUG">
+              defines="ZEN_DEBUG" buildAUv3="0">
   <MAINGROUP id="rkSyKN" name="ZenAutoTrim">
     <GROUP id="{46BC2584-9128-B380-7D1C-6797FA2C5463}" name="assets">
       <GROUP id="{606CE0B9-19EC-EBD6-9894-C772651A04EE}" name="gui">
@@ -113,6 +113,8 @@
           <FILE id="xucAGG" name="ZenUnitTest.hpp" compile="0" resource="0" file="Source/zen_utils/tests/ZenUnitTest.hpp"/>
         </GROUP>
         <GROUP id="{9FCB9CB4-3F15-54B8-F464-EAFC2F330B4C}" name="utilities">
+          <FILE id="POvUEi" name="ZenDenormals.hpp" compile="0" resource="0"
+                file="Source/zen_utils/utilities/ZenDenormals.hpp"/>
           <FILE id="f5qCDz" name="ZenBinaryData.cpp" compile="1" resource="0"
                 file="Source/zen_utils/utilities/ZenBinaryData.cpp"/>
           <FILE id="wxwF12" name="ZenBinaryData.h" compile="0" resource="0" file="Source/zen_utils/utilities/ZenBinaryData.h"/>
@@ -155,14 +157,14 @@
                        binaryPath="" headerPath="..\..\Source\zen_utils;"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../JUCE/modules"/>
         <MODULEPATH id="juce_data_structures" path="../JUCE/modules"/>
         <MODULEPATH id="juce_events" path="../JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
       </MODULEPATHS>
     </VS2015>
@@ -181,4 +183,7 @@
   <JUCEOPTIONS JUCE_QUICKTIME="disabled" JUCE_PLUGINHOST_VST="enabled" JUCE_PLUGINHOST_VST3="enabled"
                JUCE_PLUGINHOST_AU="disabled" JUCE_WEB_BROWSER="disabled" DROWAUDIO_USE_FFTREAL="enabled"
                DROWAUDIO_USE_SOUNDTOUCH="enabled" DROWAUDIO_USE_CURL="disabled"/>
+  <LIVE_SETTINGS>
+    <WINDOWS/>
+  </LIVE_SETTINGS>
 </JUCERPROJECT>

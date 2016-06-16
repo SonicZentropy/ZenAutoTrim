@@ -23,13 +23,17 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 
 	zenLookAndFeel = new ZenLookAndFeel();
 	LookAndFeel::setDefaultLookAndFeel(zenLookAndFeel);
+	setWantsKeyboardFocus(true);
+	
 	setSize(222, 250);
+	
 		
 	backgroundImg = ImageFileFormat::loadFrom(
 		BinaryData::backgroundImg_png, (size_t)BinaryData::backgroundImg_pngSize);
 	
 	addAndMakeVisible(titleBar = new ZenTitleBar("Zen Title Bar", this));
 	titleBar->setBounds(0, 0, getWidth(), 30);
+	bypassBtnAttachment = new ZenAudioProcessorValueTreeState::ButtonAttachment(processor.getState(), processor.bypassParamID, *(titleBar->getBypassBtn()));
 	titleBar->addBypassListener(this);
 
 	//https://www.reddit.com/r/cpp_questions/comments/4kisug/lambdastdfunction_this_access_confusion/
@@ -39,7 +43,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 		if (val < -96.0f)
 			return String("-Inf");
 		else
-			return String(val);
+			return String(val) + " dB";
 	};
 	
 
@@ -130,6 +134,7 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 	autoGainBtn->setTooltip("Enable automatic gain staging of incoming signals.");
 	autoGainBtn->setBounds(154, 218, 60, 24);
 	autoGainBtn->setToggleState(processor.getAutoGainEnableParam()->getValueAsBool(), dontSendNotification);
+	autoGainBtnAttachment = new ZenAudioProcessorValueTreeState::ButtonAttachment(processor.getState(), processor.autoGainEnableParamID, *autoGainBtn);
 	autoGainBtn->addListener(this);
 
 	addAndMakeVisible(targetEditor = new ZenDecibelTextEditor("Target Editor", processor.getTargetParam()));
@@ -152,6 +157,8 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 
 	tooltipWindow.setMillisecondsBeforeTipAppears(2000);
 
+	
+
 	startTimer(100);
 	//ZEN_COMPONENT_DEBUG_ATTACH(this);
 
@@ -161,6 +168,9 @@ ZenAutoTrimAudioProcessorEditor::ZenAutoTrimAudioProcessorEditor (ZenAutoTrimAud
 
 ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 {
+	bypassBtnAttachment = nullptr;
+	autoGainBtnAttachment = nullptr;
+
 	titleBar = nullptr;
 	calcGainDisplay = nullptr;
 	
@@ -178,7 +188,8 @@ ZenAutoTrimAudioProcessorEditor::~ZenAutoTrimAudioProcessorEditor()
 	gainLabel = nullptr;
 	
 	targetEditor = nullptr;
-	resetBtn = nullptr;
+	
+	resetBtn = nullptr;	
 	autoGainBtn = nullptr;
 
 	targetComboBox = nullptr;
@@ -209,6 +220,18 @@ void ZenAutoTrimAudioProcessorEditor::textEditorReturnKeyPressed(TextEditor& edi
 	textEditorUpdateDueToChange(editorChanged);
 }
 
+void ZenAutoTrimAudioProcessorEditor::textEditorFocusLost(TextEditor& editorChanged)
+{
+	
+	//gainEdit->setText(String(processor.gainParam->getTextInDB()));
+	targetEditor->setText(String(processor.params->getDecibelParameter(processor.targetGainParamID)->getValueInDecibels()), dontSendNotification);
+}
+
+void ZenAutoTrimAudioProcessorEditor::textEditorEscapeKeyPressed(TextEditor& editorChanged)
+{
+	editorChanged.giveAwayFocus(true);
+}
+
 void ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(TextEditor& editorChanged)
 {
 	//DBG("In ZenAutoTrimAudioProcessorEditor::textEditorUpdateDueToChange(editorChanged) with editor: " << editorChanged.getName());
@@ -228,14 +251,14 @@ void ZenAutoTrimAudioProcessorEditor::buttonClicked(Button* pressedBtn)
 		processor.resetCalculation();
 		updateUIFromProcessor();
 	}
-	else if (pressedBtn == autoGainBtn)
-	{
-		processor.getAutoGainEnableParam()->toggleValue();
-	}
+	//else if (pressedBtn == autoGainBtn)
+	//{
+	//	processor.getAutoGainEnableParam()->toggleValue();
+	//}
 	else if (pressedBtn == titleBar->getBypassBtn())
 	{
 		//invert toggle state, since processor param is "Bypassed"
-		processor.getBypassParam()->setValueFromBool(!pressedBtn->getToggleState());
+		//processor.getBypassParam()->setValueFromBool(!pressedBtn->getToggleState());
 		bypassOverlay->setVisible(!pressedBtn->getToggleState());
 	}
 }
@@ -299,7 +322,7 @@ void ZenAutoTrimAudioProcessorEditor::updateUIFromProcessor()
 
 	if (processor.getTargetParam()->checkUIUpdateAndReset())
 	{
-		targetEditor->setText(String(processor.params->getDecibelParameter(processor.targetGainParamID)->getValueInDecibels()), dontSendNotification);			
+		targetEditor->setText(String(processor.params->getDecibelParameter(processor.targetGainParamID)->getValueInDecibels()) + " dB", dontSendNotification);			
 	}
 
 	if (processor.getTargetTypeParam()->checkUIUpdateAndReset())
